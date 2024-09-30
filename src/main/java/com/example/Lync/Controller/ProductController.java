@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+
 public class ProductController {
 
     private final ProductService productService;
@@ -84,7 +85,6 @@ public class ProductController {
     // ---------------- Type Endpoints ---------------- //
     @PostMapping("/types/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-
     public ResponseEntity<String> addType(@RequestBody Type type) {
         return ResponseEntity.ok(typeService.addType(type));
     }
