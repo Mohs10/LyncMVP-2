@@ -142,15 +142,19 @@ public class ProductController {
         Map<String, String> presignedUrls = s3Service.getProductImagesPresignedUrls(productId);
         return ResponseEntity.ok(presignedUrls); // Return presigned URLs for the images
     }
+
+
+
+
     // Sorted Products
-    @GetMapping("/sorted")
-    public ResponseEntity<List<Product>> getSortedProducts(@RequestParam("sortBy") String sortBy) {
-        List<Product> sortedProducts = productService.getSortedProducts(sortBy);
-        if (sortedProducts.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(sortedProducts, HttpStatus.OK);
-    }
+//    @GetMapping("/sorted")
+//    public ResponseEntity<List<Product>> getSortedProducts(@RequestParam("sortBy") String sortBy) {
+//        List<Product> sortedProducts = productService.getSortedProducts(sortBy);
+//        if (sortedProducts.isEmpty()) {
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//        return new ResponseEntity<>(sortedProducts, HttpStatus.OK);
+//    }
 
     // Search Product by Name
     @GetMapping("/search")
@@ -160,6 +164,13 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
+    // Get products by category ID and sort them
+    @GetMapping("/category/{categoryId}/sorted")
+    public List<Product> getSortedProductsByCategory(@PathVariable Long categoryId,
+                                                     @RequestParam("sortBy") String sortBy) {
+        return productService.getSortedProductsByCategory(categoryId, sortBy);
     }
 
 }

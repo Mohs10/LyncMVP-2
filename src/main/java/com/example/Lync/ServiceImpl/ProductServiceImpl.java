@@ -104,9 +104,14 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-    // Sort products by price, name, or quantity
-    public List<Product> getSortedProducts(String sortBy) {
-        List<Product> products = getAllProducts();
+    // Get products by category ID and sort them based on provided criteria
+    @Override
+    public List<Product> getSortedProductsByCategory(Long categoryId, String sortBy) {
+        List<Product> products = productRepository.findByCategoryCategoryId(categoryId);
+        if (products.isEmpty()) {
+            throw new RuntimeException("No products found for category ID: " + categoryId);
+        }
+
         Product[] productArray = products.toArray(new Product[0]);
 
         Comparator<Product> comparator = switch (sortBy) {
@@ -122,6 +127,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Search product by name (assumes array is sorted by name)
+    @Override
     public Product searchProductByName(String productName) {
         List<Product> products = getAllProducts();
         products = products.stream()
@@ -140,6 +146,19 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Product not found with name: " + productName);
         }
     }
+
+
+    // Separate method to find products by category ID
+
+    @Override
+    public List<Product> findByCategoryId(Long categoryId) {
+        List<Product> products = productRepository.findByCategoryCategoryId(categoryId);
+        if (products.isEmpty()) {
+            throw new RuntimeException("No products found for category ID: " + categoryId);
+        }
+        return products;
+    }
+
 
 
 
