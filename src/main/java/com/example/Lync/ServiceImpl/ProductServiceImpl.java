@@ -9,6 +9,8 @@ import com.example.Lync.Repository.CategoryRepository;
 import com.example.Lync.Repository.ProductRepository;
 import com.example.Lync.Repository.TypeRepository;
 import com.example.Lync.Repository.VarietyRepository;
+import com.example.Lync.ReusablePackage.BinarySearch;
+import com.example.Lync.ReusablePackage.Sorting;
 import com.example.Lync.Service.ProductService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -30,6 +34,10 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final VarietyRepository varietyRepository;
     private final TypeRepository typeRepository;
+
+
+    private final Sorting<Product> sortingUtility = new Sorting<>();
+    private final BinarySearch<Product> searchUtility = new BinarySearch<>();
 
 //    @Value("${file.upload-dir}")
 //    private String uploadDir;
@@ -93,6 +101,48 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+
+
+
+    // Sort products by price, name, or quantity
+    public List<Product> getSortedProducts(String sortBy) {
+        List<Product> products = getAllProducts();
+        Product[] productArray = products.toArray(new Product[0]);
+
+        Comparator<Product> comparator = switch (sortBy) {
+            case "price" -> Comparator.comparingDouble(Product::getPrice);
+            case "name" -> Comparator.comparing(Product::getProductName);
+            case "quantity" -> Comparator.comparingInt(Product::getQuantity);
+            default -> throw new IllegalArgumentException("Invalid sort field: " + sortBy);
+        };
+
+        sortingUtility.quickSort(productArray, comparator, 0, productArray.length - 1);
+
+        return List.of(productArray);
+    }
+
+    // Search product by name (assumes array is sorted by name)
+    public Product searchProductByName(String productName) {
+        List<Product> products = getAllProducts();
+        products = products.stream()
+                .sorted(Comparator.comparing(Product::getProductName))
+                .collect(Collectors.toList());
+
+        Product[] productArray = products.toArray(new Product[0]);
+        Product target = new Product();
+        target.setProductName(productName);
+
+        int index = searchUtility.binarySearch(productArray, target, Comparator.comparing(Product::getProductName));
+
+        if (index != -1) {
+            return productArray[index];
+        } else {
+            throw new RuntimeException("Product not found with name: " + productName);
+        }
+    }
+
+
+
 
     @Override
     public String addProductTemp(ProductDTO productDTO) {
@@ -164,5 +214,12 @@ public class ProductServiceImpl implements ProductService {
 
         return "Image Added Successfully";
     }
+
+
+
+
+
+
+
 
 }

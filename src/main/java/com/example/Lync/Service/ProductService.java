@@ -13,5 +13,7 @@ public interface ProductService {
 
     String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;
-    }
+    public Product searchProductByName(String productName);
+    public List<Product> getSortedProducts(String sortBy);
+}
 

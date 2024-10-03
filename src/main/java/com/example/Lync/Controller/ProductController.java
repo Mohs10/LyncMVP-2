@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -141,7 +142,25 @@ public class ProductController {
         Map<String, String> presignedUrls = s3Service.getProductImagesPresignedUrls(productId);
         return ResponseEntity.ok(presignedUrls); // Return presigned URLs for the images
     }
+    // Sorted Products
+    @GetMapping("/sorted")
+    public ResponseEntity<List<Product>> getSortedProducts(@RequestParam("sortBy") String sortBy) {
+        List<Product> sortedProducts = productService.getSortedProducts(sortBy);
+        if (sortedProducts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(sortedProducts, HttpStatus.OK);
+    }
 
+    // Search Product by Name
+    @GetMapping("/search")
+    public ResponseEntity<Product> searchProductByName(@RequestParam("name") String productName) {
+        Product product = productService.searchProductByName(productName);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
 
 }
 
