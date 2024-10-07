@@ -14,6 +14,9 @@ public interface ProductService {
     String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;
     public Product searchProductByName(String productName);
+    public List<Product> searchProductsByPrefixOriginal(String prefix);
+
+    public List<Product> searchProductsByPrefix(String prefix);
     public List<Product> getSortedProductsByCategory(Long categoryId, String sortBy);
     public List<Product> findByCategoryId(Long categoryId);
 }

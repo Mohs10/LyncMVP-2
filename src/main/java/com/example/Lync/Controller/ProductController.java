@@ -144,33 +144,76 @@ public class ProductController {
     }
 
 
-
-
-    // Sorted Products
-//    @GetMapping("/sorted")
-//    public ResponseEntity<List<Product>> getSortedProducts(@RequestParam("sortBy") String sortBy) {
-//        List<Product> sortedProducts = productService.getSortedProducts(sortBy);
-//        if (sortedProducts.isEmpty()) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//        return new ResponseEntity<>(sortedProducts, HttpStatus.OK);
-//    }
-
     // Search Product by Name
-    @GetMapping("/search")
-    public ResponseEntity<Product> searchProductByName(@RequestParam("name") String productName) {
-        Product product = productService.searchProductByName(productName);
-        if (product == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(product, HttpStatus.OK);
+    // API to search products by name prefix
+    @GetMapping("/search/prefix/{prefix}")
+    public ResponseEntity<List<Product>> searchProductsByPrefix(@PathVariable String prefix) {
+        List<Product> products = productService.searchProductsByPrefixOriginal(prefix);
+        return ResponseEntity.ok(products);
     }
 
-    // Get products by category ID and sort them
+
+
+
+    // API to get products by category ID without sorting
+    @GetMapping("/productByCategory/{categoryId}")
+    public ResponseEntity<Map<String, Object>> getProductsByCategory(@PathVariable Long categoryId) {
+        try {
+            List<Product> products = productService.findByCategoryId(categoryId);
+
+            // Return a structured response with products and success message
+            return new ResponseEntity<>(
+                    Map.of(
+                            "status", HttpStatus.OK.value(),
+                            "message", "Products fetched successfully",
+                            "data", products
+                    ), HttpStatus.OK
+            );
+        } catch (RuntimeException e) {
+            // Return a 404 NOT FOUND response if no products are found
+            return new ResponseEntity<>(
+                    Map.of(
+                            "status", HttpStatus.NOT_FOUND.value(),
+                            "message", e.getMessage()
+                    ), HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
+    // API to get products by category ID with sorting
     @GetMapping("/category/{categoryId}/sorted")
-    public List<Product> getSortedProductsByCategory(@PathVariable Long categoryId,
-                                                     @RequestParam("sortBy") String sortBy) {
-        return productService.getSortedProductsByCategory(categoryId, sortBy);
+    public ResponseEntity<Map<String, Object>> getSortedProductsByCategory(@PathVariable Long categoryId,
+                                                                           @RequestParam("sortBy") String sortBy) {
+        try {
+
+            // Sort the products by the specified field
+            List<Product> sortedProducts = productService.getSortedProductsByCategory(categoryId, sortBy);
+
+            // Return a structured response with sorted products
+            return new ResponseEntity<>(
+                    Map.of(
+                            "status", HttpStatus.OK.value(),
+                            "message", "Products fetched and sorted successfully",
+                            "data", sortedProducts
+                    ), HttpStatus.OK
+            );
+        } catch (IllegalArgumentException e) {
+            // Handle invalid sort field (e.g., not price, name, or quantity)
+            return new ResponseEntity<>(
+                    Map.of(
+                            "status", HttpStatus.BAD_REQUEST.value(),
+                            "message", e.getMessage()
+                    ), HttpStatus.BAD_REQUEST
+            );
+        } catch (RuntimeException e) {
+            // Handle case where products are not found for the category ID
+            return new ResponseEntity<>(
+                    Map.of(
+                            "status", HttpStatus.NOT_FOUND.value(),
+                            "message", e.getMessage()
+                    ), HttpStatus.NOT_FOUND
+            );
+        }
     }
 
 }

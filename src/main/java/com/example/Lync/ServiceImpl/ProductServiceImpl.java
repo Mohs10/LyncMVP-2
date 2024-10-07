@@ -11,20 +11,15 @@ import com.example.Lync.Repository.TypeRepository;
 import com.example.Lync.Repository.VarietyRepository;
 import com.example.Lync.ReusablePackage.BinarySearch;
 import com.example.Lync.ReusablePackage.Sorting;
+import com.example.Lync.ReusablePackage.StringAndDateUtils;
 import com.example.Lync.Service.ProductService;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.Lync.trie.Trie;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,19 +30,35 @@ public class ProductServiceImpl implements ProductService {
     private final VarietyRepository varietyRepository;
     private final TypeRepository typeRepository;
 
-
+    private final StringAndDateUtils stringAndDateUtils;
     private final Sorting<Product> sortingUtility = new Sorting<>();
     private final BinarySearch<Product> searchUtility = new BinarySearch<>();
+
+    private final Trie productNameTrie = new Trie();
+    @PostConstruct
+    public void init() {
+        loadNameCache();
+    }
+
+    // Load products into Trie
+    public void loadNameCache() {
+        List<Product> productList = productRepository.findAll();
+        for (Product product : productList) {
+            productNameTrie.insert(product.getProductName().toLowerCase(), product);
+        }
+    }
+
 
 //    @Value("${file.upload-dir}")
 //    private String uploadDir;
 
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
-                              VarietyRepository varietyRepository, TypeRepository typeRepository) {
+                              VarietyRepository varietyRepository, TypeRepository typeRepository, StringAndDateUtils stringAndDateUtils) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.varietyRepository = varietyRepository;
         this.typeRepository = typeRepository;
+        this.stringAndDateUtils = stringAndDateUtils;
     }
 
     @Override
@@ -126,25 +137,35 @@ public class ProductServiceImpl implements ProductService {
         return List.of(productArray);
     }
 
-    // Search product by name (assumes array is sorted by name)
+    // Search products by name prefix
+    @Override
+    public List<Product> searchProductsByPrefix(String prefix) {
+        return productNameTrie.searchByPrefix(prefix.toLowerCase());
+    }
+
+    // Search by exact product name
+
+
     @Override
     public Product searchProductByName(String productName) {
-        List<Product> products = getAllProducts();
-        products = products.stream()
-                .sorted(Comparator.comparing(Product::getProductName))
-                .collect(Collectors.toList());
+        return productNameTrie.searchByPrefix(productName.toLowerCase()).stream()
+                .filter(product -> product.getProductName().equalsIgnoreCase(productName))
+                .findFirst()
+                .orElse(null);
+    }
 
-        Product[] productArray = products.toArray(new Product[0]);
-        Product target = new Product();
-        target.setProductName(productName);
-
-        int index = searchUtility.binarySearch(productArray, target, Comparator.comparing(Product::getProductName));
-
-        if (index != -1) {
-            return productArray[index];
-        } else {
-            throw new RuntimeException("Product not found with name: " + productName);
+    @Override
+    public List<Product> searchProductsByPrefixOriginal(String productName) {
+        if (productName == null) {
+            productName = "";
         }
+
+        String thisProductName = productName.toLowerCase();
+
+        return productRepository.findAll().stream()
+                .filter(product ->
+                        stringAndDateUtils.isPartialMatch(product.getProductName().toLowerCase(), thisProductName))
+                .collect(Collectors.toList());
     }
 
 
