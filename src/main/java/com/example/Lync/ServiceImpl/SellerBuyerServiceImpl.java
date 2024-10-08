@@ -1,6 +1,7 @@
 package com.example.Lync.ServiceImpl;
 
 import com.example.Lync.DTO.SellerBuyerDTO;
+import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.*;
 
 import com.example.Lync.Repository.*;
@@ -382,13 +383,18 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     //Seller-Product -------------------------------------------------
 
+@Override
+    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO)  {
+        //Genetate SpId
+        sellerProductDTO.setSpId(generateUniqueSpId());
 
-    public SellerProduct addSellerProduct(SellerProduct sellerProduct) {
+        SellerProduct sellerProduct = toEntity(sellerProductDTO);
         sellerProduct.setAddDate(LocalDate.now());
         sellerProduct.setAddTime(LocalTime.now());
         return sellerProductRepository.save(sellerProduct);
-    }
 
+    }
+    @Override
     public List<SellerProduct> getSellerProductsBySeller(String sellerId) {
         return sellerProductRepository.findBySellerId(sellerId);
     }
@@ -400,9 +406,47 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     public void removeSellerProduct(String spId) {
         sellerProductRepository.deleteById(spId);
     }
-
+    @Override
     public Optional<SellerProduct> getSellerProductById(String spId) {
         return sellerProductRepository.findById(spId);
     }
+
+
+
+
+    // Method to generate a unique spId
+    private  String generateUniqueSpId() {
+        return "SP-" + UUID.randomUUID().toString();
+    }
+    private  SellerProduct toEntity(SellerProductDTO dto) {
+        SellerProduct sellerProduct = new SellerProduct();
+
+        sellerProduct.setSpId(dto.getSpId());
+        sellerProduct.setSellerId(dto.getSellerId());
+        sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
+        sellerProduct.setDeliveryCharges(dto.getDeliveryCharges());
+        sellerProduct.setDescription(dto.getDescription());
+        sellerProduct.setPVerity(dto.getPVerity());
+        sellerProduct.setGrainSize(dto.getGrainSize());
+        sellerProduct.setAdmixing(dto.getAdmixing());
+        sellerProduct.setMoisture(dto.getMoisture());
+        sellerProduct.setDd(dto.getDd());
+        sellerProduct.setKettValue(dto.getKettValue());
+        sellerProduct.setChalky(dto.getChalky());
+        sellerProduct.setForeignMaterial(dto.getForeignMaterial());
+        sellerProduct.setWarehouse(dto.getWarehouse());
+        sellerProduct.setAvailableAmount(dto.getAvailableAmount());
+        sellerProduct.setPImageUrl1(dto.getPImageUrl1());
+        sellerProduct.setPImageUrl2(dto.getPImageUrl2());
+        sellerProduct.setPCertificationUrl(dto.getPCertificationUrl());
+        sellerProduct.setAddDate(dto.getAddDate());
+        sellerProduct.setAddTime(dto.getAddTime());
+        sellerProduct.setEarliestAvailableDate(dto.getEarliestAvailableDate());
+        sellerProduct.setPId(dto.getPId());
+
+        return sellerProduct;
+    }
+
+
 
 }

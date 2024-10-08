@@ -2,7 +2,9 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
+import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.OTPStorageService;
@@ -15,6 +17,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com", "https://another-domain.com"})
 
@@ -87,14 +91,15 @@ public class SellerController {
         }
     }
 
-    // API to allow a seller to become a seller
-//    @PostMapping("/becomeBuyer/{userId}")
-//    public ResponseEntity<String> becomeSeller(@PathVariable String userId) {
-//        try {
-//            sellerBuyerService.becomeBuyer(userId);
-//            return ResponseEntity.ok("User role updated to include ROLE_BUYER");
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());  // Handle errors
-//        }
-//    }
+    @PostMapping("/addSellerProduct")
+    public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) {
+        SellerProduct addedSellerProduct = sellerBuyerService.addSellerProduct(sellerProductDto);
+        return ResponseEntity.ok(addedSellerProduct); // Returns the saved SellerProduct with 200 OK
+    }
+
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<SellerProduct>> getSellerProductsBySeller(@PathVariable String sellerId) {
+        List<SellerProduct> sellerProducts = sellerBuyerService.getSellerProductsBySeller(sellerId);
+        return ResponseEntity.ok(sellerProducts); // Return the list of products with HTTP 200 OK
+    }
 }

@@ -1,9 +1,11 @@
 package com.example.Lync.Service;
 
 import com.example.Lync.DTO.SellerBuyerDTO;
+import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Entity.SellerProduct;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,4 +41,8 @@ public interface SellerBuyerService {
 
     void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO);
 
+    //Seller Products -----------------------------------------------------------------------------
+    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) ;
+    public List<SellerProduct> getSellerProductsBySeller(String sellerId) ;
+    public Optional<SellerProduct> getSellerProductById(String spId);
     }
