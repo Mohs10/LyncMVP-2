@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
 
     // Load products into Trie
     public void loadNameCache() {
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findByActiveProductTrue();
         for (Product product : productList) {
             productNameTrie.insert(product.getProductName().toLowerCase(), product);
         }
@@ -110,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findByActiveProductTrue();
     }
 
 
@@ -162,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
 
         String thisProductName = productName.toLowerCase();
 
-        return productRepository.findAll().stream()
+        return productRepository.findByActiveProductTrue().stream()
                 .filter(product ->
                         stringAndDateUtils.isPartialMatch(product.getProductName().toLowerCase(), thisProductName))
                 .collect(Collectors.toList());
@@ -180,8 +180,58 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+    @Override
+    public void editProduct(Long productId, ProductDTO productDTO) throws Exception {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found."));
 
+        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(null);
+        Variety variety = varietyRepository.findById(productDTO.getVarietyId()).orElseThrow(null);
 
+        List<Type> productTypes = product.getTypes();
+
+        product.setProductName(productDTO.getProductName());
+        product.setCategory(category);
+        product.setVariety(variety);
+
+        for (String typeName : productDTO.getTypeNames()) {
+            Type type = typeRepository.findByTypeName(typeName);
+            if (type == null) {
+                type = new Type();
+                type.setTypeName(typeName);
+                typeRepository.save(type);
+            }
+
+            // Check if the type already exists in the product's types list before adding
+            if (!productTypes.contains(type)) {
+                productTypes.add(type);
+            }
+        }
+
+        product.setTypes(productTypes);
+        productRepository.save(product);
+    }
+
+    @Override
+    public void allActive() {
+        List<Product> products = productRepository.findAll();
+        products.stream().filter(product -> !product.isActiveProduct())
+                .forEach(product -> {
+                    product.setActiveProduct(true);
+                    productRepository.save(product);
+                });
+    }
+
+    @Override
+    public void inactiveProduct(Long productId) throws Exception {
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new Exception("Product does not exist with Product ID: " + productId));
+        if(product.isActiveProduct()){
+            product.setActiveProduct(false);
+            productRepository.save(product);
+        }else {
+            throw new Exception("Product with ID " + productId + " is already inactive");
+        }
+    }
 
 
     @Override
@@ -254,12 +304,5 @@ public class ProductServiceImpl implements ProductService {
 
         return "Image Added Successfully";
     }
-
-
-
-
-
-
-
 
 }

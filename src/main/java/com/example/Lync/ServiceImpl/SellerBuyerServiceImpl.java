@@ -337,6 +337,32 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         }
     }
 
+    @Override
+    public void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
+                new RuntimeException("User not found with User ID: " + userId));
+
+        sellerBuyer.setFullName(sellerBuyerDTO.getFullName());
+        sellerBuyer.setEmail(sellerBuyerDTO.getEmail());
+        sellerBuyer.setPhoneNumber(sellerBuyerDTO.getPhoneNumber());
+        sellerBuyer.setCountry(sellerBuyerDTO.getCountry());
+        sellerBuyer.setState(sellerBuyerDTO.getState());
+        sellerBuyer.setCity(sellerBuyerDTO.getCity());
+        sellerBuyer.setPinCode(sellerBuyerDTO.getPinCode());
+        sellerBuyer.setAddress(sellerBuyerDTO.getAddress());
+        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
+        sellerBuyer.setUpdatedAt(sellerBuyerDTO.getUpdatedAt());
+        sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
+        sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
+        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
+        sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
+        sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
+        sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
+        sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
+
+        sellerBuyerRepository.save(sellerBuyer);
+    }
+
     public List<FavouriteCategory> getFavouriteCategoriesByCategory(Long categoryId) {
         return favouriteCategoryRepository.findByCategoryId(categoryId);
     }

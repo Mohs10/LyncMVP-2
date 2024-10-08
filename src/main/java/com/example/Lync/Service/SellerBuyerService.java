@@ -37,4 +37,6 @@ public interface SellerBuyerService {
 
     public void becomeSeller(String userId) ;
 
+    void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO);
+
     }

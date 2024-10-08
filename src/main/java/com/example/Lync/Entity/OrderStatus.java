@@ -19,7 +19,7 @@ public class OrderStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long osId;
-    private Long oId; // Reference to orderId
+    private String oId; // Reference to orderId
     private String status;
     private LocalDate date;
     private LocalTime time;

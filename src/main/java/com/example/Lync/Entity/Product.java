@@ -40,5 +40,7 @@ public class Product {
 
     private double price;
     private int quantity;
+
+    private boolean activeProduct;
 }
 

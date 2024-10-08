@@ -216,5 +216,26 @@ public class ProductController {
         }
     }
 
+    @PostMapping("/editProduct/{productId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<String> editProduct(@PathVariable Long productId, @RequestBody ProductDTO productDTO) throws Exception {
+        productService.editProduct(productId, productDTO);
+        return ResponseEntity.ok("Product Edited Successfully.");
+    }
+
+    @GetMapping("/setActive")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<String> active(){
+        productService.allActive();
+        return ResponseEntity.ok("Success");
+    }
+
+    @PatchMapping("/inactivateProduct/{productId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<String> inactivateProduct(@PathVariable Long productId) throws Exception {
+        productService.inactiveProduct(productId);
+        return ResponseEntity.ok("Product Deleted Successfully");
+    }
+
 }
 

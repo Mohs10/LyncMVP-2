@@ -19,5 +19,11 @@ public interface ProductService {
     public List<Product> searchProductsByPrefix(String prefix);
     public List<Product> getSortedProductsByCategory(Long categoryId, String sortBy);
     public List<Product> findByCategoryId(Long categoryId);
+
+    void editProduct(Long productId, ProductDTO productDTO) throws Exception;
+
+    void allActive();
+
+    void inactiveProduct(Long productId) throws Exception;
 }
 

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class Order {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long oId;
+    private String oId;
     private String status;
     private String buyerUId; // Reference to buyer (User)
     private String sellerUId; // Reference to seller (User)

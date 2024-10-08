@@ -84,4 +84,12 @@ public class AdminController {
         return ResponseEntity.ok(sellerBuyer);
     }
 
+    @PutMapping("/editUser/{userId}")
+    public ResponseEntity<String> editUser(@PathVariable String userId, @RequestBody SellerBuyerDTO sellerBuyerDTO){
+        sellerBuyerService.editSellerBuyer(userId, sellerBuyerDTO);
+        return ResponseEntity.ok("User Edited Successfully");
+    }
+
+
+
 }
