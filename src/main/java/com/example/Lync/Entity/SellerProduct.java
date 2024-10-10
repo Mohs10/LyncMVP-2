@@ -22,7 +22,7 @@ public class SellerProduct {
     private Double maxPricePerTon;
     private Double deliveryCharges;
     private String description;
-    private String pVerity;
+    private String productVariety;
     private String grainSize;
     private String admixing;
     private Double moisture;
@@ -32,13 +32,34 @@ public class SellerProduct {
     private Double foreignMaterial;
     private String warehouse;
     private Double availableAmount;
-    private String pImageUrl1;
-    private String pImageUrl2;
-    private String pCertificationUrl;
+    private String productImageUrl1;
+    private String productImageUrl2;
+
+
+
+    private String productCertifications;
+    private String productCertificationUrl;
     private LocalDate addDate;
     private LocalTime addTime;
     private LocalDate earliestAvailableDate;
-    private Long pId; // Reference to Product without join
+    private Long productId; // Reference to Product without join
+
+
+    private Boolean npop;
+    private String npopCertification;
+
+    private Boolean nop;
+    private String nopCertification;
+
+    private Boolean eu;
+    private String euCertification;
+
+    private Boolean gsdc;
+    private String gsdcCertification;
+
+    private Boolean ipm;
+    private String ipmCertification;
+
 
     // Getters and Setters
 }

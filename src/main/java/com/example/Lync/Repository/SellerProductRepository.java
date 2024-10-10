@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface SellerProductRepository extends JpaRepository<SellerProduct, String> {
     List<SellerProduct> findBySellerId(String sellerId);
-    @Query("SELECT sp FROM SellerProduct sp WHERE sp.pId = :pId")
-    List<SellerProduct> findByPId(@Param("pId") Long pId); }
+    @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId")
+    List<SellerProduct> findByPId(@Param("productId") Long productId); }

@@ -129,6 +129,66 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     }
 
+    @Override
+    public void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
+                new RuntimeException("User not found with User ID: " + userId));
+        String email = sellerBuyer.getEmail();
+
+
+        // Check if the new email is in cache or already in use by another user
+        if (!sellerBuyer.getEmail().equals(sellerBuyerDTO.getEmail())) {
+            if (isEmailInCache(sellerBuyerDTO.getEmail())) {
+                throw new RuntimeException("Email already exists in cache: " + sellerBuyerDTO.getEmail());
+            }
+//            if (existsByEmail(sellerBuyerDTO.getEmail())) {
+//                throw new RuntimeException("Email is already in use by another user: " + sellerBuyerDTO.getEmail());
+//            }
+        }
+
+        // Check if the new phone number is in cache or already in use by another user
+        if (!sellerBuyer.getPhoneNumber().equals(sellerBuyerDTO.getPhoneNumber())) {
+            if (isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
+                throw new RuntimeException("Phone number already exists in cache: " + sellerBuyerDTO.getPhoneNumber());
+            }
+//            if (sellerBuyerRepository.existsByPhoneNumber(sellerBuyerDTO.getPhoneNumber())) {
+//                throw new RuntimeException("Phone number is already in use by another user: " + sellerBuyerDTO.getPhoneNumber());
+//            }
+        }
+
+        sellerBuyer.setFullName(sellerBuyerDTO.getFullName());
+        sellerBuyer.setEmail(sellerBuyerDTO.getEmail());
+        sellerBuyer.setPhoneNumber(sellerBuyerDTO.getPhoneNumber());
+        sellerBuyer.setCountry(sellerBuyerDTO.getCountry());
+        sellerBuyer.setState(sellerBuyerDTO.getState());
+        sellerBuyer.setCity(sellerBuyerDTO.getCity());
+        sellerBuyer.setPinCode(sellerBuyerDTO.getPinCode());
+        sellerBuyer.setAddress(sellerBuyerDTO.getAddress());
+        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
+        sellerBuyer.setUpdatedAt(sellerBuyerDTO.getUpdatedAt());
+        sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
+        sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
+        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
+        sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
+        sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
+        sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
+        sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
+
+
+
+        SellerBuyer newSellerBuyer=   sellerBuyerRepository.save(sellerBuyer);
+
+
+    UserInfo userInfo = userInfoRepository.findByEmail(email).orElseThrow(()->
+            new RuntimeException("User not found with User Email: " + email));
+        addToPhoneNumberCache(newSellerBuyer.getPhoneNumber(),sellerBuyer);
+        addToPhoneEmailCache(newSellerBuyer.getEmail(),sellerBuyer);
+        userInfo.setEmail(newSellerBuyer.getEmail());
+        userInfo.setName(newSellerBuyer.getFullName());
+        userInfo.setMobileNumber(newSellerBuyer.getPhoneNumber());
+        userInfoRepository.save(userInfo);
+    }
+
 
     private SellerBuyer convertToSellerBuyer(SellerBuyerDTO sellerBuyerDTO) {
         SellerBuyer sellerBuyer = new SellerBuyer();
@@ -338,31 +398,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         }
     }
 
-    @Override
-    public void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO) {
-        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
-                new RuntimeException("User not found with User ID: " + userId));
 
-        sellerBuyer.setFullName(sellerBuyerDTO.getFullName());
-        sellerBuyer.setEmail(sellerBuyerDTO.getEmail());
-        sellerBuyer.setPhoneNumber(sellerBuyerDTO.getPhoneNumber());
-        sellerBuyer.setCountry(sellerBuyerDTO.getCountry());
-        sellerBuyer.setState(sellerBuyerDTO.getState());
-        sellerBuyer.setCity(sellerBuyerDTO.getCity());
-        sellerBuyer.setPinCode(sellerBuyerDTO.getPinCode());
-        sellerBuyer.setAddress(sellerBuyerDTO.getAddress());
-        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
-        sellerBuyer.setUpdatedAt(sellerBuyerDTO.getUpdatedAt());
-        sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
-        sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
-        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
-        sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
-        sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
-        sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
-        sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
-
-        sellerBuyerRepository.save(sellerBuyer);
-    }
 
     public List<FavouriteCategory> getFavouriteCategoriesByCategory(Long categoryId) {
         return favouriteCategoryRepository.findByCategoryId(categoryId);
@@ -385,9 +421,10 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
 @Override
     public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO)  {
+
         //Genetate SpId
         sellerProductDTO.setSpId(generateUniqueSpId());
-
+    System.out.println(sellerProductDTO);
         SellerProduct sellerProduct = toEntity(sellerProductDTO);
         sellerProduct.setAddDate(LocalDate.now());
         sellerProduct.setAddTime(LocalTime.now());
@@ -426,7 +463,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
         sellerProduct.setDeliveryCharges(dto.getDeliveryCharges());
         sellerProduct.setDescription(dto.getDescription());
-        sellerProduct.setPVerity(dto.getPVerity());
+        sellerProduct.setProductVariety(dto.getProductVariety());
         sellerProduct.setGrainSize(dto.getGrainSize());
         sellerProduct.setAdmixing(dto.getAdmixing());
         sellerProduct.setMoisture(dto.getMoisture());
@@ -436,13 +473,18 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setForeignMaterial(dto.getForeignMaterial());
         sellerProduct.setWarehouse(dto.getWarehouse());
         sellerProduct.setAvailableAmount(dto.getAvailableAmount());
-        sellerProduct.setPImageUrl1(dto.getPImageUrl1());
-        sellerProduct.setPImageUrl2(dto.getPImageUrl2());
-        sellerProduct.setPCertificationUrl(dto.getPCertificationUrl());
+        sellerProduct.setProductImageUrl1(dto.getProductImageUrl1());
+        sellerProduct.setProductImageUrl2(dto.getProductImageUrl2());
+        sellerProduct.setProductCertificationUrl(dto.getProductCertificationUrl());
         sellerProduct.setAddDate(dto.getAddDate());
         sellerProduct.setAddTime(dto.getAddTime());
         sellerProduct.setEarliestAvailableDate(dto.getEarliestAvailableDate());
-        sellerProduct.setPId(dto.getPId());
+        sellerProduct.setProductId(dto.getProductId());
+        sellerProduct.setNpop(dto.getNpop());
+        sellerProduct.setNop(dto.getNop());
+        sellerProduct.setEu(dto.getEu());
+        sellerProduct.setGsdc(dto.getGsdc());
+        sellerProduct.setIpm(dto.getIpm());
 
         return sellerProduct;
     }

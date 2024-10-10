@@ -203,6 +203,7 @@ public class ProductServiceImpl implements ProductService {
 
             // Check if the type already exists in the product's types list before adding
             if (!productTypes.contains(type)) {
+                productTypes.clear();
                 productTypes.add(type);
             }
         }

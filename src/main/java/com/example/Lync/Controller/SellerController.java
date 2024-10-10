@@ -61,14 +61,8 @@ public class SellerController {
     public ResponseEntity<SellerBuyer> sellerDetails() {
         // Get the Authentication object
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         // Get the username from the Authentication object
         String username = authentication.getName();
-
-        // Fetch user info based on email (username)
-//        UserInfo userInfo = userInfoRepository.findByEmail(username).orElseThrow(() ->
-//                new UsernameNotFoundException("User not found with email: " + username)
-//        );
 
         // Fetch SellerBuyer details based on email (username)
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
@@ -93,13 +87,35 @@ public class SellerController {
 
     @PostMapping("/addSellerProduct")
     public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the username from the Authentication object
+        String username = authentication.getName();
+
+        // Fetch SellerBuyer details based on email (username)
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        sellerProductDto.setSellerId(sellerDetails.getUserId());
+
         SellerProduct addedSellerProduct = sellerBuyerService.addSellerProduct(sellerProductDto);
+
         return ResponseEntity.ok(addedSellerProduct); // Returns the saved SellerProduct with 200 OK
     }
 
-    @GetMapping("/seller/{sellerId}")
-    public ResponseEntity<List<SellerProduct>> getSellerProductsBySeller(@PathVariable String sellerId) {
-        List<SellerProduct> sellerProducts = sellerBuyerService.getSellerProductsBySeller(sellerId);
+    @GetMapping("/sellerProduct")
+    public ResponseEntity<List<SellerProduct>> getSellerProductsBySeller() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the username from the Authentication object
+        String username = authentication.getName();
+
+        // Fetch SellerBuyer details based on email (username)
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<SellerProduct> sellerProducts = sellerBuyerService.getSellerProductsBySeller(sellerDetails.getUserId());
         return ResponseEntity.ok(sellerProducts); // Return the list of products with HTTP 200 OK
     }
 }
