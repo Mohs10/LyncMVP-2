@@ -48,12 +48,12 @@ public class SecurityConfig {
                             "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
                             "https://another-domain.com"
                     )); // Add multiple origins
-                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // Allowed methods
+                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH")); // Allowed methods
                     config.setAllowedHeaders(List.of("*")); // Allowed headers
                     return config;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/addBuyer", "/auth/addSeller", "/auth/generateToken").permitAll()
+                        .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/addBuyer", "/auth/addSeller", "/auth/generateToken", "/auth/allEmails").permitAll()
                         .requestMatchers("/auth/user/**").hasAuthority("ROLE_USER")
                         .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/auth/seller/**").hasAuthority("ROLE_SELLER")

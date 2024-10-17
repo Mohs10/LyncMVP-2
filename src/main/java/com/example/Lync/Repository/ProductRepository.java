@@ -10,5 +10,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByVarietyVarietyId(Long varietyId);
 
     List<Product> findByActiveProductTrue();
+
+    List<Product> findByActiveProductFalse();
 }
 

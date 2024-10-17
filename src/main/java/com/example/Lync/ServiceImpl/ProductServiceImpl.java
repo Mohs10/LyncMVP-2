@@ -113,6 +113,10 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByActiveProductTrue();
     }
 
+    @Override
+    public List<Product> getAllInactiveProducts() {
+        return productRepository.findByActiveProductFalse();
+    }
 
 
     // Get products by category ID and sort them based on provided criteria
@@ -182,6 +186,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void editProduct(Long productId, ProductDTO productDTO) throws Exception {
+        System.out.println("ProductDTO" + productDTO);
         Product product = productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found."));
 
         Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(null);
@@ -231,6 +236,18 @@ public class ProductServiceImpl implements ProductService {
             productRepository.save(product);
         }else {
             throw new Exception("Product with ID " + productId + " is already inactive");
+        }
+    }
+
+    @Override
+    public void activeProduct(Long productId) throws Exception {
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new Exception("Product does not exist with Product ID: " + productId));
+        if(!product.isActiveProduct()){
+            product.setActiveProduct(true);
+            productRepository.save(product);
+        }else {
+            throw new Exception("Product with ID " + productId + " is already active");
         }
     }
 

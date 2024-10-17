@@ -1,8 +1,11 @@
 package com.example.Lync.Config;
 
 
+import com.example.Lync.DTO.SellerProductImageDto;
 import com.example.Lync.Entity.Product;
+import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.ProductRepository;
+import com.example.Lync.Repository.SellerProductRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -29,12 +34,14 @@ public class S3Service {
     private String bucketName;
 
     private final ProductRepository productRepository;
+    private final SellerProductRepository sellerProductRepository;
 
 
-    public S3Service(S3Client s3Client, S3Presigner s3Presigner, ProductRepository productRepository) {
+    public S3Service(S3Client s3Client, S3Presigner s3Presigner, ProductRepository productRepository, SellerProductRepository sellerProductRepository) {
         this.s3Client = s3Client;
         this.s3Presigner = s3Presigner;
         this.productRepository = productRepository;
+        this.sellerProductRepository = sellerProductRepository;
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
@@ -185,6 +192,135 @@ public class S3Service {
         presignedUrls.put("image2", presignedUrl2);
 
         return presignedUrls;  // Return presigned URLs for both images
+    }
+
+
+    public String uploadFileToS3(MultipartFile file, String folder) throws IOException {
+        // Generate unique key for the file in the S3 bucket
+        String key = folder + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+
+        // Create metadata map for file content type and length
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Content-Type", file.getContentType());
+        metadata.put("Content-Length", String.valueOf(file.getSize()));
+
+        // Create the S3 PutObjectRequest with metadata
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .metadata(metadata)
+                .build();
+
+        // Upload the file to S3
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key (file path)
+        return key;
+    }
+
+
+
+//    public String uploadFileToS3(MultipartFile file, String folder) throws IOException {
+//        String fileName = file.getOriginalFilename();
+//        String key = folder + "/" + UUID.randomUUID() + "-" + fileName;
+//
+//        s3Client.putObject(PutObjectRequest.builder()
+//                        .bucket(bucketName)
+//                        .key(key)
+//                        .build(),
+//                RequestBody.fromBytes(file.getBytes()));
+//
+//        // Return the S3 key (file path) of the uploaded file
+//        return key;
+//    }
+
+    public SellerProduct addSellerProductImages(SellerProductImageDto sellerProductImageDto) throws IOException {
+        SellerProduct sellerProduct =  sellerProductRepository.findById(sellerProductImageDto.getSpId()).orElseThrow(()->
+                new RuntimeException("Seller Product not found for ID: " + sellerProductImageDto.getSpId()));
+
+        if (sellerProductImageDto.getProductImageUrl1() != null && !sellerProductImageDto.getProductImageUrl1().isEmpty()) {
+            String productImageUrl1 = uploadFileToS3(sellerProductImageDto.getProductImageUrl1(), "product-images");
+            sellerProduct.setProductImageUrl1(productImageUrl1);
+        }
+
+        if (sellerProductImageDto.getProductImageUrl2() != null && !sellerProductImageDto.getProductImageUrl2().isEmpty()) {
+            String productImageUrl2 = uploadFileToS3(sellerProductImageDto.getProductImageUrl2(), "product-images");
+            sellerProduct.setProductImageUrl2(productImageUrl2);
+        }
+
+        if (sellerProductImageDto.getProductCertificationUrl() != null && !sellerProductImageDto.getProductCertificationUrl().isEmpty()) {
+            String certificationUrl = uploadFileToS3(sellerProductImageDto.getProductCertificationUrl(), "certifications");
+            sellerProduct.setProductCertificationUrl(certificationUrl);
+        }
+
+        // Upload NPOP certification if exists
+        if (sellerProductImageDto.getNpopCertification() != null && !sellerProductImageDto.getNpopCertification().isEmpty()) {
+            String npopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNpopCertification(), "certifications");
+            sellerProduct.setNpopCertification(npopCertificationUrl);
+        }
+
+        // Upload NOP certification if exists
+        if (sellerProductImageDto.getNopCertification() != null && !sellerProductImageDto.getNopCertification().isEmpty()) {
+            String nopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNopCertification(), "certifications");
+            sellerProduct.setNopCertification(nopCertificationUrl);
+        }
+
+        // Upload EU certification if exists
+        if (sellerProductImageDto.getEuCertification() != null && !sellerProductImageDto.getEuCertification().isEmpty()) {
+            String euCertificationUrl = uploadFileToS3(sellerProductImageDto.getEuCertification(), "certifications");
+            sellerProduct.setEuCertification(euCertificationUrl);
+        }
+
+        // Upload GSDC certification if exists
+        if (sellerProductImageDto.getGsdcCertification() != null && !sellerProductImageDto.getGsdcCertification().isEmpty()) {
+            String gsdcCertificationUrl = uploadFileToS3(sellerProductImageDto.getGsdcCertification(), "certifications");
+            sellerProduct.setGsdcCertification(gsdcCertificationUrl);
+        }
+
+        // Upload IPM certification if exists
+        if (sellerProductImageDto.getIpmCertification() != null && !sellerProductImageDto.getIpmCertification().isEmpty()) {
+            String ipmCertificationUrl = uploadFileToS3(sellerProductImageDto.getIpmCertification(), "certifications");
+            sellerProduct.setIpmCertification(ipmCertificationUrl);
+        }
+
+        return sellerProductRepository.save(sellerProduct);
+    }
+
+    public Map<String, String> getProductImageUrls(String spId) throws Exception {
+        SellerProduct product = sellerProductRepository.findById(spId).orElse(null);
+
+        Map<String, String> imageUrls = new HashMap<>();
+
+        // Add the image URLs if they exist
+        assert product != null;
+        if (product.getProductImageUrl1() != null) {
+            imageUrls.put("productImageUrl1", product.getProductImageUrl1());
+        }
+        if (product.getProductImageUrl2() != null) {
+            imageUrls.put("productImageUrl2", product.getProductImageUrl2());
+        }
+        if (product.getProductCertificationUrl() != null) {
+            imageUrls.put("productCertificationUrl", product.getProductCertificationUrl());
+        }
+
+        // Add certification URLs if they exist
+        if (product.getNpopCertification() != null) {
+            imageUrls.put("npopCertification", product.getNpopCertification());
+        }
+        if (product.getNopCertification() != null) {
+            imageUrls.put("nopCertification", product.getNopCertification());
+        }
+        if (product.getEuCertification() != null) {
+            imageUrls.put("euCertification", product.getEuCertification());
+        }
+        if (product.getGsdcCertification() != null) {
+            imageUrls.put("gsdcCertification", product.getGsdcCertification());
+        }
+        if (product.getIpmCertification() != null) {
+            imageUrls.put("ipmCertification", product.getIpmCertification());
+        }
+
+        return imageUrls;
     }
 }
 

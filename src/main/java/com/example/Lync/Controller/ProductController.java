@@ -2,10 +2,8 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.ProductDTO;
-import com.example.Lync.Entity.Category;
-import com.example.Lync.Entity.Product;
-import com.example.Lync.Entity.Type;
-import com.example.Lync.Entity.Variety;
+import com.example.Lync.DTO.SellerProductImageDto;
+import com.example.Lync.Entity.*;
 import com.example.Lync.Service.CategoryService;
 import com.example.Lync.Service.ProductService;
 import com.example.Lync.Service.TypeService;
@@ -62,6 +60,11 @@ public class ProductController {
     @GetMapping("/products/all")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    @GetMapping("/inactiveProducts")
+    public List<Product> getAllInactiveProducts(){
+        return productService.getAllInactiveProducts();
     }
 
     // ---------------- Category Endpoints ---------------- //
@@ -233,8 +236,71 @@ public class ProductController {
     @PatchMapping("/inactivateProduct/{productId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<String> inactivateProduct(@PathVariable Long productId) throws Exception {
-        productService.inactiveProduct(productId);
-        return ResponseEntity.ok("Product Deleted Successfully");
+        try {
+            productService.inactiveProduct(productId);
+            return ResponseEntity.ok("Product with ID " + productId + " inactivated successfully");
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/activateProduct/{productId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<String> activateProduct(@PathVariable Long productId) throws Exception {
+        try {
+            productService.activeProduct(productId);
+            return ResponseEntity.ok("Product with ID " + productId + " activated successfully");
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+
+
+
+    @PostMapping("/upload-images/{spId}")
+    public ResponseEntity<?> uploadSellerProductImages(
+            @PathVariable("spId") String spId, // Capture spId from the URL path
+            @RequestParam(value = "productImageUrl1", required = false) MultipartFile productImageUrl1,
+            @RequestParam(value = "productImageUrl2", required = false) MultipartFile productImageUrl2,
+            @RequestParam(value = "productCertificationUrl", required = false) MultipartFile productCertificationUrl,
+            @RequestParam(value = "npopCertification", required = false) MultipartFile npopCertification,
+            @RequestParam(value = "nopCertification", required = false) MultipartFile nopCertification,
+            @RequestParam(value = "euCertification", required = false) MultipartFile euCertification,
+            @RequestParam(value = "gsdcCertification", required = false) MultipartFile gsdcCertification,
+            @RequestParam(value = "ipmCertification", required = false) MultipartFile ipmCertification
+    ) {
+        try {
+            // Initialize the image DTO and set values
+            SellerProductImageDto imageDto = new SellerProductImageDto();
+            imageDto.setSpId(spId);
+            imageDto.setProductImageUrl1(productImageUrl1);
+            imageDto.setProductImageUrl2(productImageUrl2);
+            imageDto.setProductCertificationUrl(productCertificationUrl);
+            imageDto.setNpopCertification(npopCertification);
+            imageDto.setNopCertification(nopCertification);
+            imageDto.setEuCertification(euCertification);
+            imageDto.setGsdcCertification(gsdcCertification);
+            imageDto.setIpmCertification(ipmCertification);
+
+            // Call the service to handle the images
+            SellerProduct updatedSellerProduct = s3Service.addSellerProductImages(imageDto);
+            return ResponseEntity.ok(updatedSellerProduct);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/image/{spId}")
+    public ResponseEntity<?> getProductImageUrls(@PathVariable String spId) {
+        try {
+            Map<String, String> imageUrls = s3Service.getProductImageUrls(spId);
+            return ResponseEntity.ok(imageUrls);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
     }
 
 }

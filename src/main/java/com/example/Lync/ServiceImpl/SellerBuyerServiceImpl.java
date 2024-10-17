@@ -448,7 +448,12 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         return sellerProductRepository.findById(spId);
     }
 
-
+    @Override
+    public List<String> allEmail() {
+        return sellerBuyerRepository.findAll().stream()
+                .map(SellerBuyer::getEmail)
+                .toList();
+    }
 
 
     // Method to generate a unique spId

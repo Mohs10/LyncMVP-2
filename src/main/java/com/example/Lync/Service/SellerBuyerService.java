@@ -45,4 +45,6 @@ public interface SellerBuyerService {
     public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) ;
     public List<SellerProduct> getSellerProductsBySeller(String sellerId) ;
     public Optional<SellerProduct> getSellerProductById(String spId);
+
+    List<String> allEmail();
     }

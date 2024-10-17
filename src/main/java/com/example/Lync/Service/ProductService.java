@@ -10,7 +10,7 @@ import java.util.List;
 public interface ProductService {
     String addProduct(ProductDTO productDTO, MultipartFile productImage1, MultipartFile productImage2) throws IOException, IOException;
     List<Product> getAllProducts();
-
+    List<Product> getAllInactiveProducts();
     String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;
     public Product searchProductByName(String productName);
@@ -25,5 +25,7 @@ public interface ProductService {
     void allActive();
 
     void inactiveProduct(Long productId) throws Exception;
+
+    void activeProduct(Long productId) throws Exception;
 }
 
