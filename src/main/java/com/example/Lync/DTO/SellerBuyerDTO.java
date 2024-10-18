@@ -33,8 +33,8 @@ public class SellerBuyerDTO {
 
     private LocalDate incorporationDate;
     private String companyName;
-    private String registrationNumber;
-    private String companyEmail;
+    private String registrationNumber; //nw
+    private String companyEmail; //new
     private String gstIn;
     private String companyLocation;
     private String wareHouseAddress;

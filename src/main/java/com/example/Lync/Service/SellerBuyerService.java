@@ -42,7 +42,7 @@ public interface SellerBuyerService {
     void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO);
 
     //Seller Products -----------------------------------------------------------------------------
-    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) ;
+    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) throws Exception;
     public List<SellerProduct> getSellerProductsBySeller(String sellerId) ;
     public Optional<SellerProduct> getSellerProductById(String spId);
 

@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Data
@@ -11,12 +12,20 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class SellerProductDTO {
+
+//    private String productName;
+//    private String productCategory;
+//    private String productTypeName;
+//    private String productVariety;
+
+
     private String spId; // Unique ID for seller's product
     private String sellerId; // Unique ID for seller
     private Double maxPricePerTon;
+    private Double minPricePerTon;
     private Double deliveryCharges;
     private String description;
-    private String productVariety;
+
     private String grainSize;
     private String admixing;
     private Double moisture;
@@ -49,4 +58,9 @@ public class SellerProductDTO {
 
     private Boolean ipm;
     private String ipmCertification;
+
+    private Boolean other;
+    private String otherCertification;
+
+
 }

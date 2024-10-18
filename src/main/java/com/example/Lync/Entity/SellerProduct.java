@@ -19,10 +19,18 @@ public class SellerProduct {
 
     private String sellerId; // Unique ID for seller's product
 
+//    private String productName;
+//    private String productCategory;
+//    private String productTypeName;
+//    private String productVariety;
+
     private Double maxPricePerTon;
+    private Double minPricePerTon;
+
+
+
     private Double deliveryCharges;
     private String description;
-    private String productVariety;
     private String grainSize;
     private String admixing;
     private Double moisture;
@@ -61,7 +69,8 @@ public class SellerProduct {
     private Boolean ipm;
     private String ipmCertification;
 
-
+    private Boolean other;
+    private String otherCertification;
     // Getters and Setters
 }
 

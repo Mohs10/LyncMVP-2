@@ -28,7 +28,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     private final FavouriteCategoryRepository favouriteCategoryRepository;
 
-
+    private final TypeRepository typeRepository;
+    private final ProductRepository productRepository;
     private final FavouriteProductRepository favouriteProductRepository;
     private final SellerProductRepository sellerProductRepository;
 
@@ -38,10 +39,12 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository,  FavouriteCategoryRepository favouriteCategoryRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
+        this.typeRepository = typeRepository;
+        this.productRepository = productRepository;
         this.favouriteProductRepository = favouriteProductRepository;
         this.sellerProductRepository = sellerProductRepository;
     }
@@ -431,7 +434,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     //Seller-Product -------------------------------------------------
 
 @Override
-    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO)  {
+    public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) throws Exception {
 
         //Genetate SpId
         sellerProductDTO.setSpId(generateUniqueSpId());
@@ -471,15 +474,15 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private  String generateUniqueSpId() {
         return "SP-" + UUID.randomUUID().toString();
     }
-    private  SellerProduct toEntity(SellerProductDTO dto) {
+    private  SellerProduct toEntity(SellerProductDTO dto) throws Exception {
         SellerProduct sellerProduct = new SellerProduct();
 
         sellerProduct.setSpId(dto.getSpId());
         sellerProduct.setSellerId(dto.getSellerId());
         sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
+        sellerProduct.setMinPricePerTon(dto.getMinPricePerTon());
         sellerProduct.setDeliveryCharges(dto.getDeliveryCharges());
         sellerProduct.setDescription(dto.getDescription());
-        sellerProduct.setProductVariety(dto.getProductVariety());
         sellerProduct.setGrainSize(dto.getGrainSize());
         sellerProduct.setAdmixing(dto.getAdmixing());
         sellerProduct.setMoisture(dto.getMoisture());
@@ -502,6 +505,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setEu(dto.getEu());
         sellerProduct.setGsdc(dto.getGsdc());
         sellerProduct.setIpm(dto.getIpm());
+        sellerProduct.setOther(dto.getOther());
+
+
 
         return sellerProduct;
     }

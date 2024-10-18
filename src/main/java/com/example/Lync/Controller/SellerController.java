@@ -90,7 +90,7 @@ public class SellerController {
     }
 
     @PostMapping("/addSellerProduct")
-    public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) {
+    public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Get the username from the Authentication object
