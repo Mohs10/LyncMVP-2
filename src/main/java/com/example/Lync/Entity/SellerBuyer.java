@@ -41,7 +41,7 @@ public class SellerBuyer {
     private String companyEmail;
     private String gstIn;
     private String companyLocation;
-//    private String wareHouseAddress;
+    private String wareHouseAddress;
 //    private Boolean storageLicense;
 //    private String storageLicenseUrl;
 

@@ -13,9 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -93,8 +91,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setBuyer(false);
         sellerBuyerDTO.setSeller(true);
         sellerBuyerDTO.setUserId(generateUserId());
-
-      SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
+        LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
+        sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
+        SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
         addToPhoneEmailCache(sellerBuyer.getEmail(),sellerBuyer);
         UserInfo userInfo = new UserInfo();
@@ -114,6 +113,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setBuyer(true);
         sellerBuyerDTO.setSeller(false);
         sellerBuyerDTO.setUserId(generateUserId());
+
+        LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
+        sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
 
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
@@ -173,6 +175,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
         sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
         sellerBuyer.setCompanyEmail(sellerBuyerDTO.getCompanyEmail());
+        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
 
@@ -197,6 +200,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         // Set basic fields
         sellerBuyer.setUserId(sellerBuyerDTO.getUserId());
+        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
         sellerBuyer.setFullName(sellerBuyerDTO.getFullName());
         sellerBuyer.setEmail(sellerBuyerDTO.getEmail());
         sellerBuyer.setPhoneNumber(sellerBuyerDTO.getPhoneNumber());
@@ -215,6 +219,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
         sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
         sellerBuyer.setCompanyEmail(sellerBuyerDTO.getCompanyEmail());
+        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
 //        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
@@ -246,9 +251,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setCompanyName(sellerBuyer.getCompanyName());
         sellerBuyerDTO.setRegistrationNumber(sellerBuyer.getRegistrationNumber());
         sellerBuyerDTO.setCompanyEmail(sellerBuyer.getCompanyEmail());
+        sellerBuyerDTO.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
         sellerBuyerDTO.setGstIn(sellerBuyer.getGstIn());
         sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
-//        sellerBuyerDTO.setWareHouseAddress(sellerBuyer.getWareHouseAddress());
 //        sellerBuyerDTO.setStorageLicense(sellerBuyer.getStorageLicense());
 //        sellerBuyerDTO.setProfilePictureUrl(sellerBuyer.getProfilePictureUrl());
 //        sellerBuyerDTO.setStorageLicenseFileUrl(sellerBuyer.getStorageLicenseFileUrl());
