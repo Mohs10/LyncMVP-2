@@ -171,6 +171,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
+        sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
+        sellerBuyer.setCompanyEmail(sellerBuyerDTO.getCompanyEmail());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
 
@@ -211,6 +213,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
+        sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
+        sellerBuyer.setCompanyEmail(sellerBuyerDTO.getCompanyEmail());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
 //        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
@@ -240,6 +244,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setBuyer(sellerBuyer.getBuyer());
         sellerBuyerDTO.setIncorporationDate(sellerBuyer.getIncorporationDate());
         sellerBuyerDTO.setCompanyName(sellerBuyer.getCompanyName());
+        sellerBuyerDTO.setRegistrationNumber(sellerBuyer.getRegistrationNumber());
+        sellerBuyerDTO.setCompanyEmail(sellerBuyer.getCompanyEmail());
         sellerBuyerDTO.setGstIn(sellerBuyer.getGstIn());
         sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
 //        sellerBuyerDTO.setWareHouseAddress(sellerBuyer.getWareHouseAddress());

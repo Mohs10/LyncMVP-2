@@ -33,8 +33,12 @@ public class SellerBuyer {
     private Boolean seller;
     private Boolean buyer;
     private Boolean activeUser=true;
+
+
     private LocalDate incorporationDate;
     private String companyName;
+    private String registrationNumber;
+    private String companyEmail;
     private String gstIn;
     private String companyLocation;
 //    private String wareHouseAddress;
