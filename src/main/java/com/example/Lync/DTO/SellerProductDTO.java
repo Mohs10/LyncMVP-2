@@ -33,6 +33,7 @@ public class SellerProductDTO {
     private LocalTime addTime;
     private LocalDate earliestAvailableDate;
     private Long productId; // Reference to Product without join
+    private String origin;
 
     private Boolean npop;
     private String npopCertification;

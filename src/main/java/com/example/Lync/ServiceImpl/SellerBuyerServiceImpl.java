@@ -251,7 +251,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setCompanyName(sellerBuyer.getCompanyName());
         sellerBuyerDTO.setRegistrationNumber(sellerBuyer.getRegistrationNumber());
         sellerBuyerDTO.setCompanyEmail(sellerBuyer.getCompanyEmail());
-        sellerBuyerDTO.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
+        sellerBuyerDTO.setWareHouseAddress(sellerBuyer.getWareHouseAddress());
         sellerBuyerDTO.setGstIn(sellerBuyer.getGstIn());
         sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
 //        sellerBuyerDTO.setStorageLicense(sellerBuyer.getStorageLicense());
@@ -483,6 +483,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setGrainSize(dto.getGrainSize());
         sellerProduct.setAdmixing(dto.getAdmixing());
         sellerProduct.setMoisture(dto.getMoisture());
+        sellerProduct.setOrigin(dto.getOrigin());
         sellerProduct.setDd(dto.getDd());
         sellerProduct.setKettValue(dto.getKettValue());
         sellerProduct.setChalky(dto.getChalky());

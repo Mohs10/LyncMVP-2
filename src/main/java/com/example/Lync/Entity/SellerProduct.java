@@ -34,6 +34,7 @@ public class SellerProduct {
     private Double availableAmount;
     private String productImageUrl1;
     private String productImageUrl2;
+    private String origin;
 
 
 
