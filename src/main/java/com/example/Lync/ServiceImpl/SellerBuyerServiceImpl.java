@@ -104,7 +104,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         userInfo.setMobileNumber(sellerBuyer.getPhoneNumber());
         userInfo.setPassword(encoder.encode(sellerBuyerDTO.getPassword()));
         userInfoRepository.save(userInfo);
-
+//        Kishan
 
     }
 
