@@ -169,11 +169,12 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setCity(sellerBuyerDTO.getCity());
         sellerBuyer.setPinCode(sellerBuyerDTO.getPinCode());
         sellerBuyer.setAddress(sellerBuyerDTO.getAddress());
-        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
-        sellerBuyer.setUpdatedAt(sellerBuyerDTO.getUpdatedAt());
+//        sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
+        LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
+        sellerBuyer.setUpdatedAt(indianLocalDateTime);
         sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
         sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
-        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
+//        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
         sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
