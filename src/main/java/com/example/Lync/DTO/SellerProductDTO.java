@@ -13,8 +13,8 @@ import java.util.List;
 @Setter
 public class SellerProductDTO {
 
-//    private String productName;
-//    private String productCategory;
+    private String productName;
+    private String productCategory;
 //    private String productTypeName;
 //    private String productVariety;
 

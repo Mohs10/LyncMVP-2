@@ -109,7 +109,7 @@ public class SellerController {
     }
 
     @GetMapping("/sellerProduct")
-    public ResponseEntity<List<SellerProduct>> getSellerProductsBySeller() {
+    public ResponseEntity<List<SellerProductDTO>> getSellerProductsBySeller() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Get the username from the Authentication object
@@ -119,8 +119,8 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        List<SellerProduct> sellerProducts = sellerBuyerService.getSellerProductsBySeller(sellerDetails.getUserId());
-        return ResponseEntity.ok(sellerProducts); // Return the list of products with HTTP 200 OK
+        List<SellerProductDTO> sellerProductDTOList = sellerBuyerService.getSellerProductDTOsBySeller(sellerDetails.getUserId());
+        return ResponseEntity.ok(sellerProductDTOList); // Return the list of products with HTTP 200 OK
     }
 
 

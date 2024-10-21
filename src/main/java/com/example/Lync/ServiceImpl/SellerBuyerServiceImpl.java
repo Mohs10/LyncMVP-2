@@ -450,6 +450,15 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     public List<SellerProduct> getSellerProductsBySeller(String sellerId) {
         return sellerProductRepository.findBySellerId(sellerId);
     }
+@Override
+    public List<SellerProductDTO> getSellerProductDTOsBySeller(String sellerId) {
+        // Fetch list of SellerProduct entities by sellerId
+        List<SellerProduct> sellerProducts = sellerProductRepository.findBySellerId(sellerId);
+        return sellerProducts.stream()
+                .map(this::toDTO)  // Map each SellerProduct to SellerProductDTO
+                .collect(Collectors.toList());
+    }
+
 
     public List<SellerProduct> getSellerProductsByProduct(Long pId) {
         return sellerProductRepository.findByPId(pId);
@@ -512,6 +521,51 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         return sellerProduct;
     }
+
+    private SellerProductDTO toDTO(SellerProduct sellerProduct) {
+        SellerProductDTO dto = new SellerProductDTO();
+
+        Product product =productRepository.findById(sellerProduct.getProductId()).get();
+
+        dto.setSpId(sellerProduct.getSpId());
+        dto.setSellerId(sellerProduct.getSellerId());
+        dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
+        dto.setMinPricePerTon(sellerProduct.getMinPricePerTon());
+        dto.setDeliveryCharges(sellerProduct.getDeliveryCharges());
+        dto.setDescription(sellerProduct.getDescription());
+        dto.setGrainSize(sellerProduct.getGrainSize());
+        dto.setAdmixing(sellerProduct.getAdmixing());
+        dto.setMoisture(sellerProduct.getMoisture());
+        dto.setOrigin(sellerProduct.getOrigin());
+        dto.setDd(sellerProduct.getDd());
+        dto.setKettValue(sellerProduct.getKettValue());
+        dto.setChalky(sellerProduct.getChalky());
+        dto.setForeignMaterial(sellerProduct.getForeignMaterial());
+        dto.setWarehouse(sellerProduct.getWarehouse());
+        dto.setAvailableAmount(sellerProduct.getAvailableAmount());
+        dto.setProductImageUrl1(sellerProduct.getProductImageUrl1());
+        dto.setProductImageUrl2(sellerProduct.getProductImageUrl2());
+        dto.setProductCertificationUrl(sellerProduct.getProductCertificationUrl());
+        dto.setAddDate(sellerProduct.getAddDate());
+        dto.setAddTime(sellerProduct.getAddTime());
+        dto.setEarliestAvailableDate(sellerProduct.getEarliestAvailableDate());
+
+        //product
+        dto.setProductId(sellerProduct.getProductId());
+        dto.setProductName(product.getProductName());
+        dto.setProductCategory(product.getCategory().getCategoryName());
+
+        //Certifications
+        dto.setNpop(sellerProduct.getNpop());
+        dto.setNop(sellerProduct.getNop());
+        dto.setEu(sellerProduct.getEu());
+        dto.setGsdc(sellerProduct.getGsdc());
+        dto.setIpm(sellerProduct.getIpm());
+        dto.setOther(sellerProduct.getOther());
+
+        return dto;
+    }
+
 
 
 
