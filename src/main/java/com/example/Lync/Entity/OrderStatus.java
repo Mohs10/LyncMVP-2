@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Data
@@ -21,8 +22,8 @@ public class OrderStatus {
     private Long osId;
     private String oId; // Reference to orderId
     private String status;
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDate date= LocalDate.now();
+    private LocalTime time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
     private String description;
     private String imageUrl;
     private String location;

@@ -3,11 +3,13 @@ package com.example.Lync.Controller;
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.FavoriteProductAndCategory_DTO;
+import com.example.Lync.DTO.InquiryDTO;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
+import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.OTPStorageService;
 import com.example.Lync.Service.OtpService;
 import com.example.Lync.Service.SellerBuyerService;
@@ -38,8 +40,9 @@ public class BuyerController {
     private final OtpService otpService;
     private final OTPStorageService otpStorageService;
     private final UserInfoService userInfoService;
+    private final InquiryService inquiryService;
 
-    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService) {
+    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -50,6 +53,7 @@ public class BuyerController {
         this.otpService = otpService;
         this.otpStorageService = otpStorageService;
         this.userInfoService = userInfoService;
+        this.inquiryService = inquiryService;
     }
 
     @GetMapping("/buyerProfile")
@@ -153,6 +157,31 @@ public class BuyerController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());  // Handle errors
         }
+    }
+
+
+    @PostMapping("/addInquiry")
+    public ResponseEntity<String> addInquiry(@RequestBody InquiryDTO inquiryDTO){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        inquiryService.addInquiry(inquiryDTO, sellerDetails.getUserId());
+        return ResponseEntity.ok("Inquiry added successfully");
+    }
+
+    @PostMapping("/buyerRejectsInquiry/{qId}")
+    public  ResponseEntity<String> buyerReject(@PathVariable String qId, @RequestBody String description) throws Exception {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        inquiryService.buyerRejectsInquiries(qId, description, sellerDetails.getUserId());
+        return ResponseEntity.ok("Inquiry Declined Successfully.");
     }
     
 }

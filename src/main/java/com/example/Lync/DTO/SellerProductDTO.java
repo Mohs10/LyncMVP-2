@@ -21,6 +21,10 @@ public class SellerProductDTO {
 
     private String spId; // Unique ID for seller's product
     private String sellerId; // Unique ID for seller
+    private String sellerName; // New Kishan
+    private String sellerEmail; // New Kishan
+    private String sellerNumber; // New Kishan
+
     private Double maxPricePerTon;
     private Double minPricePerTon;
     private Double deliveryCharges;

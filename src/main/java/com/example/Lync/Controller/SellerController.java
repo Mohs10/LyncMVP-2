@@ -2,26 +2,24 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
+import com.example.Lync.DTO.InquiryDTO;
 import com.example.Lync.DTO.SellerProductDTO;
-import com.example.Lync.DTO.SellerProductImageDto;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
+import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.OTPStorageService;
 import com.example.Lync.Service.OtpService;
 import com.example.Lync.Service.SellerBuyerService;
 import com.example.Lync.ServiceImpl.UserInfoService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com", "https://another-domain.com"})
@@ -40,8 +38,9 @@ public class SellerController {
     private final OtpService otpService;
     private final OTPStorageService otpStorageService;
     private final UserInfoService userInfoService;
+    private final InquiryService inquiryService;
 
-    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService) {
+    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -52,6 +51,7 @@ public class SellerController {
         this.otpService = otpService;
         this.otpStorageService = otpStorageService;
         this.userInfoService = userInfoService;
+        this.inquiryService = inquiryService;
     }
 
     @GetMapping("/sellerProfile")
@@ -123,5 +123,49 @@ public class SellerController {
         return ResponseEntity.ok(sellerProductDTOList); // Return the list of products with HTTP 200 OK
     }
 
+
+
+
+
+
+    @GetMapping("/sellerAllInquiries")
+    public ResponseEntity<List<InquiryDTO>> sellerAllInquiries(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return ResponseEntity.ok(inquiryService.sellerAllInquiries(sellerDetails.getUserId()));
+    }
+
+    @GetMapping("/newInquiries")
+    public ResponseEntity<List<InquiryDTO>> sellerNewInquiries(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        return ResponseEntity.ok(inquiryService.sellerNewInquiries(sellerDetails.getUserId()));
+    }
+
+    @GetMapping("/sellerOpenInquiry/{qId}")
+    public ResponseEntity<InquiryDTO> sellerOpenInquiry(@PathVariable String qId) throws Exception {
+        return ResponseEntity.ok(inquiryService.sellerOpenInquiry(qId));
+    }
+
+    @PostMapping("/acceptInquiry/{qId}")
+    public ResponseEntity<String> sellerAcceptQuery(@PathVariable String qId, @RequestBody String description) throws Exception {
+        inquiryService.sellerAcceptQuery(qId, description);
+        return ResponseEntity.ok("Accepted Inquiry with ID" + qId);
+    }
+
+    @PostMapping("/sellerRejectQuery/{qId}")
+    public ResponseEntity<String> sellerRejectQuery(@PathVariable String qId, @RequestBody String description) throws Exception {
+        inquiryService.sellerRejectQuery(qId, description);
+        return ResponseEntity.ok("Rejected Inquiry for ID" + qId);
+    }
 
 }

@@ -62,7 +62,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/api/**").permitAll()
                         .requestMatchers("/auth/sellerbuyer_login/**").permitAll()
                         .requestMatchers("/auth/otp-authenticate/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/inquiry/**").permitAll()
+                        .anyRequest().authenticated() // Protect all other endpoints
                 )
                 .sessionManagement(sess -> sess
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
