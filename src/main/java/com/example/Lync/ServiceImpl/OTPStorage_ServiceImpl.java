@@ -37,4 +37,9 @@ public class OTPStorage_ServiceImpl implements OTPStorageService {
         return otp.equals(otpStorage.get(mobileNumber));
     }
 
+
+    public Map<String, String> allStoredOTPs(){
+
+        return otpStorage;
+    }
 }

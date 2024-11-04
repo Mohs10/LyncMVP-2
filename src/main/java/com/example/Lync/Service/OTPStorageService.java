@@ -14,5 +14,7 @@ public interface OTPStorageService {
 
     public Map<String, String> getStoredOTPs();
     public boolean validateOtp(String mobileNumber, String otp);
+    public Map<String, String> allStoredOTPs();
 
-}
+
+    }

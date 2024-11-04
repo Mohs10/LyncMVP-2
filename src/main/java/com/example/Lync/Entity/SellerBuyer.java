@@ -45,6 +45,21 @@ public class SellerBuyer {
 //    private Boolean storageLicense;
 //    private String storageLicenseUrl;
 
+    // Additional fields
+    private String companyCountry;
+    private String companyState;
+    private String companyCity;
+    private String companyPinCode;
+
+    private String warehouseCountry;
+    private String warehouseState;
+    private String warehouseCity;
+    private String warehousePinCode;
+
+    private Boolean waiveSampleFree = false;
+
+
+
     // Getters and Setters
 }
 

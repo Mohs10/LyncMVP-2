@@ -119,7 +119,6 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
         sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
-
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
         addToPhoneEmailCache(sellerBuyer.getEmail(),sellerBuyer);
@@ -182,7 +181,15 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
-
+        sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
+        sellerBuyerDTO.setCompanyCountry(sellerBuyer.getCompanyCountry());
+        sellerBuyerDTO.setCompanyState(sellerBuyer.getCompanyState());
+        sellerBuyerDTO.setCompanyCity(sellerBuyer.getCompanyCity());
+        sellerBuyerDTO.setCompanyPinCode(sellerBuyer.getCompanyPinCode());
+        sellerBuyerDTO.setWarehouseCountry(sellerBuyer.getWarehouseCountry());
+        sellerBuyerDTO.setWarehouseState(sellerBuyer.getWarehouseState());
+        sellerBuyerDTO.setWarehouseCity(sellerBuyer.getWarehouseCity());
+        sellerBuyerDTO.setWarehousePinCode(sellerBuyer.getWarehousePinCode());
 
 
         SellerBuyer newSellerBuyer=   sellerBuyerRepository.save(sellerBuyer);
@@ -205,8 +212,10 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         // Set basic fields
         sellerBuyer.setUserId(sellerBuyerDTO.getUserId());
         sellerBuyer.setCreatedAt(sellerBuyerDTO.getCreatedAt());
+        sellerBuyer.setUpdatedAt(sellerBuyerDTO.getUpdatedAt());
         sellerBuyer.setFullName(sellerBuyerDTO.getFullName());
         sellerBuyer.setEmail(sellerBuyerDTO.getEmail());
+//        sellerBuyer.setPassword(sellerBuyerDTO.getPassword());
         sellerBuyer.setPhoneNumber(sellerBuyerDTO.getPhoneNumber());
         sellerBuyer.setCountry(sellerBuyerDTO.getCountry());
         sellerBuyer.setState(sellerBuyerDTO.getState());
@@ -214,33 +223,50 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setPinCode(sellerBuyerDTO.getPinCode());
         sellerBuyer.setAddress(sellerBuyerDTO.getAddress());
 
-
+        // Set role and status fields
         sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
         sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
 
-
+        // Set company details
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
         sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
         sellerBuyer.setCompanyEmail(sellerBuyerDTO.getCompanyEmail());
-        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
         sellerBuyer.setGstIn(sellerBuyerDTO.getGstIn());
         sellerBuyer.setCompanyLocation(sellerBuyerDTO.getCompanyLocation());
-//        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
-//        sellerBuyer.setStorageLicense(sellerBuyerDTO.getStorageLicense());
+        sellerBuyer.setWareHouseAddress(sellerBuyerDTO.getWareHouseAddress());
 
+        // Set additional company location details
+        sellerBuyer.setCompanyCountry(sellerBuyerDTO.getCompanyCountry());
+        sellerBuyer.setCompanyState(sellerBuyerDTO.getCompanyState());
+        sellerBuyer.setCompanyCity(sellerBuyerDTO.getCompanyCity());
+        sellerBuyer.setCompanyPinCode(sellerBuyerDTO.getCompanyPinCode());
 
+        // Set additional warehouse address details
+        sellerBuyer.setWarehouseCountry(sellerBuyerDTO.getWarehouseCountry());
+        sellerBuyer.setWarehouseState(sellerBuyerDTO.getWarehouseState());
+        sellerBuyer.setWarehouseCity(sellerBuyerDTO.getWarehouseCity());
+        sellerBuyer.setWarehousePinCode(sellerBuyerDTO.getWarehousePinCode());
+
+        // Set waiver and document URLs
+//        sellerBuyer.setWaiveSampleFree(sellerBuyerDTO.getWaiveSampleFree());
+        sellerBuyer.setProfilePictureUrl(sellerBuyerDTO.getProfilePictureUrl());
+//        sellerBuyer.setCancelledChequeUrl(sellerBuyerDTO.getCancelledChequeUrl());
+//        sellerBuyer.setCertificateUrl(sellerBuyerDTO.getCertificateUrl());
 
         return sellerBuyer;
     }
 
-    private SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer) {
-        SellerBuyerDTO sellerBuyerDTO = new SellerBuyerDTO();
 
+    private SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer) {
+        if (sellerBuyer == null) {
+            return null; // Handle null input
+        }
+
+        SellerBuyerDTO sellerBuyerDTO = new SellerBuyerDTO();
         sellerBuyerDTO.setUserId(sellerBuyer.getUserId());
         sellerBuyerDTO.setFullName(sellerBuyer.getFullName());
         sellerBuyerDTO.setEmail(sellerBuyer.getEmail());
-//        sellerBuyerDTO.setPassword(sellerBuyer.getPassword());
         sellerBuyerDTO.setPhoneNumber(sellerBuyer.getPhoneNumber());
         sellerBuyerDTO.setCountry(sellerBuyer.getCountry());
         sellerBuyerDTO.setState(sellerBuyer.getState());
@@ -258,17 +284,21 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setWareHouseAddress(sellerBuyer.getWareHouseAddress());
         sellerBuyerDTO.setGstIn(sellerBuyer.getGstIn());
         sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
-//        sellerBuyerDTO.setStorageLicense(sellerBuyer.getStorageLicense());
-//        sellerBuyerDTO.setProfilePictureUrl(sellerBuyer.getProfilePictureUrl());
-//        sellerBuyerDTO.setStorageLicenseFileUrl(sellerBuyer.getStorageLicenseFileUrl());
-
-        // Since you are using MultipartFile, you'll need to handle it accordingly.
-        // You can map MultipartFile to null or handle the conversion separately.
-        sellerBuyerDTO.setProfilePicture(null); // You can set this when handling the file upload
-        sellerBuyerDTO.setStorageLicenseFile(null); // Same as above
+        sellerBuyerDTO.setProfilePicture(null); // Set appropriately during file upload handling
+        sellerBuyerDTO.setStorageLicenseFile(null); // Set appropriately during file upload handling
+        sellerBuyerDTO.setCompanyCountry(sellerBuyer.getCompanyCountry());
+        sellerBuyerDTO.setCompanyState(sellerBuyer.getCompanyState());
+        sellerBuyerDTO.setCompanyCity(sellerBuyer.getCompanyCity());
+        sellerBuyerDTO.setCompanyPinCode(sellerBuyer.getCompanyPinCode());
+        sellerBuyerDTO.setWarehouseCountry(sellerBuyer.getWarehouseCountry());
+        sellerBuyerDTO.setWarehouseState(sellerBuyer.getWarehouseState());
+        sellerBuyerDTO.setWarehouseCity(sellerBuyer.getWarehouseCity());
+        sellerBuyerDTO.setWarehousePinCode(sellerBuyer.getWarehousePinCode());
+        sellerBuyerDTO.setWaiveSampleFree(sellerBuyer.getWaiveSampleFree());
 
         return sellerBuyerDTO;
     }
+
 
 
 
@@ -484,9 +514,10 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private  String generateUniqueSpId() {
         return "SP-" + UUID.randomUUID().toString();
     }
-    private  SellerProduct toEntity(SellerProductDTO dto) throws Exception {
+    private SellerProduct toEntity(SellerProductDTO dto) throws Exception {
         SellerProduct sellerProduct = new SellerProduct();
 
+        // Set fields from SellerProductDTO to SellerProduct
         sellerProduct.setSpId(dto.getSpId());
         sellerProduct.setSellerId(dto.getSellerId());
         sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
@@ -509,6 +540,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setAddDate(dto.getAddDate());
         sellerProduct.setAddTime(dto.getAddTime());
         sellerProduct.setEarliestAvailableDate(dto.getEarliestAvailableDate());
+
+        // Set product ID and certification fields
         sellerProduct.setProductId(dto.getProductId());
         sellerProduct.setNpop(dto.getNpop());
         sellerProduct.setNop(dto.getNop());
@@ -517,16 +550,18 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerProduct.setIpm(dto.getIpm());
         sellerProduct.setOther(dto.getOther());
 
-
-
         return sellerProduct;
     }
+
 
     private SellerProductDTO toDTO(SellerProduct sellerProduct) {
         SellerProductDTO dto = new SellerProductDTO();
 
-        Product product =productRepository.findById(sellerProduct.getProductId()).get();
+        // Fetch product details safely with Optional
+        Product product = productRepository.findById(sellerProduct.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        // Set fields from SellerProduct to SellerProductDTO
         dto.setSpId(sellerProduct.getSpId());
         dto.setSellerId(sellerProduct.getSellerId());
         dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
@@ -550,12 +585,12 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         dto.setAddTime(sellerProduct.getAddTime());
         dto.setEarliestAvailableDate(sellerProduct.getEarliestAvailableDate());
 
-        //product
+        // Set fields related to the Product entity
         dto.setProductId(sellerProduct.getProductId());
         dto.setProductName(product.getProductName());
         dto.setProductCategory(product.getCategory().getCategoryName());
 
-        //Certifications
+        // Set certifications
         dto.setNpop(sellerProduct.getNpop());
         dto.setNop(sellerProduct.getNop());
         dto.setEu(sellerProduct.getEu());
@@ -565,6 +600,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         return dto;
     }
+
 
 
 

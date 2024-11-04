@@ -121,7 +121,7 @@ public class LoginController {
         Map<String, String> response = new HashMap<>();
         String phoneNumber = otpDetails.getPhoneNumber();
         Boolean isPresent = sellerBuyerService.isPhoneNumberInCache(phoneNumber);
-
+        System.out.println(otpStorageService.getStoredOTPs());
         if (isPresent)
         {
             response.put("message", "Number already exists.");
