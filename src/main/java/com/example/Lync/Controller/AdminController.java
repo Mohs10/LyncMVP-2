@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -90,7 +91,16 @@ public class AdminController {
     }
 
     @PutMapping("/editUser/{userId}")
-    public ResponseEntity<String> editUser(@PathVariable String userId, @RequestBody SellerBuyerDTO sellerBuyerDTO){
+    public ResponseEntity<String> editUser(@PathVariable String userId,
+                                           @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
+                                           @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+                                           @RequestParam(value = "certificate", required = false) MultipartFile certificate,
+                                           @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque){
+
+        sellerBuyerDTO.setCancelledCheque(cancelledCheque);
+        sellerBuyerDTO.setCertificate(certificate);
+        sellerBuyerDTO.setProfilePicture(profilePicture);
+
         sellerBuyerService.editSellerBuyer(userId, sellerBuyerDTO);
         return ResponseEntity.ok("User Edited Successfully");
     }

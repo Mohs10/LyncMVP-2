@@ -1,5 +1,6 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.*;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -33,13 +35,15 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final FavouriteProductRepository favouriteProductRepository;
     private final SellerProductRepository sellerProductRepository;
 
+    private final S3Service s3Service;
+
 
     @Autowired
     @Lazy
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, S3Service s3Service) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -47,6 +51,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.productRepository = productRepository;
         this.favouriteProductRepository = favouriteProductRepository;
         this.sellerProductRepository = sellerProductRepository;
+        this.s3Service = s3Service;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
     private final Map<String, SellerBuyer> sellerBuyerEmailCache = new HashMap<>();
@@ -90,12 +95,34 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     }
 
     @Override
-    public void createSeller(SellerBuyerDTO sellerBuyerDTO) {
+    public void createSeller(SellerBuyerDTO sellerBuyerDTO) throws IOException {
         sellerBuyerDTO.setBuyer(false);
         sellerBuyerDTO.setSeller(true);
         sellerBuyerDTO.setUserId(generateUserId());
         LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
         sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
+
+
+        // Upload profile picture if provided
+        if (sellerBuyerDTO.getProfilePicture() != null) {
+            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
+            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
+        }
+
+        // Upload certificate if provided
+        if (sellerBuyerDTO.getCertificate() != null) {
+            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
+            sellerBuyerDTO.setCertificateUrl(certificateUrl);
+        }
+
+        // Upload cancelled cheque if provided
+        if (sellerBuyerDTO.getCancelledCheque() != null) {
+            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
+            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
+        }
+
+
+
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
         addToPhoneEmailCache(sellerBuyer.getEmail(),sellerBuyer);
@@ -112,13 +139,33 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     }
 
     @Override
-    public void createBuyer(SellerBuyerDTO sellerBuyerDTO) {
+    public void createBuyer(SellerBuyerDTO sellerBuyerDTO) throws IOException {
         sellerBuyerDTO.setBuyer(true);
         sellerBuyerDTO.setSeller(false);
         sellerBuyerDTO.setUserId(generateUserId());
 
         LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
         sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
+
+        // Upload profile picture if provided
+        if (sellerBuyerDTO.getProfilePicture() != null) {
+            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
+            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
+        }
+
+        // Upload certificate if provided
+        if (sellerBuyerDTO.getCertificate() != null) {
+            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
+            sellerBuyerDTO.setCertificateUrl(certificateUrl);
+        }
+
+        // Upload cancelled cheque if provided
+        if (sellerBuyerDTO.getCancelledCheque() != null) {
+            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
+            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
+        }
+
+
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
         addToPhoneEmailCache(sellerBuyer.getEmail(),sellerBuyer);
@@ -251,8 +298,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         // Set waiver and document URLs
 //        sellerBuyer.setWaiveSampleFree(sellerBuyerDTO.getWaiveSampleFree());
         sellerBuyer.setProfilePictureUrl(sellerBuyerDTO.getProfilePictureUrl());
-//        sellerBuyer.setCancelledChequeUrl(sellerBuyerDTO.getCancelledChequeUrl());
-//        sellerBuyer.setCertificateUrl(sellerBuyerDTO.getCertificateUrl());
+        sellerBuyer.setCancelledChequeUrl(sellerBuyerDTO.getCancelledChequeUrl());
+        sellerBuyer.setCertificateUrl(sellerBuyerDTO.getCertificateUrl());
 
         return sellerBuyer;
     }
@@ -296,6 +343,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setWarehousePinCode(sellerBuyer.getWarehousePinCode());
         sellerBuyerDTO.setWaiveSampleFree(sellerBuyer.getWaiveSampleFree());
 
+        sellerBuyerDTO.setProfilePictureUrl(s3Service.getUserImagePresignedUrl(sellerBuyer.getProfilePictureUrl()));
+        sellerBuyerDTO.setCertificateUrl(s3Service.getUserCertificatePresignedUrl(sellerBuyer.getCertificateUrl()));
+        sellerBuyerDTO.setCancelledChequeUrl(s3Service.getUserCancelledChequePresignedUrl(sellerBuyer.getCancelledChequeUrl()));
         return sellerBuyerDTO;
     }
 
@@ -597,7 +647,6 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         dto.setGsdc(sellerProduct.getGsdc());
         dto.setIpm(sellerProduct.getIpm());
         dto.setOther(sellerProduct.getOther());
-
         return dto;
     }
 

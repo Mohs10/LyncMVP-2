@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +52,34 @@ public class LoginController {
 
 
     //Seller/Buyer Register----------------------------------------------------------------
-    @PostMapping("/addSeller")
-    public ResponseEntity<String> addSeller(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
+//    @PostMapping("/addSeller")
+//    public ResponseEntity<String> addSeller(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
+//        try {
+//            // Check if the phone number is already in cache
+//            if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
+//                return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists.");
+//            }
+//
+//            // Check if the email is already in cache
+//            if (sellerBuyerService.isEmailInCache(sellerBuyerDTO.getEmail())) {
+//                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
+//            }
+//
+//            // If both checks pass, create the seller
+//            sellerBuyerService.createSeller(sellerBuyerDTO);
+//            return ResponseEntity.ok("Seller added successfully.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while adding seller.");
+//        }
+//    }
+
+
+        @PostMapping("/addSeller")
+    public ResponseEntity<String> addSeller(
+                @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
+                @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+                @RequestParam(value = "certificate", required = false) MultipartFile certificate,
+                @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque) {
         try {
             // Check if the phone number is already in cache
             if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
@@ -63,6 +90,10 @@ public class LoginController {
             if (sellerBuyerService.isEmailInCache(sellerBuyerDTO.getEmail())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
             }
+
+            sellerBuyerDTO.setCancelledCheque(cancelledCheque);
+            sellerBuyerDTO.setCertificate(certificate);
+            sellerBuyerDTO.setProfilePicture(profilePicture);
 
             // If both checks pass, create the seller
             sellerBuyerService.createSeller(sellerBuyerDTO);
@@ -72,8 +103,14 @@ public class LoginController {
         }
     }
 
+
+
     @PostMapping("/addBuyer")
-    public ResponseEntity<String> addBuyer(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
+    public ResponseEntity<String> addBuyer(
+            @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestParam(value = "certificate", required = false) MultipartFile certificate,
+            @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque) {
         try {
             // Check if the phone number is already in cache
             if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
@@ -84,6 +121,10 @@ public class LoginController {
             if (sellerBuyerService.isEmailInCache(sellerBuyerDTO.getEmail())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
             }
+
+            sellerBuyerDTO.setCancelledCheque(cancelledCheque);
+            sellerBuyerDTO.setCertificate(certificate);
+            sellerBuyerDTO.setProfilePicture(profilePicture);
 
             // If both checks pass, create the buyer
             sellerBuyerService.createBuyer(sellerBuyerDTO);

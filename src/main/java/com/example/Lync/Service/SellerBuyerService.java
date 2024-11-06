@@ -7,6 +7,7 @@ import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +15,8 @@ public interface SellerBuyerService {
 
     SellerBuyer findbyPhoneNumber(String phoneNumber);
 
-    void createSeller(SellerBuyerDTO sellerBuyerDTO);
-    void createBuyer(SellerBuyerDTO sellerBuyerDTO);
+    void createSeller(SellerBuyerDTO sellerBuyerDTO) throws IOException;
+    void createBuyer(SellerBuyerDTO sellerBuyerDTO) throws IOException;
 
     public boolean isPhoneNumberInCache(String phoneNumber);
     public boolean isEmailInCache(String email);

@@ -58,6 +58,8 @@ public class SellerBuyer {
 
     private Boolean waiveSampleFree = false;
 
+    private String cancelledChequeUrl;
+    private String certificateUrl;
 
 
     // Getters and Setters

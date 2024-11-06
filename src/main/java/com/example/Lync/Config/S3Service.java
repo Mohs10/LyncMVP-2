@@ -70,6 +70,37 @@ public class S3Service {
         return s3Key;  // Return the S3 key of the uploaded image
     }
 
+
+    public String uploadUserCertificate(String userId, MultipartFile file) throws IOException {
+        // Define the S3 key for user license as users/{userId}/license/{fileName}
+        String fileName = file.getOriginalFilename();
+        String s3Key = "users/" + userId + "/certificate/" + fileName;
+
+        // Upload the license to the specific S3 key
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        return s3Key;  // Return the S3 key of the uploaded license
+    }
+
+    public String uploadUserCancelledCheque(String userId, MultipartFile file) throws IOException {
+        // Define the S3 key for user license as users/{userId}/license/{fileName}
+        String fileName = file.getOriginalFilename();
+        String s3Key = "users/" + userId + "/cancelledCheque/" + fileName;
+
+        // Upload the license to the specific S3 key
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        return s3Key;  // Return the S3 key of the uploaded license
+    }
+
     public String uploadUserLicense(String userId, MultipartFile file) throws IOException {
         // Define the S3 key for user license as users/{userId}/license/{fileName}
         String fileName = file.getOriginalFilename();
@@ -87,8 +118,42 @@ public class S3Service {
 
 
     // Generate a presigned URL to retrieve the user's image
-    public String getUserImagePresignedUrl(String userId, String fileName) {
-        String s3Key = "users/" + userId + "/images/" + fileName;
+    public String getUserImagePresignedUrl(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+
+    public String getUserCertificatePresignedUrl(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+
+    public String getUserCancelledChequePresignedUrl(String url) {
+        String s3Key = url;
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)

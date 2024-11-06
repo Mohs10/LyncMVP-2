@@ -22,6 +22,9 @@ public class Testimonial {
     @Column(nullable = false)
     private String name;
 
+    private String organizationName;
+
+
     @Column(nullable = false)
     private LocalDate date;
 

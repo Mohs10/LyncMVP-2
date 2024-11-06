@@ -119,26 +119,26 @@ public class UserController {
 
 
     // API to retrieve user image as presigned URL
-    @GetMapping("/api/{userId}/image")
-    public ResponseEntity<String> getUserImage(@PathVariable String userId, @RequestParam("fileName") String fileName) {
-        try {
-            String presignedUrl = s3Service.getUserImagePresignedUrl(userId, fileName);
-            return ResponseEntity.ok("Image download URL: " + presignedUrl);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to retrieve image: " + e.getMessage());
-        }
-    }
+//    @GetMapping("/api/{userId}/image")
+//    public ResponseEntity<String> getUserImage(@PathVariable String userId, @RequestParam("fileName") String fileName) {
+//        try {
+//            String presignedUrl = s3Service.getUserImagePresignedUrl(userId, fileName);
+//            return ResponseEntity.ok("Image download URL: " + presignedUrl);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Failed to retrieve image: " + e.getMessage());
+//        }
+//    }
 
     // API to retrieve user license as presigned URL
-    @GetMapping("/api/{userId}/license")
-    public ResponseEntity<String> getUserLicense(@PathVariable String userId, @RequestParam("fileName") String fileName) {
-        try {
-            String presignedUrl = s3Service.getUserLicensePresignedUrl(userId, fileName);
-            return ResponseEntity.ok("License download URL: " + presignedUrl);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to retrieve license: " + e.getMessage());
-        }
-    }
+//    @GetMapping("/api/{userId}/license")
+//    public ResponseEntity<String> getUserLicense(@PathVariable String userId, @RequestParam("fileName") String fileName) {
+//        try {
+//            String presignedUrl = s3Service.getUserLicensePresignedUrl(userId, fileName);
+//            return ResponseEntity.ok("License download URL: " + presignedUrl);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Failed to retrieve license: " + e.getMessage());
+//        }
+//    }
 
 
 
