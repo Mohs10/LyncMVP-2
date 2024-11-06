@@ -33,6 +33,7 @@ public class SellerBuyer {
     private Boolean seller;
     private Boolean buyer;
     private Boolean activeUser=true;
+    private String panNumber;
 
 
     private LocalDate incorporationDate;

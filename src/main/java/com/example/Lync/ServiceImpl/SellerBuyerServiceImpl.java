@@ -221,6 +221,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
         sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
 //        sellerBuyer.setActiveUser(sellerBuyerDTO.getActiveUser());
+        sellerBuyer.setPanNumber(sellerBuyerDTO.getPanNumber());
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
         sellerBuyer.setCompanyName(sellerBuyerDTO.getCompanyName());
         sellerBuyer.setRegistrationNumber(sellerBuyerDTO.getRegistrationNumber());
@@ -273,6 +274,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         // Set role and status fields
         sellerBuyer.setSeller(sellerBuyerDTO.getSeller());
         sellerBuyer.setBuyer(sellerBuyerDTO.getBuyer());
+        sellerBuyer.setPanNumber(sellerBuyerDTO.getPanNumber());
 
         // Set company details
         sellerBuyer.setIncorporationDate(sellerBuyerDTO.getIncorporationDate());
@@ -324,6 +326,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setUpdatedAt(sellerBuyer.getUpdatedAt());
         sellerBuyerDTO.setSeller(sellerBuyer.getSeller());
         sellerBuyerDTO.setBuyer(sellerBuyer.getBuyer());
+        sellerBuyerDTO.setPanNumber(sellerBuyer.getPanNumber());
+
         sellerBuyerDTO.setIncorporationDate(sellerBuyer.getIncorporationDate());
         sellerBuyerDTO.setCompanyName(sellerBuyer.getCompanyName());
         sellerBuyerDTO.setRegistrationNumber(sellerBuyer.getRegistrationNumber());
@@ -343,9 +347,29 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setWarehousePinCode(sellerBuyer.getWarehousePinCode());
         sellerBuyerDTO.setWaiveSampleFree(sellerBuyer.getWaiveSampleFree());
 
-        sellerBuyerDTO.setProfilePictureUrl(s3Service.getUserImagePresignedUrl(sellerBuyer.getProfilePictureUrl()));
-        sellerBuyerDTO.setCertificateUrl(s3Service.getUserCertificatePresignedUrl(sellerBuyer.getCertificateUrl()));
-        sellerBuyerDTO.setCancelledChequeUrl(s3Service.getUserCancelledChequePresignedUrl(sellerBuyer.getCancelledChequeUrl()));
+//        sellerBuyerDTO.setProfilePictureUrl(s3Service.getUserImagePresignedUrl(sellerBuyer.getProfilePictureUrl()));
+//        sellerBuyerDTO.setCertificateUrl(s3Service.getUserCertificatePresignedUrl(sellerBuyer.getCertificateUrl()));
+//        sellerBuyerDTO.setCancelledChequeUrl(s3Service.getUserCancelledChequePresignedUrl(sellerBuyer.getCancelledChequeUrl()));
+
+
+        sellerBuyerDTO.setProfilePictureUrl(
+                Optional.ofNullable(sellerBuyer.getProfilePictureUrl())
+                        .map(s3Service::getUserImagePresignedUrl)
+                        .orElse(null)
+        );
+
+        sellerBuyerDTO.setCertificateUrl(
+                Optional.ofNullable(sellerBuyer.getCertificateUrl())
+                        .map(s3Service::getUserCertificatePresignedUrl)
+                        .orElse(null)
+        );
+
+        sellerBuyerDTO.setCancelledChequeUrl(
+                Optional.ofNullable(sellerBuyer.getCancelledChequeUrl())
+                        .map(s3Service::getUserCancelledChequePresignedUrl)
+                        .orElse(null)
+        );
+
         return sellerBuyerDTO;
     }
 

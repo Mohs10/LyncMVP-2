@@ -28,6 +28,7 @@ public class SellerBuyerDTO {
     private Boolean seller;
     private Boolean buyer;
     private Boolean activeUser;
+    private String panNumber;
 
     private LocalDate incorporationDate;
     private String companyName;
