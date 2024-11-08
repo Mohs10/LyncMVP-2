@@ -161,7 +161,7 @@ public class BuyerController {
 
 
     @PostMapping("/addInquiry")
-    public ResponseEntity<String> addInquiry(@RequestBody InquiryDTO inquiryDTO){
+    public ResponseEntity<String> addInquiry(@RequestBody InquiryDTO inquiryDTO) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

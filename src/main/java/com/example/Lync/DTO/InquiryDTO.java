@@ -16,10 +16,42 @@ public class InquiryDTO {
     private String qId; //same orderId- oId
     private String buyerUId; // Reference to buyer (User)
     private Long productId; // Reference to Product
+    private String type;
+
+    //Order Specification
     private Double quantity;
-    private Boolean certificate;
-    private Double askPrice;
-    private String shipAddress;
+    private String quantityUnit;
+    private String priceTerms;
+//    private Boolean certificate;
+    private Double askMinPrice;
+    private Double askMaxPrice;
+    private String priceUnit;
+    private Boolean npop;
+    private Boolean nop;
+    private Boolean eu;
+    private Boolean gsdc;
+    private Boolean ipm;
+    private Boolean other;
+    private String otherCertification;
+    private String packagingMaterial;
+    private String paymentTerms;
+    private String targetLeadTime;
+    private String deliveryAddress;
+    private String country;
+    private String state;
+    private String city;
+    private int pincode;
+    private LocalDate specifyDeliveryDate;
+
+    //Product Specification
+    private Double chalkyGrains;
+    private String grainSize;
+    private Double kettValue;
+    private Double moistureContent;
+    private String brokenGrain;
+    private String admixing;
+    private String dd;
+
     private LocalDate raiseDate = LocalDate.now();
     private LocalTime raiseTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
     private String orderStatus;
@@ -27,6 +59,7 @@ public class InquiryDTO {
     private Double sentPrice;
     private LocalDate sentDate;
     private LocalTime sentTime;
+    private String unit;
 
     private Long osId;
 //    private Long oId; // Reference to orderId

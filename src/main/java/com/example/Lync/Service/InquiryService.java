@@ -7,7 +7,7 @@ import com.example.Lync.DTO.SellerProductDTO;
 import java.util.List;
 
 public interface InquiryService {
-    void addInquiry(InquiryDTO inquiryDTO, String buyerUId); //buyer raise inquiry
+    void addInquiry(InquiryDTO inquiryDTO, String buyerUId) throws Exception; //buyer raise inquiry
 
     List<InquiryDTO> getAllInquiries(); //Admin get all inquiry
 
