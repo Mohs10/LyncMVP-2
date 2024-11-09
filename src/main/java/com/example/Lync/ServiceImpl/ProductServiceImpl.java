@@ -1,14 +1,11 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.S3Service;
+import com.example.Lync.DTO.CertificationDTO;
 import com.example.Lync.DTO.ProductDTO;
-import com.example.Lync.Entity.Category;
-import com.example.Lync.Entity.Product;
-import com.example.Lync.Entity.Type;
-import com.example.Lync.Entity.Variety;
-import com.example.Lync.Repository.CategoryRepository;
-import com.example.Lync.Repository.ProductRepository;
-import com.example.Lync.Repository.TypeRepository;
-import com.example.Lync.Repository.VarietyRepository;
+import com.example.Lync.DTO.SpecificationDTO;
+import com.example.Lync.Entity.*;
+import com.example.Lync.Repository.*;
 import com.example.Lync.ReusablePackage.BinarySearch;
 import com.example.Lync.ReusablePackage.Sorting;
 import com.example.Lync.ReusablePackage.StringAndDateUtils;
@@ -16,10 +13,11 @@ import com.example.Lync.Service.ProductService;
 import com.example.Lync.trie.Trie;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +27,17 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final VarietyRepository varietyRepository;
     private final TypeRepository typeRepository;
-
+    private final CertificationRepository certificationRepository;
+    private final FormRepository formRepository;
     private final StringAndDateUtils stringAndDateUtils;
     private final Sorting<Product> sortingUtility = new Sorting<>();
     private final BinarySearch<Product> searchUtility = new BinarySearch<>();
 
+    private final S3Service s3Service;
     private final Trie productNameTrie = new Trie();
+
+    private static final AtomicInteger counter = new AtomicInteger(0);
+
     @PostConstruct
     public void init() {
         loadNameCache();
@@ -53,59 +56,68 @@ public class ProductServiceImpl implements ProductService {
 //    private String uploadDir;
 
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
-                              VarietyRepository varietyRepository, TypeRepository typeRepository, StringAndDateUtils stringAndDateUtils) {
+                              VarietyRepository varietyRepository, TypeRepository typeRepository, CertificationRepository certificationRepository, FormRepository formRepository, StringAndDateUtils stringAndDateUtils, S3Service s3Service) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.varietyRepository = varietyRepository;
         this.typeRepository = typeRepository;
+        this.certificationRepository = certificationRepository;
+        this.formRepository = formRepository;
         this.stringAndDateUtils = stringAndDateUtils;
+        this.s3Service = s3Service;
     }
 
     @Override
-    public String addProduct(ProductDTO productDTO, MultipartFile productImage1, MultipartFile productImage2) throws IOException {
-        Product product = new Product();
-        product.setProductName(productDTO.getProductName());
-
-        // Set category
+    public Product addProduct(ProductDTO productDTO) throws IOException {
+        // Retrieve the category, varieties, forms, and certifications
         Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
-        product.setCategory(category);
+                .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        // Set variety
-        Variety variety = varietyRepository.findById(productDTO.getVarietyId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid variety ID"));
-        product.setVariety(variety);
+        List<Variety> varieties = varietyRepository.findAllById(productDTO.getVarietyIds());
+        List<Form> forms = formRepository.findAllById(productDTO.getFormIds());
 
-        // Set types
-        List<Type> types = new ArrayList<>();
-        for (String typeName : productDTO.getTypeNames()) {
-            Type type = typeRepository.findByTypeName(typeName);
-            if (type == null) {
-                type = new Type();
-                type.setTypeName(typeName);
-                typeRepository.save(type);
-            }
-            types.add(type);
+        // Map certifications
+        List<Certification> certifications = new ArrayList<>();
+        for (CertificationDTO certificationDTO : productDTO.getCertifications()) {
+            Certification certification = new Certification();
+            certification.setCertificationName(certificationDTO.getCertificationName());
+            certification.setIsCertified(certificationDTO.getIsCertified());
+            certifications.add(certificationRepository.save(certification));  // Save each certification
         }
-        product.setTypes(types);
 
-//        // Save product images
-//        if (!productImage1.isEmpty()) {
-//            String imageUrl1 = saveImage(productImage1);
-//            product.setProductImageUrl1(imageUrl1);
-//        }
-//
-//        if (!productImage2.isEmpty()) {
-//            String imageUrl2 = saveImage(productImage2);
-//            product.setProductImageUrl2(imageUrl2);
-//        }
+        List<Specification> specifications = new ArrayList<>();
+        for (SpecificationDTO specificationDTO : productDTO.getSpecifications()) {
+            Specification specification = new Specification();
+            specification.setSpecificationName(specificationDTO.getSpecificationName());
+            specification.setSpecificationValue(specificationDTO.getSpecificationValue());
+            specifications.add(specification);
+        }
 
-//        product.setPrice(productDTO.getPrice());
-//        product.setQuantity(productDTO.getQuantity());
 
-        productRepository.save(product);
+        productDTO.setProductId(generateUniqueProductId());
 
-        return "Product added successfully!";
+        if (productDTO.getProductImage() != null) {
+            String profilePictureUrl =s3Service. uploadProductImage(productDTO.getProductId(), productDTO.getProductImage());
+            productDTO.setProductImageUrl(profilePictureUrl);
+        }
+
+        // Create new product
+        Product product = new Product();
+        product.setProductId(productDTO.getProductId());
+        product.setProductName(productDTO.getProductName());
+        product.setHsnCode(productDTO.getHsnCode());
+        product.setCategory(category);
+        product.setVarieties(varieties);
+        product.setForms(forms);
+        product.setProductImageUrl(productDTO.getProductImageUrl());
+        product.setProductDescription(productDTO.getProductDescription());
+//        product.setActiveProduct(productDTO.isActiveProduct());
+        product.setCertifications(certifications);  // Set the certifications
+        product.setSpecifications(specifications);
+
+
+        // Save the product
+        return productRepository.save(product);
     }
 
     @Override
@@ -129,14 +141,14 @@ public class ProductServiceImpl implements ProductService {
 
         Product[] productArray = products.toArray(new Product[0]);
 
-        Comparator<Product> comparator = switch (sortBy) {
-            case "price" -> Comparator.comparingDouble(Product::getPrice);
-            case "name" -> Comparator.comparing(Product::getProductName);
-            case "quantity" -> Comparator.comparingInt(Product::getQuantity);
-            default -> throw new IllegalArgumentException("Invalid sort field: " + sortBy);
-        };
+//        Comparator<Product> comparator = switch (sortBy) {
+//            case "price" -> Comparator.comparingDouble(Product::getPrice);
+//            case "name" -> Comparator.comparing(Product::getProductName);
+//            case "quantity" -> Comparator.comparingInt(Product::getQuantity);
+//            default -> throw new IllegalArgumentException("Invalid sort field: " + sortBy);
+//        };
 
-        sortingUtility.quickSort(productArray, comparator, 0, productArray.length - 1);
+//        sortingUtility.quickSort(productArray, comparator, 0, productArray.length - 1);
 
         return List.of(productArray);
     }
@@ -185,37 +197,38 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void editProduct(Long productId, ProductDTO productDTO) throws Exception {
-        System.out.println("ProductDTO" + productDTO);
-        Product product = productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found."));
-
-        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(null);
-        Variety variety = varietyRepository.findById(productDTO.getVarietyId()).orElseThrow(null);
-
-        List<Type> productTypes = product.getTypes();
-
-        product.setProductName(productDTO.getProductName());
-        product.setCategory(category);
-        product.setVariety(variety);
-
-        for (String typeName : productDTO.getTypeNames()) {
-            Type type = typeRepository.findByTypeName(typeName);
-            if (type == null) {
-                type = new Type();
-                type.setTypeName(typeName);
-                typeRepository.save(type);
-            }
-
-            // Check if the type already exists in the product's types list before adding
-            if (!productTypes.contains(type)) {
-                productTypes.clear();
-                productTypes.add(type);
-            }
-        }
-
-        product.setTypes(productTypes);
-        productRepository.save(product);
-    }
+    public void editProduct(Long productId, ProductDTO productDTO){}
+//    public void editProduct(Long productId, ProductDTO productDTO) throws Exception {
+//        System.out.println("ProductDTO" + productDTO);
+//        Product product = productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found."));
+//
+//        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(null);
+//        Variety variety = varietyRepository.findById(productDTO.getVarietyId()).orElseThrow(null);
+//
+////        List<Type> productTypes = product.getTypes();
+//
+//        product.setProductName(productDTO.getProductName());
+//        product.setCategory(category);
+////        product.setVariety(variety);
+//
+//        for (String typeName : productDTO.getTypeNames()) {
+//            Type type = typeRepository.findByTypeName(typeName);
+//            if (type == null) {
+//                type = new Type();
+//                type.setTypeName(typeName);
+//                typeRepository.save(type);
+//            }
+//
+//            // Check if the type already exists in the product's types list before adding
+////            if (!productTypes.contains(type)) {
+////                productTypes.clear();
+////                productTypes.add(type);
+////            }
+//        }
+//
+////        product.setTypes(productTypes);
+//        productRepository.save(product);
+//    }
 
     @Override
     public void allActive() {
@@ -252,52 +265,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    @Override
-    public String addProductTemp(ProductDTO productDTO) {
-        Product product = new Product();
-        product.setProductName(productDTO.getProductName());
 
-        // Set category
-        Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID"));
-        product.setCategory(category);
-
-        // Set variety
-        Variety variety = varietyRepository.findById(productDTO.getVarietyId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid variety ID"));
-        product.setVariety(variety);
-
-        // Set types
-        List<Type> types = new ArrayList<>();
-        for (String typeName : productDTO.getTypeNames()) {
-            Type type = typeRepository.findByTypeName(typeName);
-            if (type == null) {
-                type = new Type();
-                type.setTypeName(typeName);
-                typeRepository.save(type);
-            }
-            types.add(type);
-        }
-        product.setTypes(types);
-
-        // Save product images
-//        if (!productImage1.isEmpty()) {
-//            String imageUrl1 = saveImage(productImage1);
-//            product.setProductImageUrl1(imageUrl1);
-//        }
-//
-//        if (!productImage2.isEmpty()) {
-//            String imageUrl2 = saveImage(productImage2);
-//            product.setProductImageUrl2(imageUrl2);
-//        }
-
-
-
-
-        productRepository.save(product);
-
-        return "Product added successfully!";
-    }
 
 //    private String saveImage(MultipartFile file) throws IOException {
 //        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -314,13 +282,43 @@ public class ProductServiceImpl implements ProductService {
                 new RuntimeException("Product not found with id: " + productId));
 
         // Set image URLs
-        product.setProductImageUrl1(s3KeyImage1);
-        product.setProductImageUrl2(s3KeyImage2);
+//        product.setProductImageUrl1(s3KeyImage1);
+//        product.setProductImageUrl2(s3KeyImage2);
 
         // Save the updated product back to the database
         productRepository.save(product);
 
         return "Image Added Successfully";
     }
+
+
+
+
+
+
+
+
+    // Method to generate unique Product ID
+    public static long generateUniqueProductId() {
+        // Get the current date in 'yyyyMMdd' format
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String dateStr = dateFormat.format(new Date());
+
+        // Get current time in milliseconds
+        long currentMillis = System.currentTimeMillis();
+
+        // Increment the counter to get a unique number
+        int uniqueNumber = counter.incrementAndGet();
+
+        // Combine the date (yyyyMMdd), current time in millis, and the unique incremented counter
+        String productIdStr = dateStr + currentMillis % 100000 + uniqueNumber;
+
+        // Convert the final string to a long value and return
+        return Long.parseLong(productIdStr);
+    }
+
+
+
+
 
 }

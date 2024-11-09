@@ -188,42 +188,76 @@ public class S3Service {
 
 
     // Upload two images for the product
-    public Map<String, String> uploadProductImages(Long productId, MultipartFile image1, MultipartFile image2) throws IOException {
-        // Define the S3 keys for product images
-        String fileName1 = image1.getOriginalFilename();
-        String fileName2 = image2.getOriginalFilename();
+//    public Map<String, String> uploadProductImages(Long productId, MultipartFile image1, MultipartFile image2) throws IOException {
+//        // Define the S3 keys for product images
+//        String fileName1 = image1.getOriginalFilename();
+//        String fileName2 = image2.getOriginalFilename();
+//
+//        String s3KeyImage1 = "products/" + productId + "/images/image1_" + fileName1;
+//        String s3KeyImage2 = "products/" + productId + "/images/image2_" + fileName2;
+//
+//        // Upload the first product image
+//        s3Client.putObject(PutObjectRequest.builder()
+//                        .bucket(bucketName)
+//                        .key(s3KeyImage1)
+//                        .build(),
+//                RequestBody.fromBytes(image1.getBytes()));
+//
+//        // Upload the second product image
+//        s3Client.putObject(PutObjectRequest.builder()
+//                        .bucket(bucketName)
+//                        .key(s3KeyImage2)
+//                        .build(),
+//                RequestBody.fromBytes(image2.getBytes()));
+//
+//        // Return the S3 keys of the uploaded images
+//        Map<String, String> uploadedImageKeys = new HashMap<>();
+//        uploadedImageKeys.put("image1", s3KeyImage1);
+//        uploadedImageKeys.put("image2", s3KeyImage2);
+//
+//        return uploadedImageKeys;  // Return the S3 keys for both images
+//    }
 
-        String s3KeyImage1 = "products/" + productId + "/images/image1_" + fileName1;
-        String s3KeyImage2 = "products/" + productId + "/images/image2_" + fileName2;
 
-        // Upload the first product image
+    public String uploadProductImage(Long productId, MultipartFile image) throws IOException {
+        // Define the S3 key for the product image
+        String fileName = image.getOriginalFilename();
+        String s3KeyImage = "products/" + productId + "/images/" + "image_" + fileName;
+
+        // Upload the product image
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(bucketName)
-                        .key(s3KeyImage1)
+                        .key(s3KeyImage)
                         .build(),
-                RequestBody.fromBytes(image1.getBytes()));
+                RequestBody.fromBytes(image.getBytes()));
 
-        // Upload the second product image
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3KeyImage2)
-                        .build(),
-                RequestBody.fromBytes(image2.getBytes()));
-
-        // Return the S3 keys of the uploaded images
-        Map<String, String> uploadedImageKeys = new HashMap<>();
-        uploadedImageKeys.put("image1", s3KeyImage1);
-        uploadedImageKeys.put("image2", s3KeyImage2);
-
-        return uploadedImageKeys;  // Return the S3 keys for both images
+        // Return the S3 key of the uploaded image
+        return s3KeyImage;
     }
+
+    public String getProductImagePresignedUrl(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
 
     // Generate presigned URLs to retrieve both product images
     public Map<String, String> getProductImagesPresignedUrls(Long productId) {
         Product product =  productRepository.findById(productId).get();
 
-        String s3KeyImage1 = product.getProductImageUrl1() ;
-        String s3KeyImage2 = product.getProductImageUrl2();
+        String s3KeyImage1 = "product.getProductImageUrl1()" ;
+        String s3KeyImage2 = "product.getProductImageUrl2()";
 
         // Generate the presigned URL for the first product image
         GetObjectRequest getObjectRequest1 = GetObjectRequest.builder()

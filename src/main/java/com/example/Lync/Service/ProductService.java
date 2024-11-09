@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
-    String addProduct(ProductDTO productDTO, MultipartFile productImage1, MultipartFile productImage2) throws IOException, IOException;
+    Product addProduct(ProductDTO productDTO) throws IOException;
     List<Product> getAllProducts();
     List<Product> getAllInactiveProducts();
-    String addProductTemp(ProductDTO productDTO);
+//    String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;
     public Product searchProductByName(String productName);
     public List<Product> searchProductsByPrefixOriginal(String prefix);

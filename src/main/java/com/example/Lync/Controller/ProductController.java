@@ -4,16 +4,12 @@ import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.ProductDTO;
 import com.example.Lync.DTO.SellerProductImageDto;
 import com.example.Lync.Entity.*;
-import com.example.Lync.Service.CategoryService;
-import com.example.Lync.Service.ProductService;
-import com.example.Lync.Service.TypeService;
-import com.example.Lync.Service.VarietyService;
+import com.example.Lync.Service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,13 +26,16 @@ public class ProductController {
     private final VarietyService varietyService;
     private final TypeService typeService;
 
+    private final FormService formService;
+
     public ProductController(ProductService productService, S3Service s3Service, CategoryService categoryService,
-                             VarietyService varietyService, TypeService typeService) {
+                             VarietyService varietyService, TypeService typeService, FormService formService) {
         this.productService = productService;
         this.s3Service = s3Service;
         this.categoryService = categoryService;
         this.varietyService = varietyService;
         this.typeService = typeService;
+        this.formService = formService;
     }
 
     // ---------------- Product Endpoints ---------------- //
@@ -49,12 +48,14 @@ public class ProductController {
 //    }
 
     @PostMapping("/products/add")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Product> addProduct( @RequestPart("productDTO") ProductDTO productDTO,
+    @RequestParam(value = "productImage", required = false) MultipartFile productImage) throws IOException {
 
-    public ResponseEntity<String> addProduct(
-            @RequestBody ProductDTO productDTO) throws IOException {
-        System.out.println("here");
-        return ResponseEntity.ok(productService.addProductTemp(productDTO));
+        if (productImage != null && !productImage.isEmpty()) {
+            productDTO.setProductImage(productImage);
+        }        // Call the service layer to save the product
+        Product product = productService.addProduct(productDTO);
+        return new ResponseEntity<>(product, HttpStatus.CREATED);  // Return the created product
     }
 
     @GetMapping("/products/all")
@@ -69,7 +70,7 @@ public class ProductController {
 
     // ---------------- Category Endpoints ---------------- //
     @PostMapping("/categories/add")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
         return ResponseEntity.ok(categoryService.addCategory(category));
@@ -82,7 +83,7 @@ public class ProductController {
 
     // ---------------- Variety Endpoints ---------------- //
     @PostMapping("/varieties/add")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
     public ResponseEntity<String> addVariety(@RequestBody Variety variety) {
         return ResponseEntity.ok(varietyService.addVariety(variety));
@@ -93,7 +94,22 @@ public class ProductController {
         return varietyService.getAllVarieties();
     }
 
-    // ---------------- Type Endpoints ---------------- //
+    // ---------------- Form Endpoints ---------------- //
+    @PostMapping("/forms/add")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
+    public ResponseEntity<String> addForm(@RequestBody Form form) {
+        return ResponseEntity.ok(formService.addForm(form));
+    }
+
+    @GetMapping("/forms/all")
+    public List<Form> getAllForms() {
+        return formService.getAllForm();
+    }
+
+
+    // ---------------- Types Endpoints ---------------- //
+
     @PostMapping("/types/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
@@ -106,37 +122,37 @@ public class ProductController {
         return typeService.getAllTypes();
     }
 
-    @PostMapping("/products/{productId}/upload-images")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-
-    public ResponseEntity<Map<String, String>> uploadProductImages(
-            @PathVariable Long productId,
-            @RequestParam("image1") MultipartFile image1,
-            @RequestParam("image2") MultipartFile image2) {
-        try {
-            // Upload images and get the map of image keys
-            Map<String, String> uploadedImageKeys = s3Service.uploadProductImages(productId, image1, image2);
-
-// Print the map to see the keys and values
-            System.out.println(uploadedImageKeys);
-
-// Assuming the map contains the keys "image1" and "image2"
-            String image1Key = uploadedImageKeys.get("image1");
-            String image2Key = uploadedImageKeys.get("image2");
-
-// Check if both keys are present
-            if (image1Key != null && image2Key != null) {
-                // Pass the keys to the product service method
-                productService.addImageByProductId(productId, image1Key, image2Key);
-            } else {
-                System.out.println("One or both image keys are missing.");
-            }
-
-            return ResponseEntity.ok(uploadedImageKeys); // Return the S3 keys for the uploaded images
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Return error if upload fails
-        }
-    }
+//    @PostMapping("/products/{productId}/upload-images")
+////    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//
+//    public ResponseEntity<Map<String, String>> uploadProductImages(
+//            @PathVariable Long productId,
+//            @RequestParam("image1") MultipartFile image1,
+//            @RequestParam("image2") MultipartFile image2) {
+//        try {
+//            // Upload images and get the map of image keys
+//            Map<String, String> uploadedImageKeys = s3Service.uploadProductImages(productId, image1, image2);
+//
+//// Print the map to see the keys and values
+//            System.out.println(uploadedImageKeys);
+//
+//// Assuming the map contains the keys "image1" and "image2"
+//            String image1Key = uploadedImageKeys.get("image1");
+//            String image2Key = uploadedImageKeys.get("image2");
+//
+//// Check if both keys are present
+//            if (image1Key != null && image2Key != null) {
+//                // Pass the keys to the product service method
+//                productService.addImageByProductId(productId, image1Key, image2Key);
+//            } else {
+//                System.out.println("One or both image keys are missing.");
+//            }
+//
+//            return ResponseEntity.ok(uploadedImageKeys); // Return the S3 keys for the uploaded images
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Return error if upload fails
+//        }
+//    }
 
     @GetMapping("/products/{productId}/images/presigned-urls")
 
