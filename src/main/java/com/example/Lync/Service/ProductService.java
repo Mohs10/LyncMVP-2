@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductService {
     Product addProduct(ProductDTO productDTO) throws IOException;
-    List<Product> getAllProducts();
+    List<ProductDTO> getAllProducts();
     List<Product> getAllInactiveProducts();
 //    String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;
@@ -20,7 +20,7 @@ public interface ProductService {
     public List<Product> getSortedProductsByCategory(Long categoryId, String sortBy);
     public List<Product> findByCategoryId(Long categoryId);
 
-    void editProduct(Long productId, ProductDTO productDTO) throws Exception;
+    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws Exception;
 
     void allActive();
 

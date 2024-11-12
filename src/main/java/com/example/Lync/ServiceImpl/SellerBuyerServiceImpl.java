@@ -3,18 +3,21 @@ package com.example.Lync.ServiceImpl;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
+import com.example.Lync.DTO.SpecificationDTO;
 import com.example.Lync.Entity.*;
 
 import com.example.Lync.Repository.*;
 import com.example.Lync.Service.SellerBuyerService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -22,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     private  final SellerBuyerRepository sellerBuyerRepository;
@@ -35,15 +39,19 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final FavouriteProductRepository favouriteProductRepository;
     private final SellerProductRepository sellerProductRepository;
 
+    private final FormRepository formRepository;
+    private final VarietyRepository varietyRepository;
+    private final SellerProductSpecificationRepository sellerProductSpecificationRepository;
     private final S3Service s3Service;
 
+    private static final AtomicInteger serialNumber = new AtomicInteger(1); // Initialize starting value
 
     @Autowired
     @Lazy
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, S3Service s3Service) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -51,6 +59,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.productRepository = productRepository;
         this.favouriteProductRepository = favouriteProductRepository;
         this.sellerProductRepository = sellerProductRepository;
+        this.formRepository = formRepository;
+        this.varietyRepository = varietyRepository;
+        this.sellerProductSpecificationRepository = sellerProductSpecificationRepository;
         this.s3Service = s3Service;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
@@ -541,15 +552,139 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 @Override
     public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) throws Exception {
 
-        //Genetate SpId
-        sellerProductDTO.setSpId(generateUniqueSpId());
-    System.out.println(sellerProductDTO);
-        SellerProduct sellerProduct = toEntity(sellerProductDTO);
-        sellerProduct.setAddDate(LocalDate.now());
-        sellerProduct.setAddTime(LocalTime.now());
-        return sellerProductRepository.save(sellerProduct);
+
+        List<SellerProductSpecification> specifications=new ArrayList<>();
+    for (SpecificationDTO specificationDTO : sellerProductDTO.getSpecifications()) {
+        SellerProductSpecification specification = new SellerProductSpecification();
+        specification.setSpecificationName(specificationDTO.getSpecificationName());
+        specification.setSpecificationValue(specificationDTO.getSpecificationValue());
+        specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
+        specifications.add(sellerProductSpecificationRepository.save(specification));
+    }
+
+    //Genetate SpId
+    sellerProductDTO.setSpId(generateUniqueSpId());
+    SellerProduct sellerProduct = new SellerProduct();
+
+    // Map DTO fields to the entity
+    sellerProduct.setSpId(sellerProductDTO.getSpId());
+    sellerProduct.setSellerId(sellerProductDTO.getSellerId());
+    sellerProduct.setProductId(sellerProductDTO.getProductId());
+    sellerProduct.setProductFormId(sellerProductDTO.getProductFormId());
+    sellerProduct.setProductVarietyId(sellerProductDTO.getProductVarietyId());
+    sellerProduct.setOriginOfProduce(sellerProductDTO.getOriginOfProduce());
+    sellerProduct.setAvailableAmount(sellerProductDTO.getAvailableAmount());
+    sellerProduct.setUnit(sellerProductDTO.getUnit());
+    sellerProduct.setDescription(sellerProductDTO.getDescription());
+    sellerProduct.setMaxPrice(sellerProductDTO.getMaxPrice());
+    sellerProduct.setMinPrice(sellerProductDTO.getMinPrice());
+    sellerProduct.setDeliveryCharges(sellerProductDTO.getDeliveryCharges());
+    sellerProduct.setPriceTerms(sellerProductDTO.getPriceTerms());
+    sellerProduct.setPackagingMaterial(sellerProductDTO.getPackagingMaterial());
+    sellerProduct.setPaymentTerms(sellerProductDTO.getPaymentTerms());
+    sellerProduct.setEarliestAvailableDate(sellerProductDTO.getEarliestAvailableDate());
+    sellerProduct.setWarehouseCountry(sellerProductDTO.getWarehouseCountry());
+    sellerProduct.setWarehouseState(sellerProductDTO.getWarehouseState());
+    sellerProduct.setWarehouseCity(sellerProductDTO.getWarehouseCity());
+    sellerProduct.setWarehousePinCode(sellerProductDTO.getWarehousePinCode());
+    sellerProduct.setCertificationName(sellerProductDTO.getCertificationName());
+    sellerProduct.setCertificationFileUrl(sellerProductDTO.getCertificationFileUrl());
+
+    // Handle images
+    if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
+       String image1Url =s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage1());
+        sellerProduct.setProductImageUrl1(image1Url);
+    }
+    if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
+        String image2Url =s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage2());
+        sellerProduct.setProductImageUrl2(image2Url);
+        // Upload image2 logic
+    }
+
+    // Handle certification file
+    if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
+        String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getCertificationFile());
+        sellerProduct.setCertificationFileUrl(certificateUrl);
+        // Upload certification file logic
+    }
+
+    // Set Specifications (many-to-many relationship)
+    if (sellerProductDTO.getSpecifications() != null) {
+      sellerProduct.setSpecifications(specifications);
+    }
+
+    // Save or update SellerProduct
+    return sellerProductRepository.save(sellerProduct);
 
     }
+
+
+@Override
+    public SellerProduct editSellerProduct(SellerProduct existingSellerProduct, SellerProductDTO sellerProductDTO) throws Exception {
+
+        // Update specifications
+        List<SellerProductSpecification> specifications = new ArrayList<>();
+        for (SpecificationDTO specificationDTO : sellerProductDTO.getSpecifications()) {
+            SellerProductSpecification specification = new SellerProductSpecification();
+            specification.setSpecificationName(specificationDTO.getSpecificationName());
+            specification.setSpecificationValue(specificationDTO.getSpecificationValue());
+            specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
+            specifications.add(sellerProductSpecificationRepository.save(specification));
+        }
+
+        // Update fields of the existing seller product
+        existingSellerProduct.setProductId(sellerProductDTO.getProductId());
+        existingSellerProduct.setProductFormId(sellerProductDTO.getProductFormId());
+        existingSellerProduct.setProductVarietyId(sellerProductDTO.getProductVarietyId());
+        existingSellerProduct.setOriginOfProduce(sellerProductDTO.getOriginOfProduce());
+        existingSellerProduct.setAvailableAmount(sellerProductDTO.getAvailableAmount());
+        existingSellerProduct.setUnit(sellerProductDTO.getUnit());
+        existingSellerProduct.setDescription(sellerProductDTO.getDescription());
+        existingSellerProduct.setMaxPrice(sellerProductDTO.getMaxPrice());
+        existingSellerProduct.setMinPrice(sellerProductDTO.getMinPrice());
+        existingSellerProduct.setDeliveryCharges(sellerProductDTO.getDeliveryCharges());
+        existingSellerProduct.setPriceTerms(sellerProductDTO.getPriceTerms());
+        existingSellerProduct.setPackagingMaterial(sellerProductDTO.getPackagingMaterial());
+        existingSellerProduct.setPaymentTerms(sellerProductDTO.getPaymentTerms());
+        existingSellerProduct.setEarliestAvailableDate(sellerProductDTO.getEarliestAvailableDate());
+        existingSellerProduct.setWarehouseCountry(sellerProductDTO.getWarehouseCountry());
+        existingSellerProduct.setWarehouseState(sellerProductDTO.getWarehouseState());
+        existingSellerProduct.setWarehouseCity(sellerProductDTO.getWarehouseCity());
+        existingSellerProduct.setWarehousePinCode(sellerProductDTO.getWarehousePinCode());
+        existingSellerProduct.setCertificationName(sellerProductDTO.getCertificationName());
+
+        // Update certification file if a new one is provided
+        if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
+            String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getCertificationFile());
+            existingSellerProduct.setCertificationFileUrl(certificateUrl);
+        }
+
+        // Handle product images
+        if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
+            String image1Url = s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage1());
+            existingSellerProduct.setProductImageUrl1(image1Url);
+        }
+        if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
+            String image2Url = s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage2());
+            existingSellerProduct.setProductImageUrl2(image2Url);
+        }
+
+        // Update specifications (many-to-many relationship)
+        if (sellerProductDTO.getSpecifications() != null) {
+            existingSellerProduct.setSpecifications(specifications);
+        }
+
+        // Save or update the existing SellerProduct
+        return sellerProductRepository.save(existingSellerProduct);
+    }
+
+
+
+
+
+
+
+
     @Override
     public List<SellerProduct> getSellerProductsBySeller(String sellerId) {
         return sellerProductRepository.findBySellerId(sellerId);
@@ -585,94 +720,146 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
 
     // Method to generate a unique spId
-    private  String generateUniqueSpId() {
-        return "SP-" + UUID.randomUUID().toString();
+    public static String generateUniqueSpId() {
+        // Get the current year
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+        String year = yearFormat.format(new Date());
+
+        // Get the serial number and increment it atomically
+        int serial = serialNumber.getAndIncrement();
+
+        // Format the serial number with leading zeros
+        String formattedSerial = String.format("%05d", serial);
+
+        // Generate the sellerProductId
+        return "SP-" + year + "-" + formattedSerial;
     }
     private SellerProduct toEntity(SellerProductDTO dto) throws Exception {
         SellerProduct sellerProduct = new SellerProduct();
 
         // Set fields from SellerProductDTO to SellerProduct
-        sellerProduct.setSpId(dto.getSpId());
-        sellerProduct.setSellerId(dto.getSellerId());
-        sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
-        sellerProduct.setMinPricePerTon(dto.getMinPricePerTon());
-        sellerProduct.setDeliveryCharges(dto.getDeliveryCharges());
-        sellerProduct.setDescription(dto.getDescription());
-        sellerProduct.setGrainSize(dto.getGrainSize());
-        sellerProduct.setAdmixing(dto.getAdmixing());
-        sellerProduct.setMoisture(dto.getMoisture());
-        sellerProduct.setOrigin(dto.getOrigin());
-        sellerProduct.setDd(dto.getDd());
-        sellerProduct.setKettValue(dto.getKettValue());
-        sellerProduct.setChalky(dto.getChalky());
-        sellerProduct.setForeignMaterial(dto.getForeignMaterial());
-        sellerProduct.setWarehouse(dto.getWarehouse());
-        sellerProduct.setAvailableAmount(dto.getAvailableAmount());
-        sellerProduct.setProductImageUrl1(dto.getProductImageUrl1());
-        sellerProduct.setProductImageUrl2(dto.getProductImageUrl2());
-        sellerProduct.setProductCertificationUrl(dto.getProductCertificationUrl());
-        sellerProduct.setAddDate(dto.getAddDate());
-        sellerProduct.setAddTime(dto.getAddTime());
-        sellerProduct.setEarliestAvailableDate(dto.getEarliestAvailableDate());
-
-        // Set product ID and certification fields
-        sellerProduct.setProductId(dto.getProductId());
-        sellerProduct.setNpop(dto.getNpop());
-        sellerProduct.setNop(dto.getNop());
-        sellerProduct.setEu(dto.getEu());
-        sellerProduct.setGsdc(dto.getGsdc());
-        sellerProduct.setIpm(dto.getIpm());
-        sellerProduct.setOther(dto.getOther());
+//        sellerProduct.setSpId(dto.getSpId());
+//        sellerProduct.setSellerId(dto.getSellerId());
+//        sellerProduct.setMaxPricePerTon(dto.getMaxPricePerTon());
+//        sellerProduct.setMinPricePerTon(dto.getMinPricePerTon());
+//        sellerProduct.setDeliveryCharges(dto.getDeliveryCharges());
+//        sellerProduct.setDescription(dto.getDescription());
+//        sellerProduct.setGrainSize(dto.getGrainSize());
+//        sellerProduct.setAdmixing(dto.getAdmixing());
+//        sellerProduct.setMoisture(dto.getMoisture());
+//        sellerProduct.setOrigin(dto.getOrigin());
+//        sellerProduct.setDd(dto.getDd());
+//        sellerProduct.setKettValue(dto.getKettValue());
+//        sellerProduct.setChalky(dto.getChalky());
+//        sellerProduct.setForeignMaterial(dto.getForeignMaterial());
+//        sellerProduct.setWarehouse(dto.getWarehouse());
+//        sellerProduct.setAvailableAmount(dto.getAvailableAmount());
+//        sellerProduct.setProductImageUrl1(dto.getProductImageUrl1());
+//        sellerProduct.setProductImageUrl2(dto.getProductImageUrl2());
+//        sellerProduct.setProductCertificationUrl(dto.getProductCertificationUrl());
+//        sellerProduct.setAddDate(dto.getAddDate());
+//        sellerProduct.setAddTime(dto.getAddTime());
+//        sellerProduct.setEarliestAvailableDate(dto.getEarliestAvailableDate());
+//
+//        // Set product ID and certification fields
+//        sellerProduct.setProductId(dto.getProductId());
+//        sellerProduct.setNpop(dto.getNpop());
+//        sellerProduct.setNop(dto.getNop());
+//        sellerProduct.setEu(dto.getEu());
+//        sellerProduct.setGsdc(dto.getGsdc());
+//        sellerProduct.setIpm(dto.getIpm());
+//        sellerProduct.setOther(dto.getOther());
 
         return sellerProduct;
     }
 
 
-    private SellerProductDTO toDTO(SellerProduct sellerProduct) {
+
+
+    public  SellerProductDTO toDTO(SellerProduct sellerProduct) {
         SellerProductDTO dto = new SellerProductDTO();
 
-        // Fetch product details safely with Optional
-        Product product = productRepository.findById(sellerProduct.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        // Set fields from SellerProduct to SellerProductDTO
         dto.setSpId(sellerProduct.getSpId());
         dto.setSellerId(sellerProduct.getSellerId());
-        dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
-        dto.setMinPricePerTon(sellerProduct.getMinPricePerTon());
-        dto.setDeliveryCharges(sellerProduct.getDeliveryCharges());
-        dto.setDescription(sellerProduct.getDescription());
-        dto.setGrainSize(sellerProduct.getGrainSize());
-        dto.setAdmixing(sellerProduct.getAdmixing());
-        dto.setMoisture(sellerProduct.getMoisture());
-        dto.setOrigin(sellerProduct.getOrigin());
-        dto.setDd(sellerProduct.getDd());
-        dto.setKettValue(sellerProduct.getKettValue());
-        dto.setChalky(sellerProduct.getChalky());
-        dto.setForeignMaterial(sellerProduct.getForeignMaterial());
-        dto.setWarehouse(sellerProduct.getWarehouse());
+        dto.setProductId(sellerProduct.getProductId());
+
+        // Product details
+        dto.setProductFormId(sellerProduct.getProductFormId());
+        dto.setProductVarietyId(sellerProduct.getProductVarietyId());
+
+        String productName = productRepository.findById(sellerProduct.getProductId())
+                .map(Product::getProductName)
+                .orElse("Not found");
+
+        String formName = formRepository.findById(sellerProduct.getProductFormId())
+                .map(Form::getFormName)
+                .orElse("Not found");
+
+        String varietyName = varietyRepository.findById(sellerProduct.getProductVarietyId())
+                .map(Variety::getVarietyName)
+                .orElse("Not found");
+
+        dto.setProductName(productName);
+        dto.setProductFormName(formName);
+        dto.setProductVarietyName(varietyName);
+
+
+
+        dto.setOriginOfProduce(sellerProduct.getOriginOfProduce());
         dto.setAvailableAmount(sellerProduct.getAvailableAmount());
-        dto.setProductImageUrl1(sellerProduct.getProductImageUrl1());
-        dto.setProductImageUrl2(sellerProduct.getProductImageUrl2());
-        dto.setProductCertificationUrl(sellerProduct.getProductCertificationUrl());
-        dto.setAddDate(sellerProduct.getAddDate());
-        dto.setAddTime(sellerProduct.getAddTime());
+        dto.setUnit(sellerProduct.getUnit());
+        dto.setDescription(sellerProduct.getDescription());
+
+        String image1Url= s3Service.getSellerProductImage1Url(sellerProduct.getProductImageUrl1());
+        String image2Url= s3Service.getSellerProductImage2Url(sellerProduct.getProductImageUrl1());
+        String certificateUrl= s3Service.getSellerProductCertificateUrl(sellerProduct.getProductImageUrl1());
+
+        // Product Images
+        dto.setProductImageUrl1(image1Url);
+        dto.setProductImageUrl2(image2Url);
+
+        // Pricing details
+        dto.setMaxPrice(sellerProduct.getMaxPrice());
+        dto.setMinPrice(sellerProduct.getMinPrice());
+        dto.setDeliveryCharges(sellerProduct.getDeliveryCharges());
+        dto.setPriceTerms(sellerProduct.getPriceTerms());
+
+        // Packaging & Payment
+        dto.setPackagingMaterial(sellerProduct.getPackagingMaterial());
+        dto.setPaymentTerms(sellerProduct.getPaymentTerms());
+
+        // Availability
         dto.setEarliestAvailableDate(sellerProduct.getEarliestAvailableDate());
 
-        // Set fields related to the Product entity
-        dto.setProductId(sellerProduct.getProductId());
-        dto.setProductName(product.getProductName());
-        dto.setProductCategory(product.getCategory().getCategoryName());
+        // Warehouse location
+        dto.setWarehouseCountry(sellerProduct.getWarehouseCountry());
+        dto.setWarehouseState(sellerProduct.getWarehouseState());
+        dto.setWarehouseCity(sellerProduct.getWarehouseCity());
+        dto.setWarehousePinCode(sellerProduct.getWarehousePinCode());
 
-        // Set certifications
-        dto.setNpop(sellerProduct.getNpop());
-        dto.setNop(sellerProduct.getNop());
-        dto.setEu(sellerProduct.getEu());
-        dto.setGsdc(sellerProduct.getGsdc());
-        dto.setIpm(sellerProduct.getIpm());
-        dto.setOther(sellerProduct.getOther());
+        // Certification details
+        dto.setCertificationName(sellerProduct.getCertificationName());
+        dto.setCertificationFileUrl(certificateUrl);
+
+        // Specifications
+        List<SpecificationDTO> specificationsDTO = sellerProduct.getSpecifications().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+        dto.setSpecifications(specificationsDTO);
+
         return dto;
     }
+
+
+    private  SpecificationDTO toDTO(SellerProductSpecification specification)
+    { SpecificationDTO specificationDTO = new SpecificationDTO();
+        specificationDTO.setSpecificationName(specification.getSpecificationName());
+        specificationDTO.setSpecificationValue(specification.getSpecificationValue());
+        specificationDTO.setSpecificationValueUnits(specification.getSpecificationValueUnits());
+        return  specificationDTO;
+
+    }
+
 
 
 

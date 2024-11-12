@@ -12,6 +12,7 @@ import com.example.Lync.ReusablePackage.StringAndDateUtils;
 import com.example.Lync.Service.ProductService;
 import com.example.Lync.trie.Trie;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -30,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final CertificationRepository certificationRepository;
     private final FormRepository formRepository;
     private final StringAndDateUtils stringAndDateUtils;
+
+    private final SpecificationRepository specificationRepository;
     private final Sorting<Product> sortingUtility = new Sorting<>();
     private final BinarySearch<Product> searchUtility = new BinarySearch<>();
 
@@ -56,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
 //    private String uploadDir;
 
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
-                              VarietyRepository varietyRepository, TypeRepository typeRepository, CertificationRepository certificationRepository, FormRepository formRepository, StringAndDateUtils stringAndDateUtils, S3Service s3Service) {
+                              VarietyRepository varietyRepository, TypeRepository typeRepository, CertificationRepository certificationRepository, FormRepository formRepository, StringAndDateUtils stringAndDateUtils, SpecificationRepository specificationRepository, S3Service s3Service) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.varietyRepository = varietyRepository;
@@ -64,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
         this.certificationRepository = certificationRepository;
         this.formRepository = formRepository;
         this.stringAndDateUtils = stringAndDateUtils;
+        this.specificationRepository = specificationRepository;
         this.s3Service = s3Service;
     }
 
@@ -90,7 +95,8 @@ public class ProductServiceImpl implements ProductService {
             Specification specification = new Specification();
             specification.setSpecificationName(specificationDTO.getSpecificationName());
             specification.setSpecificationValue(specificationDTO.getSpecificationValue());
-            specifications.add(specification);
+            specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
+            specifications.add(specificationRepository.save(specification));
         }
 
 
@@ -111,9 +117,10 @@ public class ProductServiceImpl implements ProductService {
         product.setForms(forms);
         product.setProductImageUrl(productDTO.getProductImageUrl());
         product.setProductDescription(productDTO.getProductDescription());
-//        product.setActiveProduct(productDTO.isActiveProduct());
         product.setCertifications(certifications);  // Set the certifications
         product.setSpecifications(specifications);
+        System.out.println(product.getSpecifications());
+
 
 
         // Save the product
@@ -121,8 +128,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findByActiveProductTrue();
+    public List<ProductDTO> getAllProducts() {
+
+        return productRepository.findByActiveProductTrue().stream().map(this::toDTO) // Using helper method
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -197,38 +206,54 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void editProduct(Long productId, ProductDTO productDTO){}
-//    public void editProduct(Long productId, ProductDTO productDTO) throws Exception {
-//        System.out.println("ProductDTO" + productDTO);
-//        Product product = productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found."));
-//
-//        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(null);
-//        Variety variety = varietyRepository.findById(productDTO.getVarietyId()).orElseThrow(null);
-//
-////        List<Type> productTypes = product.getTypes();
-//
-//        product.setProductName(productDTO.getProductName());
-//        product.setCategory(category);
-////        product.setVariety(variety);
-//
-//        for (String typeName : productDTO.getTypeNames()) {
-//            Type type = typeRepository.findByTypeName(typeName);
-//            if (type == null) {
-//                type = new Type();
-//                type.setTypeName(typeName);
-//                typeRepository.save(type);
-//            }
-//
-//            // Check if the type already exists in the product's types list before adding
-////            if (!productTypes.contains(type)) {
-////                productTypes.clear();
-////                productTypes.add(type);
-////            }
-//        }
-//
-////        product.setTypes(productTypes);
-//        productRepository.save(product);
-//    }
+    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws IOException {
+        // Update fields of the existing product with new data from productDTO
+        existingProduct.setProductName(productDTO.getProductName());
+        existingProduct.setHsnCode(productDTO.getHsnCode());
+        existingProduct.setProductDescription(productDTO.getProductDescription());
+
+        // Retrieve the category, varieties, forms, and certifications again in case they have changed
+        Category category = categoryRepository.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        existingProduct.setCategory(category);
+
+        List<Variety> varieties = varietyRepository.findAllById(productDTO.getVarietyIds());
+        existingProduct.setVarieties(varieties);
+
+        List<Form> forms = formRepository.findAllById(productDTO.getFormIds());
+        existingProduct.setForms(forms);
+
+        // Update certifications
+        List<Certification> certifications = new ArrayList<>();
+        for (CertificationDTO certificationDTO : productDTO.getCertifications()) {
+            Certification certification = new Certification();
+            certification.setCertificationName(certificationDTO.getCertificationName());
+            certification.setIsCertified(certificationDTO.getIsCertified());
+            certifications.add(certificationRepository.save(certification));  // Save each certification
+        }
+        existingProduct.setCertifications(certifications);
+
+        // Update specifications
+        List<Specification> specifications = new ArrayList<>();
+        for (SpecificationDTO specificationDTO : productDTO.getSpecifications()) {
+            Specification specification = new Specification();
+            specification.setSpecificationName(specificationDTO.getSpecificationName());
+            specification.setSpecificationValue(specificationDTO.getSpecificationValue());
+            specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
+            specifications.add(specificationRepository.save(specification));
+        }
+        existingProduct.setSpecifications(specifications);
+
+        // Update product image if a new one is provided
+        if (productDTO.getProductImage() != null) {
+            String profilePictureUrl = s3Service.uploadProductImage(existingProduct.getProductId(), productDTO.getProductImage());
+            existingProduct.setProductImageUrl(profilePictureUrl);
+        }
+
+        // Save the updated product
+        return productRepository.save(existingProduct);
+    }
+
 
     @Override
     public void allActive() {
@@ -317,7 +342,61 @@ public class ProductServiceImpl implements ProductService {
         return Long.parseLong(productIdStr);
     }
 
+    private  ProductDTO toDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
 
+        dto.setProductId(product.getProductId());
+        dto.setProductName(product.getProductName());
+        dto.setHsnCode(product.getHsnCode());
+        dto.setCategoryId(product.getCategory().getCategoryId());
+
+        dto.setVarietyIds(product.getVarieties().stream().map(variety -> variety.getVarietyId()).collect(Collectors.toList()));
+
+        dto.setVarietys(product.getVarieties());
+
+        dto.setFormIds(product.getForms().stream().map(form -> form.getFormId()).collect(Collectors.toList()));
+        dto.setForms(product.getForms());
+
+        String imageUrl= s3Service.getProductImagePresignedUrl(product.getProductImageUrl());
+
+        dto.setProductImageUrl(imageUrl);
+        dto.setProductDescription(product.getProductDescription());
+
+        // Map Certifications
+        List<CertificationDTO> certificationsDTO = product.getCertifications().stream()
+                .map(this::toDTO) // Using helper method
+                .collect(Collectors.toList());
+        dto.setCertifications(certificationsDTO);
+
+        // Map Specifications
+        List<SpecificationDTO> specificationsDTO = product.getSpecifications().stream()
+                .map(this::toDTO) // Using helper method
+                .collect(Collectors.toList());
+        dto.setSpecifications(specificationsDTO);
+
+        dto.setActiveProduct(product.isActiveProduct());
+
+        return dto;
+    }
+
+
+    private  CertificationDTO toDTO(Certification certification)
+    {
+        CertificationDTO certificationDTO =  new CertificationDTO();
+        certificationDTO.setCertificationName(certification.getCertificationName());
+//        certificationDTO.setIsCertified(certification.getIsCertified());
+
+        return certificationDTO;
+    }
+
+    private  SpecificationDTO toDTO(Specification specification)
+    { SpecificationDTO specificationDTO = new SpecificationDTO();
+        specificationDTO.setSpecificationName(specification.getSpecificationName());
+        specificationDTO.setSpecificationValue(specification.getSpecificationValue());
+        specificationDTO.setSpecificationValueUnits(specification.getSpecificationValueUnits());
+        return  specificationDTO;
+
+    }
 
 
 

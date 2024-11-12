@@ -18,6 +18,7 @@ public class Certification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long certificationId;
 
+
     private String certificationName;  // Name of the certification (e.g., NPOP, NOP, etc.)
 
     private Boolean isCertified;  // Boolean value to indicate if the product has this certification

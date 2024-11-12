@@ -7,6 +7,7 @@ import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
+import com.example.Lync.Repository.SellerProductRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.OTPStorageService;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,9 +40,11 @@ public class SellerController {
     private final OtpService otpService;
     private final OTPStorageService otpStorageService;
     private final UserInfoService userInfoService;
+
+    private final SellerProductRepository sellerProductRepository;
     private final InquiryService inquiryService;
 
-    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService) {
+    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, SellerProductRepository sellerProductRepository, InquiryService inquiryService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -51,6 +55,7 @@ public class SellerController {
         this.otpService = otpService;
         this.otpStorageService = otpStorageService;
         this.userInfoService = userInfoService;
+        this.sellerProductRepository = sellerProductRepository;
         this.inquiryService = inquiryService;
     }
 
@@ -90,7 +95,12 @@ public class SellerController {
     }
 
     @PostMapping("/addSellerProduct")
-    public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) throws Exception {
+    public ResponseEntity<SellerProduct> addSellerProduct(@RequestPart("sellerProductDto") SellerProductDTO sellerProductDto,
+     @RequestParam(value = "productImage1", required = false) MultipartFile productImage1,
+      @RequestParam(value = "productImage2", required = false) MultipartFile productImage2,
+       @RequestParam(value = "certificate", required = false) MultipartFile certificate
+
+    ) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Get the username from the Authentication object
@@ -103,10 +113,58 @@ public class SellerController {
 
         sellerProductDto.setSellerId(sellerDetails.getUserId());
 
+        if (productImage1 != null && !productImage1.isEmpty()) {
+            sellerProductDto.setProductImage1(productImage1);
+        }
+        if (productImage2 != null && !productImage2.isEmpty()) {
+            sellerProductDto.setProductImage2(productImage2);
+        }
+        if (certificate != null && !certificate.isEmpty()) {
+            sellerProductDto.setCertificationFile(certificate);
+        }
+
         SellerProduct addedSellerProduct = sellerBuyerService.addSellerProduct(sellerProductDto);
 
         return ResponseEntity.ok(addedSellerProduct); // Returns the saved SellerProduct with 200 OK
     }
+
+
+    @PutMapping("/editSellerProduct/{spId}")
+    public ResponseEntity<SellerProduct> editSellerProduct(@PathVariable("spId") String spId,
+                                                           @RequestPart("sellerProductDto") SellerProductDTO sellerProductDto,
+                                                           @RequestParam(value = "productImage1", required = false) MultipartFile productImage1,
+                                                           @RequestParam(value = "productImage2", required = false) MultipartFile productImage2,
+                                                           @RequestParam(value = "certificate", required = false) MultipartFile certificate) throws Exception {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Fetch SellerBuyer details based on email (username)
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        sellerProductDto.setSellerId(sellerDetails.getUserId());
+
+        // Fetch the existing SellerProduct
+        SellerProduct existingSellerProduct = sellerProductRepository.findById(spId)
+                .orElseThrow(() -> new RuntimeException("SellerProduct not found for SP ID: " + spId));
+
+        if (productImage1 != null && !productImage1.isEmpty()) {
+            sellerProductDto.setProductImage1(productImage1);
+        }
+        if (productImage2 != null && !productImage2.isEmpty()) {
+            sellerProductDto.setProductImage2(productImage2);
+        }
+        if (certificate != null && !certificate.isEmpty()) {
+            sellerProductDto.setCertificationFile(certificate);
+        }
+
+        SellerProduct updatedSellerProduct = sellerBuyerService.editSellerProduct(existingSellerProduct, sellerProductDto);
+
+        return ResponseEntity.ok(updatedSellerProduct); // Returns the updated SellerProduct with 200 OK
+    }
+
 
     @GetMapping("/sellerProduct")
     public ResponseEntity<List<SellerProductDTO>> getSellerProductsBySeller() {

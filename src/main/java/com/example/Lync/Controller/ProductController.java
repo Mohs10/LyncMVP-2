@@ -4,6 +4,7 @@ import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.ProductDTO;
 import com.example.Lync.DTO.SellerProductImageDto;
 import com.example.Lync.Entity.*;
+import com.example.Lync.Repository.ProductRepository;
 import com.example.Lync.Service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,16 +26,17 @@ public class ProductController {
     private final CategoryService categoryService;
     private final VarietyService varietyService;
     private final TypeService typeService;
-
+    private final ProductRepository productRepository;
     private final FormService formService;
 
     public ProductController(ProductService productService, S3Service s3Service, CategoryService categoryService,
-                             VarietyService varietyService, TypeService typeService, FormService formService) {
+                             VarietyService varietyService, TypeService typeService, ProductRepository productRepository, FormService formService) {
         this.productService = productService;
         this.s3Service = s3Service;
         this.categoryService = categoryService;
         this.varietyService = varietyService;
         this.typeService = typeService;
+        this.productRepository = productRepository;
         this.formService = formService;
     }
 
@@ -48,6 +50,8 @@ public class ProductController {
 //    }
 
     @PostMapping("/products/add")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<Product> addProduct( @RequestPart("productDTO") ProductDTO productDTO,
     @RequestParam(value = "productImage", required = false) MultipartFile productImage) throws IOException {
 
@@ -59,7 +63,7 @@ public class ProductController {
     }
 
     @GetMapping("/products/all")
-    public List<Product> getAllProducts() {
+    public List<?> getAllProducts() {
         return productService.getAllProducts();
     }
 
@@ -237,9 +241,24 @@ public class ProductController {
 
     @PostMapping("/editProduct/{productId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<String> editProduct(@PathVariable Long productId, @RequestBody ProductDTO productDTO) throws Exception {
-        productService.editProduct(productId, productDTO);
-        return ResponseEntity.ok("Product Edited Successfully.");
+    public ResponseEntity<Product> editProduct(@PathVariable("productId") Long productId,
+                                               @RequestPart("productDTO") ProductDTO productDTO,
+                                               @RequestParam(value = "productImage", required = false) MultipartFile productImage) throws Exception {
+
+        // Retrieve the existing product from the database
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Update the product details based on the incoming ProductDTO
+        if (productImage != null && !productImage.isEmpty()) {
+            // If a new image is uploaded, set it
+            productDTO.setProductImage(productImage);
+        }
+
+        // Call the service layer to update the product
+        Product updatedProduct = productService.editProduct(existingProduct, productDTO);
+
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);  // Return the updated product
     }
 
     @GetMapping("/setActive")

@@ -127,7 +127,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -144,7 +144,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -161,7 +161,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -178,7 +178,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -244,7 +244,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
@@ -266,7 +266,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest1 = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest1)
                 .build();
 
@@ -279,7 +279,7 @@ public class S3Service {
                 .build();
 
         GetObjectPresignRequest presignRequest2 = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(Duration.ofMinutes(1440))
                 .getObjectRequest(getObjectRequest2)
                 .build();
 
@@ -346,41 +346,41 @@ public class S3Service {
             String productImageUrl2 = uploadFileToS3(sellerProductImageDto.getProductImageUrl2(), "product-images");
             sellerProduct.setProductImageUrl2(productImageUrl2);
         }
-
-        if (sellerProductImageDto.getProductCertificationUrl() != null && !sellerProductImageDto.getProductCertificationUrl().isEmpty()) {
-            String certificationUrl = uploadFileToS3(sellerProductImageDto.getProductCertificationUrl(), "certifications");
-            sellerProduct.setProductCertificationUrl(certificationUrl);
-        }
-
-        // Upload NPOP certification if exists
-        if (sellerProductImageDto.getNpopCertification() != null && !sellerProductImageDto.getNpopCertification().isEmpty()) {
-            String npopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNpopCertification(), "certifications");
-            sellerProduct.setNpopCertification(npopCertificationUrl);
-        }
-
-        // Upload NOP certification if exists
-        if (sellerProductImageDto.getNopCertification() != null && !sellerProductImageDto.getNopCertification().isEmpty()) {
-            String nopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNopCertification(), "certifications");
-            sellerProduct.setNopCertification(nopCertificationUrl);
-        }
-
-        // Upload EU certification if exists
-        if (sellerProductImageDto.getEuCertification() != null && !sellerProductImageDto.getEuCertification().isEmpty()) {
-            String euCertificationUrl = uploadFileToS3(sellerProductImageDto.getEuCertification(), "certifications");
-            sellerProduct.setEuCertification(euCertificationUrl);
-        }
-
-        // Upload GSDC certification if exists
-        if (sellerProductImageDto.getGsdcCertification() != null && !sellerProductImageDto.getGsdcCertification().isEmpty()) {
-            String gsdcCertificationUrl = uploadFileToS3(sellerProductImageDto.getGsdcCertification(), "certifications");
-            sellerProduct.setGsdcCertification(gsdcCertificationUrl);
-        }
-
-        // Upload IPM certification if exists
-        if (sellerProductImageDto.getIpmCertification() != null && !sellerProductImageDto.getIpmCertification().isEmpty()) {
-            String ipmCertificationUrl = uploadFileToS3(sellerProductImageDto.getIpmCertification(), "certifications");
-            sellerProduct.setIpmCertification(ipmCertificationUrl);
-        }
+//
+//        if (sellerProductImageDto.getProductCertificationUrl() != null && !sellerProductImageDto.getProductCertificationUrl().isEmpty()) {
+//            String certificationUrl = uploadFileToS3(sellerProductImageDto.getProductCertificationUrl(), "certifications");
+//            sellerProduct.setProductCertificationUrl(certificationUrl);
+//        }
+//
+//        // Upload NPOP certification if exists
+//        if (sellerProductImageDto.getNpopCertification() != null && !sellerProductImageDto.getNpopCertification().isEmpty()) {
+//            String npopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNpopCertification(), "certifications");
+//            sellerProduct.setNpopCertification(npopCertificationUrl);
+//        }
+//
+//        // Upload NOP certification if exists
+//        if (sellerProductImageDto.getNopCertification() != null && !sellerProductImageDto.getNopCertification().isEmpty()) {
+//            String nopCertificationUrl = uploadFileToS3(sellerProductImageDto.getNopCertification(), "certifications");
+//            sellerProduct.setNopCertification(nopCertificationUrl);
+//        }
+//
+//        // Upload EU certification if exists
+//        if (sellerProductImageDto.getEuCertification() != null && !sellerProductImageDto.getEuCertification().isEmpty()) {
+//            String euCertificationUrl = uploadFileToS3(sellerProductImageDto.getEuCertification(), "certifications");
+//            sellerProduct.setEuCertification(euCertificationUrl);
+//        }
+//
+//        // Upload GSDC certification if exists
+//        if (sellerProductImageDto.getGsdcCertification() != null && !sellerProductImageDto.getGsdcCertification().isEmpty()) {
+//            String gsdcCertificationUrl = uploadFileToS3(sellerProductImageDto.getGsdcCertification(), "certifications");
+//            sellerProduct.setGsdcCertification(gsdcCertificationUrl);
+//        }
+//
+//        // Upload IPM certification if exists
+//        if (sellerProductImageDto.getIpmCertification() != null && !sellerProductImageDto.getIpmCertification().isEmpty()) {
+//            String ipmCertificationUrl = uploadFileToS3(sellerProductImageDto.getIpmCertification(), "certifications");
+//            sellerProduct.setIpmCertification(ipmCertificationUrl);
+//        }
 
         return sellerProductRepository.save(sellerProduct);
     }
@@ -398,28 +398,125 @@ public class S3Service {
         if (product.getProductImageUrl2() != null) {
             imageUrls.put("productImageUrl2", product.getProductImageUrl2());
         }
-        if (product.getProductCertificationUrl() != null) {
-            imageUrls.put("productCertificationUrl", product.getProductCertificationUrl());
-        }
-
-        // Add certification URLs if they exist
-        if (product.getNpopCertification() != null) {
-            imageUrls.put("npopCertification", product.getNpopCertification());
-        }
-        if (product.getNopCertification() != null) {
-            imageUrls.put("nopCertification", product.getNopCertification());
-        }
-        if (product.getEuCertification() != null) {
-            imageUrls.put("euCertification", product.getEuCertification());
-        }
-        if (product.getGsdcCertification() != null) {
-            imageUrls.put("gsdcCertification", product.getGsdcCertification());
-        }
-        if (product.getIpmCertification() != null) {
-            imageUrls.put("ipmCertification", product.getIpmCertification());
-        }
+//        if (product.getProductCertificationUrl() != null) {
+//            imageUrls.put("productCertificationUrl", product.getProductCertificationUrl());
+//        }
+//
+//        // Add certification URLs if they exist
+//        if (product.getNpopCertification() != null) {
+//            imageUrls.put("npopCertification", product.getNpopCertification());
+//        }
+//        if (product.getNopCertification() != null) {
+//            imageUrls.put("nopCertification", product.getNopCertification());
+//        }
+//        if (product.getEuCertification() != null) {
+//            imageUrls.put("euCertification", product.getEuCertification());
+//        }
+//        if (product.getGsdcCertification() != null) {
+//            imageUrls.put("gsdcCertification", product.getGsdcCertification());
+//        }
+//        if (product.getIpmCertification() != null) {
+//            imageUrls.put("ipmCertification", product.getIpmCertification());
+//        }
 
         return imageUrls;
     }
+
+
+
+    public String uploadSellerProductImage1(String userId ,String productId, MultipartFile image) throws IOException {
+        // Define the S3 key for the product image
+        String fileName = image.getOriginalFilename();
+        String s3Key = "users/" + userId + "/Product/"+productId+"/image1/" + fileName;
+
+        // Upload the product image
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(image.getBytes()));
+
+        // Return the S3 key of the uploaded image
+        return s3Key;
+    }
+
+    public String getSellerProductImage1Url(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(1440))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+    public String uploadSellerProductImage2(String userId ,String productId, MultipartFile image) throws IOException {
+        // Define the S3 key for the product image
+        String fileName = image.getOriginalFilename();
+        String s3Key = "users/" + userId + "/Product/"+productId+"/image2/" + fileName;
+
+        // Upload the product image
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(image.getBytes()));
+
+        // Return the S3 key of the uploaded image
+        return s3Key;
+    }
+    public String getSellerProductImage2Url(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(1440))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+    public String uploadSellerProductCertificate(String userId ,String productId, MultipartFile certificate) throws IOException {
+        // Define the S3 key for the product image
+        String fileName = certificate.getOriginalFilename();
+        String s3Key = "users/" + userId + "/Product/"+productId+"/certificate/" + fileName;
+
+        // Upload the product image
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(certificate.getBytes()));
+
+        // Return the S3 key of the uploaded image
+        return s3Key;
+    }
+
+    public String getSellerProductCertificateUrl(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(1440))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
 }
 

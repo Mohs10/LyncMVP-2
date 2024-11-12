@@ -13,8 +13,10 @@ import java.util.Random;
 @Service
 public class OtpServiceImpl implements OtpService {
     private static final String accountSid="AC46ead9f001b78f59c164b127a5e521d5";
-    private static final String authToken="7e140faca14eef32ca8b1a3fccbf079b";
+    private static final String authToken="786acbcda84dae7ef4279f28f88525f9";
     private static final String authPhoneNumber="+19414622715";
+
+
 
     public String generateRandomOTP() {
         Random random = new Random();

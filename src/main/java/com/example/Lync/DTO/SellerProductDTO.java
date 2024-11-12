@@ -1,6 +1,7 @@
 package com.example.Lync.DTO;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,60 +12,56 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+
 public class SellerProductDTO {
+    private String spId;
+    private String sellerId;
+    private Long productId;
+
+    // Product details
+    private Long productFormId;
+    private Long productVarietyId;
 
     private String productName;
-    private String productCategory;
-//    private String productTypeName;
-//    private String productVariety;
 
+    // Product details
+    private String productFormName;
+    private String productVarietyName;
 
-    private String spId; // Unique ID for seller's product
-    private String sellerId; // Unique ID for seller
-    private String sellerName; // New Kishan
-    private String sellerEmail; // New Kishan
-    private String sellerNumber; // New Kishan
-
-    private Double maxPricePerTon;
-    private Double minPricePerTon;
-    private Double deliveryCharges;
+    private String originOfProduce;
+    private Double availableAmount;
+    private String unit;
     private String description;
 
-    private String grainSize;
-    private String admixing;
-    private Double moisture;
-    private Double dd;
-    private Double kettValue;
-    private Double chalky;
-    private Double foreignMaterial;
-    private String warehouse;
-    private Double availableAmount;
+    private MultipartFile productImage1;
+    private MultipartFile productImage2;
     private String productImageUrl1;
     private String productImageUrl2;
-    private String productCertificationUrl;
-    private LocalDate addDate;
-    private LocalTime addTime;
+
+    // Pricing details
+    private Double maxPrice;
+    private Double minPrice;
+    private Double deliveryCharges;
+    private String priceTerms;
+
+    // Packaging & Payment
+    private String packagingMaterial;
+    private String paymentTerms;
+
+    // Availability
     private LocalDate earliestAvailableDate;
-    private Long productId; // Reference to Product without join
-    private String origin;
 
-    private Boolean npop;
-    private String npopCertification;
-
-    private Boolean nop;
-    private String nopCertification;
-
-    private Boolean eu;
-    private String euCertification;
-
-    private Boolean gsdc;
-    private String gsdcCertification;
-
-    private Boolean ipm;
-    private String ipmCertification;
-
-    private Boolean other;
-    private String otherCertification;
+    // Warehouse location
+    private String warehouseCountry;
+    private String warehouseState;
+    private String warehouseCity;
+    private String warehousePinCode;
 
 
+    private String certificationName;
+    private String certificationFileUrl;
+    private MultipartFile certificationFile;
+
+    private List<SpecificationDTO> specifications;
 }
+

@@ -1,77 +1,71 @@
 package com.example.Lync.Entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
-@AllArgsConstructor
+
+
+@Entity
 @Data
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 public class SellerProduct {
+
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String spId; // Unique ID for seller's product
+    private String sellerId; // Unique ID for seller
+    private Long productId;
 
-    private String sellerId; // Unique ID for seller's product
-
-//    private String productName;
-//    private String productCategory;
-//    private String productTypeName;
-//    private String productVariety;
-
-    private Double maxPricePerTon;
-    private Double minPricePerTon;
-
-
-
-    private Double deliveryCharges;
-    private String description;
-    private String grainSize;
-    private String admixing;
-    private Double moisture;
-    private Double dd;
-    private Double kettValue;
-    private Double chalky;
-    private Double foreignMaterial;
-    private String warehouse;
+    // Product details
+    private Long productFormId; // ID for the form of the product
+    private Long productVarietyId;
+    private String originOfProduce;
     private Double availableAmount;
+    private String unit;
+    private String description;
+
+    // Pricing details
+    private Double maxPrice;
+    private Double minPrice;
+    private Double deliveryCharges;
+    private String priceTerms;
+
+    // Image URLs
     private String productImageUrl1;
     private String productImageUrl2;
-    private String origin;
 
+    // Packaging & Payment
+    private String packagingMaterial;
+    private String paymentTerms;
 
-
-    private String productCertifications;
-    private String productCertificationUrl;
-    private LocalDate addDate;
-    private LocalTime addTime;
+    // Availability
     private LocalDate earliestAvailableDate;
-    private Long productId; // Reference to Product without join
+
+    private String warehouseCountry;
+    private String warehouseState;
+    private String warehouseCity;
+    private String warehousePinCode;
 
 
-    private Boolean npop;
-    private String npopCertification;
+    private String certificationName;
+    private String certificationFileUrl;
 
-    private Boolean nop;
-    private String nopCertification;
+    // Relationship with SellerProductSpecification
+    @ManyToMany
+    @JoinTable(
+            name = "seller_product_specifications",
+            joinColumns = @JoinColumn(name = "sp_id"),
+            inverseJoinColumns = @JoinColumn(name = "seller_specification_id")
+    )
+    private List<SellerProductSpecification> specifications;
 
-    private Boolean eu;
-    private String euCertification;
-
-    private Boolean gsdc;
-    private String gsdcCertification;
-
-    private Boolean ipm;
-    private String ipmCertification;
-
-    private Boolean other;
-    private String otherCertification;
-    // Getters and Setters
 }
+
+
 
 

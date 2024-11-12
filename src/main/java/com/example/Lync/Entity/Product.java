@@ -72,7 +72,8 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "specification_id")
     )
-    private List<Specification> specifications;  // New Many-to-Many relationship with Specification
+    private List<Specification> specifications;
+    // New Many-to-Many relationship with Specification
 }
 
 

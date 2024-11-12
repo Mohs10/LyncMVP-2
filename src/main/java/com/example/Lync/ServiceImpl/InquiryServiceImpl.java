@@ -296,15 +296,15 @@ public class InquiryServiceImpl implements InquiryService {
             SellerProductDTO dto = new SellerProductDTO();
             Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found with ID :" + productId));
             SellerBuyer sellerBuyer = sellerBuyerRepository.findById(sellerProduct.getSellerId()).orElseThrow(() -> new RuntimeException("Seller not found with ID: " + sellerProduct.getSellerId()));
-            dto.setProductName(product.getProductName());
-//            dto.setProductCategory(categoryRepository.findById(product.getCategory()));
-            dto.setSpId(sellerProduct.getSpId());
-            dto.setSellerId(sellerProduct.getSellerId());
-            dto.setSellerName(sellerBuyer.getFullName());
-            dto.setSellerName(sellerBuyer.getEmail());
-            dto.setSellerNumber(sellerBuyer.getPhoneNumber());
-            dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
-            dto.setMinPricePerTon(sellerProduct.getMinPricePerTon());
+//            dto.setProductName(product.getProductName());
+////            dto.setProductCategory(categoryRepository.findById(product.getCategory()));
+//            dto.setSpId(sellerProduct.getSpId());
+//            dto.setSellerId(sellerProduct.getSellerId());
+//            dto.setSellerName(sellerBuyer.getFullName());
+//            dto.setSellerName(sellerBuyer.getEmail());
+//            dto.setSellerNumber(sellerBuyer.getPhoneNumber());
+//            dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
+//            dto.setMinPricePerTon(sellerProduct.getMinPricePerTon());
             dto.setDeliveryCharges(sellerProduct.getDeliveryCharges());
 
             productDTOS.add(dto);
