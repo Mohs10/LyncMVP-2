@@ -87,7 +87,7 @@ public class ProductController {
 
     // ---------------- Variety Endpoints ---------------- //
     @PostMapping("/varieties/add")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
     public ResponseEntity<String> addVariety(@RequestBody Variety variety) {
         return ResponseEntity.ok(varietyService.addVariety(variety));
@@ -100,7 +100,7 @@ public class ProductController {
 
     // ---------------- Form Endpoints ---------------- //
     @PostMapping("/forms/add")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
     public ResponseEntity<String> addForm(@RequestBody Form form) {
         return ResponseEntity.ok(formService.addForm(form));
