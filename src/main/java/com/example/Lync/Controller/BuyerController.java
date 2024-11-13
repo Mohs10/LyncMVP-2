@@ -168,12 +168,37 @@ public class BuyerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        inquiryService.addInquiry(inquiryDTO, sellerDetails.getUserId());
-        return ResponseEntity.ok("Inquiry added successfully");
+        String message =  inquiryService.buyerAddInquiry(inquiryDTO, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/buyerGetsAllInquiry")
+    public ResponseEntity<List<InquiryDTO>> getInquiries(){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<InquiryDTO> DTOs = inquiryService.buyerGetsAllInquiry(sellerDetails.getUserId());
+
+        return ResponseEntity.ok(DTOs);
+    }
+
+    @GetMapping("/buyerGetsInquiryById/{qId}")
+    public ResponseEntity<InquiryDTO> getInquiryById(@PathVariable String qId){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        return ResponseEntity.ok(inquiryService.buyerGetsInquiryById(sellerDetails.getUserId(), qId));
     }
 
     @PostMapping("/buyerRejectsInquiry/{qId}")
-    public  ResponseEntity<String> buyerReject(@PathVariable String qId, @RequestBody String description) throws Exception {
+    public ResponseEntity<String> buyerReject(@PathVariable String qId, @RequestBody String description) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -183,5 +208,27 @@ public class BuyerController {
         inquiryService.buyerRejectsInquiries(qId, description, sellerDetails.getUserId());
         return ResponseEntity.ok("Inquiry Declined Successfully.");
     }
-    
+
+    @PostMapping("/buyerNegotiatePrice/{qId}")
+    public ResponseEntity<String> negotiatePrice(@PathVariable String qId, @RequestBody Double amount){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerNegotiatePrice(qId, sellerDetails.getUserId(), amount);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/buyerAcceptsQuery/{qId}")
+    public ResponseEntity<String> acceptsQuery(@PathVariable String qId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerAcceptQuery(qId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
 }

@@ -50,6 +50,6 @@ public interface SellerBuyerService {
     public List<SellerProductDTO> getSellerProductDTOsBySeller(String sellerId) ;
 
         public Optional<SellerProduct> getSellerProductById(String spId);
-
+    public  SellerProductDTO toDTO(SellerProduct sellerProduct);
     List<String> allEmail();
     }

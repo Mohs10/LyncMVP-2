@@ -19,9 +19,9 @@ public class SellerProduct {
     @Id
     private String spId; // Unique ID for seller's product
     private String sellerId; // Unique ID for seller
-    private Long productId;
 
     // Product details
+    private Long productId;
     private Long productFormId; // ID for the form of the product
     private Long productVarietyId;
     private String originOfProduce;

@@ -4,6 +4,7 @@ import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.InquiryDTO;
 import com.example.Lync.DTO.SellerProductDTO;
+import com.example.Lync.DTO.SellerReceiveInquiryDTO;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
@@ -187,7 +188,7 @@ public class SellerController {
 
 
     @GetMapping("/sellerAllInquiries")
-    public ResponseEntity<List<InquiryDTO>> sellerAllInquiries(){
+    public ResponseEntity<List<SellerReceiveInquiryDTO>> sellerAllInquiries(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
@@ -209,16 +210,38 @@ public class SellerController {
         return ResponseEntity.ok(inquiryService.sellerNewInquiries(sellerDetails.getUserId()));
     }
 
-    @GetMapping("/sellerOpenInquiry/{qId}")
-    public ResponseEntity<InquiryDTO> sellerOpenInquiry(@PathVariable String qId) throws Exception {
-        return ResponseEntity.ok(inquiryService.sellerOpenInquiry(qId));
+    @GetMapping("/sellerOpenInquiry/{snId}")
+    public ResponseEntity<SellerReceiveInquiryDTO> sellerOpenInquiry(@PathVariable Long snId) throws Exception {
+        return ResponseEntity.ok(inquiryService.sellerOpenInquiry(snId));
     }
 
-    @PostMapping("/acceptInquiry/{qId}")
-    public ResponseEntity<String> sellerAcceptQuery(@PathVariable String qId, @RequestBody String description) throws Exception {
-        inquiryService.sellerAcceptQuery(qId, description);
-        return ResponseEntity.ok("Accepted Inquiry with ID" + qId);
+    @PostMapping("/sellerNegotiate/{snId}")
+    public ResponseEntity<String> sellerNegotiatePrice(@PathVariable Long snId, @RequestBody Double amount){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerNegotiatePrice(snId, sellerDetails.getUserId(), amount);
+        return ResponseEntity.ok(message);
     }
+
+    @PostMapping("/acceptInquiry/{snId}")
+    public ResponseEntity<String> sellerAcceptQuery(@PathVariable Long snId) throws Exception {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        String message= inquiryService.sellerAcceptInquiry(snId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
 
     @PostMapping("/sellerRejectQuery/{qId}")
     public ResponseEntity<String> sellerRejectQuery(@PathVariable String qId, @RequestBody String description) throws Exception {

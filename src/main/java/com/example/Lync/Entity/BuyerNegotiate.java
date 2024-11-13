@@ -15,25 +15,23 @@ import java.time.LocalTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class SellerNegotiate {
+public class BuyerNegotiate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long snId;
+    private Long bnId;
     private String qId;
-    private String sellerUId; // Reference to seller (User)
+    private String buyerUId; // Reference to buyer (User)
     private Double adminInitialPrice;
+    private String comment;
+    private String paymentTerm;
     private LocalDate aipDate;
     private LocalTime aipTime;
-    private String avgLeadTime;
-    private String adminDeliveryAddress;
-    private String instruction;
-    private Double sellerNegotiatePrice;
-    private LocalDate snpDate;
-    private LocalTime snpTime;
+    private Double buyerNegotiatePrice;
+    private LocalDate bnpDate;
+    private LocalTime bnpTime;
     private Double adminFinalPrice;
     private LocalDate afpDate;
     private LocalTime afpTime;
     private String status;
-    private Long adminAddressId;
 }

@@ -6,21 +6,17 @@ import com.example.Lync.DTO.InquiryDTO;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.DTO.UserInfoDTO;
-import com.example.Lync.Entity.SellerBuyer;
-import com.example.Lync.Entity.UserInfo;
+import com.example.Lync.Entity.AdminAddress;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
-import com.example.Lync.Service.InquiryService;
-import com.example.Lync.Service.OTPStorageService;
-import com.example.Lync.Service.OtpService;
-import com.example.Lync.Service.SellerBuyerService;
+import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +37,7 @@ public class AdminController {
     private final OtpService otpService;
     private final OTPStorageService otpStorageService;
     private final InquiryService inquiryService;
+    private final AdminAddressService adminAddressService;
 
     // Removed the duplicate UserInfoService field
     public AdminController(S3Service s3Service,
@@ -51,7 +48,7 @@ public class AdminController {
                            SellerBuyerService sellerBuyerService,
                            AuthenticationManager authenticationManager,
                            OtpService otpService,
-                           OTPStorageService otpStorageService, InquiryService inquiryService) {
+                           OTPStorageService otpStorageService, InquiryService inquiryService, AdminAddressService adminAddressService) {
         this.s3Service = s3Service;
         this.service = service;
         this.jwtService = jwtService;
@@ -60,6 +57,7 @@ public class AdminController {
         this.otpService = otpService;
         this.otpStorageService = otpStorageService;
         this.inquiryService = inquiryService;
+        this.adminAddressService = adminAddressService;
     }
 
 
@@ -105,6 +103,20 @@ public class AdminController {
         return ResponseEntity.ok("User Edited Successfully");
     }
 
+    //Admin Address
+    @PostMapping("/addAddress")
+    public ResponseEntity<AdminAddress> addAdminAddress(@RequestBody AdminAddress adminAddress) {
+        AdminAddress savedAddress = adminAddressService.addAdminAddress(adminAddress);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAddress);
+    }
+
+    // GET endpoint to retrieve all AdminAddresses
+    @GetMapping("/getAllAddress")
+    public ResponseEntity<List<AdminAddress>> getAllAdminAddresses() {
+        List<AdminAddress> addresses = adminAddressService.getAllAdminAddresses();
+        return ResponseEntity.ok(addresses);
+    }
+
 
 
 
@@ -112,24 +124,50 @@ public class AdminController {
 
     @GetMapping("/allInquiries")
     public ResponseEntity<?> getInquiries(){
-        return ResponseEntity.ok(inquiryService.getAllInquiries());
+        return ResponseEntity.ok(inquiryService.adminGetAllInquiry());
     }
 
     @GetMapping("/getInquiryById/{qId}")
     public ResponseEntity<?> getInquiryById(@PathVariable String qId) throws Exception {
-        return ResponseEntity.ok(inquiryService.getInquiryByQId(qId));
+        return ResponseEntity.ok(inquiryService.adminGetInquiryByQId(qId));
     }
 
     @PostMapping("/sendInquiryToSeller/{qId}")
     public ResponseEntity<String> sendInquiry(@PathVariable String qId, @RequestBody InquiryDTO inquiryDTO){
-        inquiryService.sendInquiryToSeller(qId, inquiryDTO);
-        return ResponseEntity.ok("Sent Inquiry to Seller");
+        String responseMessage = inquiryService.sendInquiryToSeller(qId, inquiryDTO);
+        return ResponseEntity.ok(responseMessage);
     }
 
-    @GetMapping("/sellerSellingProduct/{productId}")
-    public ResponseEntity<List<SellerProductDTO>> sellersSellingProducts(@PathVariable Long productId){
-        return ResponseEntity.ok(inquiryService.sellersSellingProduct(productId));
+    @GetMapping("/sellerSellingProduct/{productId}/{productFormId}/{productVarietyId}")
+    public ResponseEntity<List<SellerProductDTO>> sellersSellingProducts(@PathVariable Long productId,
+                                                                         @PathVariable Long productFormId,
+                                                                         @PathVariable Long productVarietyId){
+        return ResponseEntity.ok(inquiryService.sellersSellingProduct(productId, productFormId, productVarietyId));
     }
 
+    @PostMapping("/sendFinalPrice/{snId}")
+    public ResponseEntity<String> sendFinalPrice(@PathVariable Long snId, @RequestBody Double amount){
+
+        String message = inquiryService.adminFinalPriceToSeller(snId, amount);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminSelectsSeller/{snId}")
+    public ResponseEntity<String> adminSelectedSeller(@PathVariable Long snId){
+        String message = inquiryService.adminSelectsSeller(snId);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminQuoteToBuyer/{qId}")
+    public ResponseEntity<String> quoteToBuyer(@PathVariable String qId, @RequestBody InquiryDTO inquiryDTO){
+        String message = inquiryService.adminQuoteToBuyer(qId, inquiryDTO);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminSentFinalPriceToBuyer/{qId}")
+    public ResponseEntity<String> finalPriceToBuyer(@PathVariable String qId, @RequestBody Double amount) {
+        String message = inquiryService.adminFinalPriceToBuyer(qId, amount);
+        return ResponseEntity.ok(message);
+    }
 
 }

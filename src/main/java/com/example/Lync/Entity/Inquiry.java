@@ -20,16 +20,20 @@ public class Inquiry {
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String qId;
     private String buyerUId; // Reference to buyer (User)
-    private Long productId; // Reference to Product
     private Long osId;
+
+    // Product details
+    private Long productId; // Reference to Product
+    private Long productFormId; // ID for the form of the product
+    private Long productVarietyId;
 
     //Order Specification
     private Double quantity;
     private String quantityUnit;
     private String priceTerms;
     //private Boolean certificate;
-    private Double askMinPrice;
-    private Double askMaxPrice;
+    private Double askMinPrice; //buyer price
+    private Double askMaxPrice; //buyer price
     private String priceUnit;
     private Boolean npop;
     private Boolean nop;
@@ -58,12 +62,13 @@ public class Inquiry {
     private String dd;
 
 
-
     private LocalDate raiseDate = LocalDate.now();
     private LocalTime raiseTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+
     private String orderStatus;
-    private String sellerUId; // Reference to seller (User)
-    private Double sentPrice;
+    private String sellerUId; // Reference to seller(User) selectedSeller
+    private Double sellerFinalPrice; //final price
+    private Double buyerFinalPrice;
     private LocalDate sentDate;
     private LocalTime sentTime;
     private String unit;

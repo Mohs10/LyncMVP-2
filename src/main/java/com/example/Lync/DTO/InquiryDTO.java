@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,8 +16,15 @@ public class InquiryDTO {
 
     private String qId; //same orderId- oId
     private String buyerUId; // Reference to buyer (User)
+
+    // Product details
     private Long productId; // Reference to Product
-    private String type;
+    private Long productFormId; // ID for the form of the product
+    private Long productVarietyId;
+
+    private String productName;
+    private String FormName;
+    private String varietyName;
 
     //Order Specification
     private Double quantity;
@@ -56,7 +64,8 @@ public class InquiryDTO {
     private LocalTime raiseTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
     private String orderStatus;
     private String sellerUId; // Reference to seller (User)
-    private Double sentPrice;
+    private Double sellerFinalPrice;
+    private Double buyerFinalPrice;
     private LocalDate sentDate;
     private LocalTime sentTime;
     private String unit;
@@ -70,4 +79,20 @@ public class InquiryDTO {
     private String imageUrl;
     private String location;
 
+    private List<String> sellerUIds; //Inquiry can be sent to multiple seller, so this is to capture sellers list.
+    private Long adminAddressId;
+
+    //Buyer Negotiate
+    private Double adminInitialPrice;
+    private String comment;
+    private String paymentTerm;
+    private LocalDate aipDate;
+    private LocalTime aipTime;
+    private Double buyerNegotiatePrice;
+    private LocalDate bnpDate;
+    private LocalTime bnpTime;
+    private Double adminFinalPrice;
+    private LocalDate afpDate;
+    private LocalTime afpTime;
+    private String status;
 }
