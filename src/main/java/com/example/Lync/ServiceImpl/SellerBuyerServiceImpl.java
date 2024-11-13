@@ -810,10 +810,14 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         dto.setUnit(sellerProduct.getUnit());
         dto.setDescription(sellerProduct.getDescription());
 
-        String image1Url= s3Service.getSellerProductImage1Url(sellerProduct.getProductImageUrl1());
-        String image2Url= s3Service.getSellerProductImage2Url(sellerProduct.getProductImageUrl1());
-        String certificateUrl= s3Service.getSellerProductCertificateUrl(sellerProduct.getProductImageUrl1());
+        String image1Url = (sellerProduct.getProductImageUrl1() != null) ?
+                s3Service.getSellerProductImage1Url(sellerProduct.getProductImageUrl1()) : null;
 
+        String image2Url = (sellerProduct.getProductImageUrl2() != null) ?
+                s3Service.getSellerProductImage2Url(sellerProduct.getProductImageUrl2()) : null;
+
+        String certificateUrl = (sellerProduct.getCertificationFileUrl() != null) ?
+                s3Service.getSellerProductCertificateUrl(sellerProduct.getCertificationFileUrl()) : null;
         // Product Images
         dto.setProductImageUrl1(image1Url);
         dto.setProductImageUrl2(image2Url);

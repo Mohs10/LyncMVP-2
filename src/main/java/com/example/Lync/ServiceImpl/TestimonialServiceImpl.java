@@ -36,7 +36,8 @@ public class TestimonialServiceImpl implements TestimonialService {
     public Testimonial updateTestimonial(Long id, Testimonial testimonial) {
         return testimonialRepository.findById(id).map(existingTestimonial -> {
             existingTestimonial.setName(testimonial.getName());
-            existingTestimonial.setDate(testimonial.getDate());
+            existingTestimonial.setOrganizationName(testimonial.getOrganizationName());
+            existingTestimonial.setDate(LocalDate.now());
             existingTestimonial.setContent(testimonial.getContent());
             return testimonialRepository.save(existingTestimonial);
         }).orElseThrow(() -> new RuntimeException("Testimonial not found with id " + id));
