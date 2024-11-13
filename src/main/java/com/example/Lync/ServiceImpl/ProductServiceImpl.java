@@ -357,9 +357,12 @@ public class ProductServiceImpl implements ProductService {
         dto.setFormIds(product.getForms().stream().map(form -> form.getFormId()).collect(Collectors.toList()));
         dto.setForms(product.getForms());
 
-        String imageUrl= s3Service.getProductImagePresignedUrl(product.getProductImageUrl());
-
+        String imageUrl = null;
+        if (product.getProductImageUrl() != null) {
+            imageUrl = s3Service.getProductImagePresignedUrl(product.getProductImageUrl());
+        }
         dto.setProductImageUrl(imageUrl);
+
         dto.setProductDescription(product.getProductDescription());
 
         // Map Certifications
