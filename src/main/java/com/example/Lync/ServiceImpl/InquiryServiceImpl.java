@@ -12,14 +12,12 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +54,13 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setQId(inquiry.getQId());
         inquiryDTO.setBuyerUId(inquiry.getBuyerUId());
         inquiryDTO.setProductId(inquiry.getProductId());
+        Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
+        inquiryDTO.setProductName(product.getProductName());
+        inquiryDTO.setVarietyName(product.getVarieties().stream().map(Variety::getVarietyName).toList().toString());
+        inquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
+        inquiryDTO.setProductFormId(inquiry.getProductFormId());
+        inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+
 
         //Order Specification
         inquiryDTO.setQuantity(inquiry.getQuantity());
@@ -79,7 +84,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setCountry(inquiry.getCountry());
         inquiryDTO.setState(inquiry.getState());
         inquiryDTO.setCity(inquiry.getCity());
-        inquiryDTO.setPincode(inquiryDTO.getPincode());
+        inquiryDTO.setPincode(inquiry.getPincode());
         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
 
         //Product Specification
@@ -109,6 +114,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setLocation(orderStatus.getLocation());
 
         return inquiryDTO;
+
     }
 
     private InquiryDTO mapToSellerDTO(Inquiry inquiry){
@@ -373,8 +379,21 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry inquiry = inquiryQIdCache.get(qId);
         List<String> successfulSellers = new ArrayList<>();
 
+        // Get all sellers selling the specified product
+        List<SellerProduct> validSellerProducts = sellerProductRepository
+                .findByProductIdAndProductFormIdAndProductVarietyId(
+                        inquiry.getProductId(),
+                        inquiry.getProductFormId(),
+                        inquiry.getProductVarietyId()
+                );
+
+        // Extract the seller IDs from the validSellerProducts list
+        Set<String> validSellerIds = validSellerProducts.stream()
+                .map(SellerProduct::getSellerId)
+                .collect(Collectors.toSet());
+
             for(String sellerUId : inquiryDTO.getSellerUIds()) {
-                if (sellerProductRepository.findBySellerIdAndProductId(inquiryDTO.getSellerUId(), inquiry.getProductId()).isPresent()) { //to be changed
+                if (validSellerIds.contains(sellerUId)) { //to be changed
 
                     inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
                     inquiry.setSentDate(LocalDate.now());
@@ -401,13 +420,13 @@ public class InquiryServiceImpl implements InquiryService {
 
                     inquiry.setOsId(orderStatus.getOsId());
                     inquiryRepository.save(inquiry);
-                    System.out.println(inquiry);
+
                     successfulSellers.add(sellerUId);
                 } else {
-                    System.out.println("Seller with ID: " + sellerUId + " is not selling the specified product.");
+                    return "Seller with ID: " + sellerUId + " is not selling the specified product.";
                 }
             }
-        return "Inquiry sent to sellers with IDs: " + String.join(", ", successfulSellers);
+        return "Inquiry sent to sellers with IDs: " + (successfulSellers.isEmpty() ? "None" : String.join(", ", successfulSellers));
     }
 
 //    @Override

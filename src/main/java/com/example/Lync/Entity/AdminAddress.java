@@ -23,5 +23,4 @@ public class AdminAddress {
     private String state;
     private String country;
     private Integer pincode;
-
 }

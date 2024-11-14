@@ -16,6 +16,7 @@ public class AdminAddressServiceImpl implements AdminAddressService {
 
     @Override
     public AdminAddress addAdminAddress(AdminAddress adminAddress) {
+
         return adminAddressRepository.save(adminAddress);
     }
 
