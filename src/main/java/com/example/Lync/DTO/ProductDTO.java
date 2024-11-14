@@ -21,7 +21,7 @@ public class ProductDTO {
     private List<Form> forms;
     private String productImageUrl;
     private String productDescription;
-    private MultipartFile productImage;
+//    private MultipartFile productImage;
 
     private List<CertificationDTO> certifications;
     private List<SpecificationDTO> specifications;

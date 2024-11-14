@@ -12,6 +12,9 @@ import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
 import org.springframework.http.HttpStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +23,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 
 
@@ -88,19 +94,70 @@ public class AdminController {
         return ResponseEntity.ok(sellerBuyer);
     }
 
-    @PutMapping("/editUser/{userId}")
-    public ResponseEntity<String> editUser(@PathVariable String userId,
-                                           @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
-                                           @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
-                                           @RequestParam(value = "certificate", required = false) MultipartFile certificate,
-                                           @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque){
+//    @PutMapping(value = "/editUser/{userId}")
+//    public ResponseEntity<String> editUser(@PathVariable String userId,
+//                                           @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
+//                                           @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
+//                                           @RequestPart(value = "certificate", required = false) MultipartFile certificate,
+//                                           @RequestPart(value = "cancelledCheque", required = false) MultipartFile cancelledCheque,
+//                                           HttpServletRequest request) throws IOException {
+//
+//        // Log the content type and headers
+//        System.out.println("Content-Type: " + request.getContentType());
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()) {
+//            String headerName = headerNames.nextElement();
+//            System.out.println(headerName + ": " + request.getHeader(headerName));
+//        }
+//
+//        // Continue with user editing logic
+//
+//
+//        sellerBuyerService.editSellerBuyer(userId, sellerBuyerDTO);
+//        return ResponseEntity.ok("User Edited Successfully");
+//    }
 
-        sellerBuyerDTO.setCancelledCheque(cancelledCheque);
-        sellerBuyerDTO.setCertificate(certificate);
-        sellerBuyerDTO.setProfilePicture(profilePicture);
 
+
+    // 1. Edit Basic User Details
+    @PutMapping(value = "/editUser/{userId}")
+    public ResponseEntity<String> editUserDetails(@PathVariable String userId,
+                                                  @RequestBody SellerBuyerDTO sellerBuyerDTO) {
         sellerBuyerService.editSellerBuyer(userId, sellerBuyerDTO);
-        return ResponseEntity.ok("User Edited Successfully");
+
+
+        System.out.println(sellerBuyerDTO);
+        return ResponseEntity.ok("User Details Edited Successfully");
+    }
+
+    // 2. Update Profile Picture
+    @PutMapping(value = "/updateProfilePicture/{userId}")
+    public ResponseEntity<String> updateProfilePicture(@PathVariable String userId,
+                                                       @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException {
+
+        System.out.println("image");
+        sellerBuyerService.uploadProfilePicture(userId, profilePicture);
+        return ResponseEntity.ok("Profile Picture Updated Successfully");
+    }
+
+    // 3. Upload Certificate
+    @PutMapping(value = "/uploadCertificate/{userId}")
+    public ResponseEntity<String> uploadCertificate(@PathVariable String userId,
+                                                    @RequestParam("certificate") MultipartFile certificate) throws IOException {
+
+        System.out.println("uploadCertificate");
+        sellerBuyerService.uploadCertificate(userId, certificate);
+        return ResponseEntity.ok("Certificate Uploaded Successfully");
+    }
+
+    // 4. Upload Cancelled Cheque
+    @PutMapping(value = "/uploadCancelledCheque/{userId}")
+    public ResponseEntity<String> uploadCancelledCheque(@PathVariable String userId,
+                                                        @RequestParam("cancelledCheque") MultipartFile cancelledCheque) throws IOException {
+
+        System.out.println("uploadCancelledCheque");
+        sellerBuyerService.uploadCancelledCheque(userId, cancelledCheque);
+        return ResponseEntity.ok("Cancelled Cheque Uploaded Successfully");
     }
 
     //Admin Address

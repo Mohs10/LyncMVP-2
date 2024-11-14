@@ -43,8 +43,8 @@ public class SellerBuyerDTO {
     private String storageLicenseFileUrl;
 
     // Using MultipartFile for image and file uploads
-    private MultipartFile profilePicture;
-    private MultipartFile storageLicenseFile;
+//    private MultipartFile profilePicture;
+//    private MultipartFile storageLicenseFile;
 
     // Additional fields for company location details
     private String companyCountry;
@@ -62,8 +62,8 @@ public class SellerBuyerDTO {
     private String cancelledChequeUrl;
     private String certificateUrl;
 
-    private MultipartFile cancelledCheque;
-    private MultipartFile certificate;
+//    private MultipartFile cancelledCheque;
+//    private MultipartFile certificate;
 
     // New field for waiving sample fee
     private Boolean waiveSampleFree;

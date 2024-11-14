@@ -14,6 +14,7 @@ import com.example.Lync.trie.Trie;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -102,10 +103,10 @@ public class ProductServiceImpl implements ProductService {
 
         productDTO.setProductId(generateUniqueProductId());
 
-        if (productDTO.getProductImage() != null) {
-            String profilePictureUrl =s3Service. uploadProductImage(productDTO.getProductId(), productDTO.getProductImage());
-            productDTO.setProductImageUrl(profilePictureUrl);
-        }
+//        if (productDTO.getProductImage() != null) {
+//            String profilePictureUrl =s3Service. uploadProductImage(productDTO.getProductId(), productDTO.getProductImage());
+//            productDTO.setProductImageUrl(profilePictureUrl);
+//        }
 
         // Create new product
         Product product = new Product();
@@ -125,6 +126,20 @@ public class ProductServiceImpl implements ProductService {
 
         // Save the product
         return productRepository.save(product);
+    }
+
+
+    public String uploadProductPicture(Long productId, MultipartFile productImage) throws IOException {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+
+        if (productImage != null) {
+            String productImageUrl = s3Service.uploadProductImage(productId, productImage);
+            product.setProductImageUrl(productImageUrl); // Save URL in the SellerBuyer entity if needed
+            productRepository.save(product); // Persist changes
+            return productImageUrl;
+        }
+        return null;
     }
 
     @Override
@@ -245,10 +260,10 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setSpecifications(specifications);
 
         // Update product image if a new one is provided
-        if (productDTO.getProductImage() != null) {
-            String profilePictureUrl = s3Service.uploadProductImage(existingProduct.getProductId(), productDTO.getProductImage());
-            existingProduct.setProductImageUrl(profilePictureUrl);
-        }
+//        if (productDTO.getProductImage() != null) {
+//            String profilePictureUrl = s3Service.uploadProductImage(existingProduct.getProductId(), productDTO.getProductImage());
+//            existingProduct.setProductImageUrl(profilePictureUrl);
+//        }
 
         // Save the updated product
         return productRepository.save(existingProduct);

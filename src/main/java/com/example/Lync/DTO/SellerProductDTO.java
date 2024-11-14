@@ -33,8 +33,8 @@ public class SellerProductDTO {
     private String unit;
     private String description;
 
-    private MultipartFile productImage1;
-    private MultipartFile productImage2;
+//    private MultipartFile productImage1;
+//    private MultipartFile productImage2;
     private String productImageUrl1;
     private String productImageUrl2;
 
@@ -60,7 +60,7 @@ public class SellerProductDTO {
 
     private String certificationName;
     private String certificationFileUrl;
-    private MultipartFile certificationFile;
+//    private MultipartFile certificationFile;
 
     private List<SpecificationDTO> specifications;
 }
