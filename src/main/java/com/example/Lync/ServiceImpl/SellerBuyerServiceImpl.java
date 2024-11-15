@@ -1,6 +1,7 @@
 package com.example.Lync.ServiceImpl;
 
 import com.example.Lync.Config.S3Service;
+import com.example.Lync.DTO.PriceRangeProjection;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.DTO.SpecificationDTO;
@@ -934,6 +935,38 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     }
 
 
+
+
+    public PriceRangeProjection priceRangeByProductId(Long productId) {
+        List<SellerProduct> sellerProducts = sellerProductRepository.findByPId(productId);
+
+        if (sellerProducts.isEmpty()) {
+            System.out.println("No products found for the given productId.");
+            return null; // Return null if no products are found
+        }
+
+        PriceRangeProjection priceRangeProjection = new PriceRangeProjection();
+        priceRangeProjection.setProductId(productId);
+
+        Double minPrice = sellerProducts.stream()
+                .mapToDouble(SellerProduct::getMinPrice)
+                .min()
+                .orElse(Double.MAX_VALUE);
+
+        Double maxPrice = sellerProducts.stream()
+                .mapToDouble(SellerProduct::getMaxPrice)
+                .max()
+                .orElse(Double.MIN_VALUE);
+
+        priceRangeProjection.setMinPrice(minPrice);
+        priceRangeProjection.setMaxPrice(maxPrice);
+
+        return priceRangeProjection; // Return the computed PriceRangeProjection
+    }
+
+
+
+
     private  SpecificationDTO toDTO(SellerProductSpecification specification)
     { SpecificationDTO specificationDTO = new SpecificationDTO();
         specificationDTO.setSpecificationName(specification.getSpecificationName());
@@ -942,6 +975,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         return  specificationDTO;
 
     }
+
+
+
 
 
 

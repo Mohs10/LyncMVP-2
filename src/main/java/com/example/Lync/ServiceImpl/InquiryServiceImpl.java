@@ -53,6 +53,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setQId(inquiry.getQId());
         inquiryDTO.setBuyerUId(inquiry.getBuyerId());
         inquiryDTO.setProductId(inquiry.getProductId());
+        System.out.println(inquiry.getProductId());
         Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
         inquiryDTO.setProductName(product.getProductName());
         inquiryDTO.setVarietyName(product.getVarieties().stream().map(Variety::getVarietyName).toList().toString());

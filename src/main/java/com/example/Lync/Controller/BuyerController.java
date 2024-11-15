@@ -4,6 +4,7 @@ import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.FavoriteProductAndCategory_DTO;
 import com.example.Lync.DTO.InquiryDTO;
+import com.example.Lync.DTO.PriceRangeProjection;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
@@ -231,5 +232,10 @@ public class BuyerController {
         );
         String message = inquiryService.buyerAcceptQuery(qId, sellerDetails.getUserId());
         return ResponseEntity.ok(message);
+    }
+    @GetMapping("/priceRange/{productId}")
+    public ResponseEntity<PriceRangeProjection> priceRange(@PathVariable Long productId) {
+        PriceRangeProjection priceRange = sellerBuyerService.priceRangeByProductId(productId);
+        return ResponseEntity.ok(priceRange);
     }
 }
