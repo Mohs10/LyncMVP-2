@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface ProductService {
     Product addProduct(ProductDTO productDTO) throws IOException;
-    List<ProductDTO> getAllProducts();
+
+    public String uploadProductPicture(Long productId, MultipartFile productImage) throws IOException ;
+
+        List<ProductDTO> getAllProducts();
     List<Product> getAllInactiveProducts();
 //    String addProductTemp(ProductDTO productDTO);
     public String addImageByProductId(Long productId, String s3KeyImage1, String s3KeyImage2) ;

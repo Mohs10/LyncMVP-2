@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -115,22 +116,22 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
 
         // Upload profile picture if provided
-        if (sellerBuyerDTO.getProfilePicture() != null) {
-            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
-            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
-        }
-
-        // Upload certificate if provided
-        if (sellerBuyerDTO.getCertificate() != null) {
-            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
-            sellerBuyerDTO.setCertificateUrl(certificateUrl);
-        }
-
-        // Upload cancelled cheque if provided
-        if (sellerBuyerDTO.getCancelledCheque() != null) {
-            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
-            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
-        }
+//        if (sellerBuyerDTO.getProfilePicture() != null) {
+//            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
+//            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
+//        }
+//
+//        // Upload certificate if provided
+//        if (sellerBuyerDTO.getCertificate() != null) {
+//            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
+//            sellerBuyerDTO.setCertificateUrl(certificateUrl);
+//        }
+//
+//        // Upload cancelled cheque if provided
+//        if (sellerBuyerDTO.getCancelledCheque() != null) {
+//            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
+//            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
+//        }
 
 
 
@@ -159,22 +160,22 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
 
         // Upload profile picture if provided
-        if (sellerBuyerDTO.getProfilePicture() != null) {
-            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
-            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
-        }
-
-        // Upload certificate if provided
-        if (sellerBuyerDTO.getCertificate() != null) {
-            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
-            sellerBuyerDTO.setCertificateUrl(certificateUrl);
-        }
-
-        // Upload cancelled cheque if provided
-        if (sellerBuyerDTO.getCancelledCheque() != null) {
-            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
-            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
-        }
+//        if (sellerBuyerDTO.getProfilePicture() != null) {
+//            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
+//            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
+//        }
+//
+//        // Upload certificate if provided
+//        if (sellerBuyerDTO.getCertificate() != null) {
+//            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
+//            sellerBuyerDTO.setCertificateUrl(certificateUrl);
+//        }
+//
+//        // Upload cancelled cheque if provided
+//        if (sellerBuyerDTO.getCancelledCheque() != null) {
+//            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
+//            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
+//        }
 
 
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
@@ -265,6 +266,46 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     }
 
 
+    // Method to upload profile picture
+    public String uploadProfilePicture(String userId, MultipartFile profilePicture) throws IOException {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
+                new RuntimeException("User not found with User ID: " + userId));
+        if (profilePicture != null) {
+            String profilePictureUrl = s3Service.uploadUserImage(userId, profilePicture);
+            sellerBuyer.setProfilePictureUrl(profilePictureUrl); // Save URL in the SellerBuyer entity if needed
+            sellerBuyerRepository.save(sellerBuyer); // Persist changes
+            return profilePictureUrl;
+        }
+        return null;
+    }
+
+    // Method to upload certificate
+    public String uploadCertificate(String userId, MultipartFile certificate) throws IOException {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
+                new RuntimeException("User not found with User ID: " + userId));
+        if (certificate != null) {
+            String certificateUrl = s3Service.uploadUserCertificate(userId, certificate);
+            sellerBuyer.setCertificateUrl(certificateUrl); // Save URL in the SellerBuyer entity if needed
+            sellerBuyerRepository.save(sellerBuyer); // Persist changes
+            return certificateUrl;
+        }
+        return null;
+    }
+
+    // Method to upload cancelled cheque
+    public String uploadCancelledCheque(String userId, MultipartFile cancelledCheque) throws IOException {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId).orElseThrow(()->
+                new RuntimeException("User not found with User ID: " + userId));
+        if (cancelledCheque != null) {
+            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(userId, cancelledCheque);
+            sellerBuyer.setCancelledChequeUrl(cancelledChequeUrl); // Save URL in the SellerBuyer entity if needed
+            sellerBuyerRepository.save(sellerBuyer); // Persist changes
+            return cancelledChequeUrl;
+        }
+        return null;
+    }
+
+
     private SellerBuyer convertToSellerBuyer(SellerBuyerDTO sellerBuyerDTO) {
         SellerBuyer sellerBuyer = new SellerBuyer();
 
@@ -346,8 +387,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setWareHouseAddress(sellerBuyer.getWareHouseAddress());
         sellerBuyerDTO.setGstIn(sellerBuyer.getGstIn());
         sellerBuyerDTO.setCompanyLocation(sellerBuyer.getCompanyLocation());
-        sellerBuyerDTO.setProfilePicture(null); // Set appropriately during file upload handling
-        sellerBuyerDTO.setStorageLicenseFile(null); // Set appropriately during file upload handling
+//        sellerBuyerDTO.setProfilePicture(null); // Set appropriately during file upload handling
+//        sellerBuyerDTO.setStorageLicenseFile(null); // Set appropriately during file upload handling
         sellerBuyerDTO.setCompanyCountry(sellerBuyer.getCompanyCountry());
         sellerBuyerDTO.setCompanyState(sellerBuyer.getCompanyState());
         sellerBuyerDTO.setCompanyCity(sellerBuyer.getCompanyCity());
@@ -590,23 +631,23 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     sellerProduct.setCertificationName(sellerProductDTO.getCertificationName());
     sellerProduct.setCertificationFileUrl(sellerProductDTO.getCertificationFileUrl());
 
-    // Handle images
-    if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
-       String image1Url =s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage1());
-        sellerProduct.setProductImageUrl1(image1Url);
-    }
-    if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
-        String image2Url =s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage2());
-        sellerProduct.setProductImageUrl2(image2Url);
-        // Upload image2 logic
-    }
-
-    // Handle certification file
-    if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
-        String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getCertificationFile());
-        sellerProduct.setCertificationFileUrl(certificateUrl);
-        // Upload certification file logic
-    }
+//    // Handle images
+//    if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
+//       String image1Url =s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage1());
+//        sellerProduct.setProductImageUrl1(image1Url);
+//    }
+//    if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
+//        String image2Url =s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getProductImage2());
+//        sellerProduct.setProductImageUrl2(image2Url);
+//        // Upload image2 logic
+//    }
+//
+//    // Handle certification file
+//    if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
+//        String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(),sellerProductDTO.getSpId(),sellerProductDTO.getCertificationFile());
+//        sellerProduct.setCertificationFileUrl(certificateUrl);
+//        // Upload certification file logic
+//    }
 
     // Set Specifications (many-to-many relationship)
     if (sellerProductDTO.getSpecifications() != null) {
@@ -616,6 +657,44 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     // Save or update SellerProduct
     return sellerProductRepository.save(sellerProduct);
 
+    }
+
+
+    public String uploadSellerProductImage1(String sellerProductId, MultipartFile productImage) throws IOException {
+        SellerProduct sellerProduct = sellerProductRepository.findById(sellerProductId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+
+        if (productImage != null) {
+            String productImageUrl = s3Service.uploadSellerProductImage1(sellerProduct.getSellerId(),sellerProduct.getSpId(),productImage);
+            sellerProduct.setProductImageUrl1(productImageUrl); // Save URL in the SellerBuyer entity if needed
+            sellerProductRepository.save(sellerProduct); // Persist changes
+            return productImageUrl;
+        }
+        return null;
+    }
+    public String uploadSellerProductImage2(String sellerProductId, MultipartFile productImage) throws IOException {
+        SellerProduct sellerProduct = sellerProductRepository.findById(sellerProductId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+
+        if (productImage != null) {
+            String productImageUrl = s3Service.uploadSellerProductImage2(sellerProduct.getSellerId(),sellerProduct.getSpId(),productImage);
+            sellerProduct.setProductImageUrl2(productImageUrl); // Save URL in the SellerBuyer entity if needed
+            sellerProductRepository.save(sellerProduct); // Persist changes
+            return productImageUrl;
+        }
+        return null;
+    }
+    public String uploadSellerProductCertificate(String sellerProductId, MultipartFile productCertificate) throws IOException {
+        SellerProduct sellerProduct = sellerProductRepository.findById(sellerProductId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+
+        if (productCertificate != null) {
+            String productImageUrl = s3Service.uploadSellerProductCertificate(sellerProduct.getSellerId(),sellerProduct.getSpId(),productCertificate);
+            sellerProduct.setCertificationFileUrl(productImageUrl); // Save URL in the SellerBuyer entity if needed
+            sellerProductRepository.save(sellerProduct); // Persist changes
+            return productImageUrl;
+        }
+        return null;
     }
 
 
@@ -653,21 +732,21 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         existingSellerProduct.setWarehousePinCode(sellerProductDTO.getWarehousePinCode());
         existingSellerProduct.setCertificationName(sellerProductDTO.getCertificationName());
 
-        // Update certification file if a new one is provided
-        if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
-            String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getCertificationFile());
-            existingSellerProduct.setCertificationFileUrl(certificateUrl);
-        }
-
-        // Handle product images
-        if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
-            String image1Url = s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage1());
-            existingSellerProduct.setProductImageUrl1(image1Url);
-        }
-        if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
-            String image2Url = s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage2());
-            existingSellerProduct.setProductImageUrl2(image2Url);
-        }
+//        // Update certification file if a new one is provided
+//        if (sellerProductDTO.getCertificationFile() != null && !sellerProductDTO.getCertificationFile().isEmpty()) {
+//            String certificateUrl = s3Service.uploadSellerProductCertificate(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getCertificationFile());
+//            existingSellerProduct.setCertificationFileUrl(certificateUrl);
+//        }
+//
+//        // Handle product images
+//        if (sellerProductDTO.getProductImage1() != null && !sellerProductDTO.getProductImage1().isEmpty()) {
+//            String image1Url = s3Service.uploadSellerProductImage1(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage1());
+//            existingSellerProduct.setProductImageUrl1(image1Url);
+//        }
+//        if (sellerProductDTO.getProductImage2() != null && !sellerProductDTO.getProductImage2().isEmpty()) {
+//            String image2Url = s3Service.uploadSellerProductImage2(sellerProductDTO.getSellerId(), sellerProductDTO.getSpId(), sellerProductDTO.getProductImage2());
+//            existingSellerProduct.setProductImageUrl2(image2Url);
+//        }
 
         // Update specifications (many-to-many relationship)
         if (sellerProductDTO.getSpecifications() != null) {

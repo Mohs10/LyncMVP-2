@@ -51,16 +51,33 @@ public class ProductController {
 
     @PostMapping("/products/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-
-    public ResponseEntity<Product> addProduct( @RequestPart("productDTO") ProductDTO productDTO,
-    @RequestParam(value = "productImage", required = false) MultipartFile productImage) throws IOException {
-
-        if (productImage != null && !productImage.isEmpty()) {
-            productDTO.setProductImage(productImage);
-        }        // Call the service layer to save the product
-        Product product = productService.addProduct(productDTO);
-        return new ResponseEntity<>(product, HttpStatus.CREATED);  // Return the created product
+    public ResponseEntity<Product> addProduct(@RequestBody ProductDTO productDTO) {
+        try {
+            // Call the service layer to save the product
+            Product product = productService.addProduct(productDTO);
+            return new ResponseEntity<>(product, HttpStatus.CREATED);  // Return the created product
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
+
+    @PostMapping("/uploadProductImage/{productId}")
+    public ResponseEntity<String> uploadProductImage(@PathVariable Long productId,
+                                                     @RequestParam("productImage") MultipartFile productImage) throws IOException {
+        try {
+            if (productImage != null && !productImage.isEmpty()) {
+                // Upload the product image and update the product with the image URL
+                String imageUrl = productService.uploadProductPicture(productId, productImage);
+                return ResponseEntity.ok("Product image uploaded successfully at : " + imageUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading product image.");
+        }
+    }
+
+
 
     @GetMapping("/products/all")
     public List<?> getAllProducts() {
@@ -125,38 +142,6 @@ public class ProductController {
     public List<Type> getAllTypes() {
         return typeService.getAllTypes();
     }
-
-//    @PostMapping("/products/{productId}/upload-images")
-////    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-//
-//    public ResponseEntity<Map<String, String>> uploadProductImages(
-//            @PathVariable Long productId,
-//            @RequestParam("image1") MultipartFile image1,
-//            @RequestParam("image2") MultipartFile image2) {
-//        try {
-//            // Upload images and get the map of image keys
-//            Map<String, String> uploadedImageKeys = s3Service.uploadProductImages(productId, image1, image2);
-//
-//// Print the map to see the keys and values
-//            System.out.println(uploadedImageKeys);
-//
-//// Assuming the map contains the keys "image1" and "image2"
-//            String image1Key = uploadedImageKeys.get("image1");
-//            String image2Key = uploadedImageKeys.get("image2");
-//
-//// Check if both keys are present
-//            if (image1Key != null && image2Key != null) {
-//                // Pass the keys to the product service method
-//                productService.addImageByProductId(productId, image1Key, image2Key);
-//            } else {
-//                System.out.println("One or both image keys are missing.");
-//            }
-//
-//            return ResponseEntity.ok(uploadedImageKeys); // Return the S3 keys for the uploaded images
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Return error if upload fails
-//        }
-//    }
 
     @GetMapping("/products/{productId}/images/presigned-urls")
 
@@ -249,11 +234,11 @@ public class ProductController {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Update the product details based on the incoming ProductDTO
-        if (productImage != null && !productImage.isEmpty()) {
-            // If a new image is uploaded, set it
-            productDTO.setProductImage(productImage);
-        }
+//        // Update the product details based on the incoming ProductDTO
+//        if (productImage != null && !productImage.isEmpty()) {
+//            // If a new image is uploaded, set it
+//            productDTO.setProductImage(productImage);
+//        }
 
         // Call the service layer to update the product
         Product updatedProduct = productService.editProduct(existingProduct, productDTO);

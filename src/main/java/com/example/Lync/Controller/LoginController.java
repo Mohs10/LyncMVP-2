@@ -75,42 +75,28 @@ public class LoginController {
 
 
         @PostMapping("/addSeller")
-    public ResponseEntity<String> addSeller(
-                @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
-                @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
-                @RequestParam(value = "certificate", required = false) MultipartFile certificate,
-                @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque) {
-        try {
-            // Check if the phone number is already in cache
-            if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists.");
+    public ResponseEntity<String> addSeller(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
+            try {
+                // Check if the phone number is already in cache
+                if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Phone number already exists.");
+                }
+
+                // Check if the email is already in cache
+                if (sellerBuyerService.isEmailInCache(sellerBuyerDTO.getEmail())) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
+                }
+
+                // Create the Seller with basic details
+                sellerBuyerService.createSeller(sellerBuyerDTO);
+                return ResponseEntity.ok("Seller added successfully.");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while adding Seller.");
             }
-
-            // Check if the email is already in cache
-            if (sellerBuyerService.isEmailInCache(sellerBuyerDTO.getEmail())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
-            }
-
-            sellerBuyerDTO.setCancelledCheque(cancelledCheque);
-            sellerBuyerDTO.setCertificate(certificate);
-            sellerBuyerDTO.setProfilePicture(profilePicture);
-
-            // If both checks pass, create the seller
-            sellerBuyerService.createSeller(sellerBuyerDTO);
-            return ResponseEntity.ok("Seller added successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while adding seller.");
         }
-    }
-
-
 
     @PostMapping("/addBuyer")
-    public ResponseEntity<String> addBuyer(
-            @RequestPart("sellerBuyerDTO") SellerBuyerDTO sellerBuyerDTO,
-            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
-            @RequestParam(value = "certificate", required = false) MultipartFile certificate,
-            @RequestParam(value = "cancelledCheque", required = false) MultipartFile cancelledCheque) {
+    public ResponseEntity<String> addBuyer(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
         try {
             // Check if the phone number is already in cache
             if (sellerBuyerService.isPhoneNumberInCache(sellerBuyerDTO.getPhoneNumber())) {
@@ -122,17 +108,44 @@ public class LoginController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
             }
 
-            sellerBuyerDTO.setCancelledCheque(cancelledCheque);
-            sellerBuyerDTO.setCertificate(certificate);
-            sellerBuyerDTO.setProfilePicture(profilePicture);
-
-            // If both checks pass, create the buyer
+            // Create the buyer with basic details
             sellerBuyerService.createBuyer(sellerBuyerDTO);
             return ResponseEntity.ok("Buyer added successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while adding Buyer.");
         }
     }
+    @PostMapping("/uploadProfilePicture/{userId}")
+    public ResponseEntity<String> uploadProfilePicture(@PathVariable String userId,
+                                                       @RequestParam("profilePicture") MultipartFile profilePicture) {
+        try {
+            String profilePictureUrl = sellerBuyerService.uploadProfilePicture(userId, profilePicture);
+            return ResponseEntity.ok("Profile Picture Uploaded Successfully: " + profilePictureUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Profile Picture.");
+        }
+    }
+    @PostMapping("/uploadCertificate/{userId}")
+    public ResponseEntity<String> uploadCertificate(@PathVariable String userId,
+                                                    @RequestParam("certificate") MultipartFile certificate) {
+        try {
+            String certificateUrl = sellerBuyerService.uploadCertificate(userId, certificate);
+            return ResponseEntity.ok("Certificate Uploaded Successfully: " + certificateUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Certificate.");
+        }
+    }
+    @PostMapping("/uploadCancelledCheque/{userId}")
+    public ResponseEntity<String> uploadCancelledCheque(@PathVariable String userId,
+                                                        @RequestParam("cancelledCheque") MultipartFile cancelledCheque) {
+        try {
+            String cancelledChequeUrl = sellerBuyerService.uploadCancelledCheque(userId, cancelledCheque);
+            return ResponseEntity.ok("Cancelled Cheque Uploaded Successfully: " + cancelledChequeUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Cancelled Cheque.");
+        }
+    }
+
 
 
 

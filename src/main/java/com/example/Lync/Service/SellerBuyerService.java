@@ -6,6 +6,7 @@ import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,10 +42,18 @@ public interface SellerBuyerService {
     public void becomeSeller(String userId) ;
 
     void editSellerBuyer(String userId, SellerBuyerDTO sellerBuyerDTO);
+    public String uploadProfilePicture(String userId, MultipartFile profilePicture) throws IOException;
+    public String uploadCertificate(String userId, MultipartFile certificate) throws IOException ;
+
+        public String uploadCancelledCheque(String userId, MultipartFile cancelledCheque) throws IOException;
 
     //Seller Products -----------------------------------------------------------------------------
     public SellerProduct addSellerProduct(SellerProductDTO sellerProductDTO) throws Exception;
-    public SellerProduct editSellerProduct(SellerProduct existingSellerProduct, SellerProductDTO sellerProductDTO) throws Exception ;
+    public String uploadSellerProductImage1(String sellerProductId, MultipartFile productImage) throws IOException ;
+    public String uploadSellerProductImage2(String sellerProductId, MultipartFile productImage) throws IOException ;
+    public String uploadSellerProductCertificate(String sellerProductId, MultipartFile productCertificate) throws IOException ;
+
+        public SellerProduct editSellerProduct(SellerProduct existingSellerProduct, SellerProductDTO sellerProductDTO) throws Exception ;
 
         public List<SellerProduct> getSellerProductsBySeller(String sellerId) ;
     public List<SellerProductDTO> getSellerProductDTOsBySeller(String sellerId) ;

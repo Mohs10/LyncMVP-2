@@ -15,6 +15,7 @@ import com.example.Lync.Service.OTPStorageService;
 import com.example.Lync.Service.OtpService;
 import com.example.Lync.Service.SellerBuyerService;
 import com.example.Lync.ServiceImpl.UserInfoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -97,46 +98,75 @@ public class SellerController {
     }
 
     @PostMapping("/addSellerProduct")
-    public ResponseEntity<SellerProduct> addSellerProduct(@RequestPart("sellerProductDto") SellerProductDTO sellerProductDto,
-     @RequestParam(value = "productImage1", required = false) MultipartFile productImage1,
-      @RequestParam(value = "productImage2", required = false) MultipartFile productImage2,
-       @RequestParam(value = "certificate", required = false) MultipartFile certificate
+    public ResponseEntity<SellerProduct> addSellerProduct(@RequestBody SellerProductDTO sellerProductDto) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
 
-    ) throws Exception {
+            // Fetch SellerBuyer details based on email (username)
+            SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                    new RuntimeException("SellerBuyer details not found for email: " + username)
+            );
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Get the username from the Authentication object
-        String username = authentication.getName();
+            sellerProductDto.setSellerId(sellerDetails.getUserId());
 
-        // Fetch SellerBuyer details based on email (username)
-        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
-                new RuntimeException("SellerBuyer details not found for email: " + username)
-        );
+            SellerProduct addedSellerProduct = sellerBuyerService.addSellerProduct(sellerProductDto);
 
-        sellerProductDto.setSellerId(sellerDetails.getUserId());
-
-        if (productImage1 != null && !productImage1.isEmpty()) {
-            sellerProductDto.setProductImage1(productImage1);
+            return ResponseEntity.ok(addedSellerProduct); // Returns the saved SellerProduct with 200 OK
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        if (productImage2 != null && !productImage2.isEmpty()) {
-            sellerProductDto.setProductImage2(productImage2);
-        }
-        if (certificate != null && !certificate.isEmpty()) {
-            sellerProductDto.setCertificationFile(certificate);
-        }
-
-        SellerProduct addedSellerProduct = sellerBuyerService.addSellerProduct(sellerProductDto);
-
-        return ResponseEntity.ok(addedSellerProduct); // Returns the saved SellerProduct with 200 OK
     }
+
+    @PostMapping("/uploadProductImage1/{sellerProductId}")
+    public ResponseEntity<String> uploadProductImage1(@PathVariable String sellerProductId,
+                                                      @RequestParam("productImage1") MultipartFile productImage1) throws Exception {
+        try {
+            if (productImage1 != null && !productImage1.isEmpty()) {
+                String imageUrl = sellerBuyerService.uploadSellerProductImage1(sellerProductId, productImage1);
+                return ResponseEntity.ok("Product Image 1 uploaded successfully: " + imageUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product Image 1 is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Product Image 1.");
+        }
+    }
+    @PostMapping("/uploadProductImage2/{sellerProductId}")
+    public ResponseEntity<String> uploadProductImage2(@PathVariable String sellerProductId,
+                                                      @RequestParam("productImage2") MultipartFile productImage2) throws Exception {
+        try {
+            if (productImage2 != null && !productImage2.isEmpty()) {
+                String imageUrl = sellerBuyerService.uploadSellerProductImage2(sellerProductId, productImage2);
+                return ResponseEntity.ok("Product Image 2 uploaded successfully: " + imageUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product Image 2 is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Product Image 2.");
+        }
+    }
+    @PostMapping("/uploadCertificate/{sellerProductId}")
+    public ResponseEntity<String> uploadCertificate(@PathVariable String sellerProductId,
+                                                    @RequestParam("certificate") MultipartFile certificate) throws Exception {
+        try {
+            if (certificate != null && !certificate.isEmpty()) {
+                String certificateUrl = sellerBuyerService.uploadSellerProductCertificate(sellerProductId, certificate);
+                return ResponseEntity.ok("Certificate uploaded successfully: " + certificateUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Certificate is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Certificate.");
+        }
+    }
+
+
 
 
     @PutMapping("/editSellerProduct/{spId}")
     public ResponseEntity<SellerProduct> editSellerProduct(@PathVariable("spId") String spId,
-                                                           @RequestPart("sellerProductDto") SellerProductDTO sellerProductDto,
-                                                           @RequestParam(value = "productImage1", required = false) MultipartFile productImage1,
-                                                           @RequestParam(value = "productImage2", required = false) MultipartFile productImage2,
-                                                           @RequestParam(value = "certificate", required = false) MultipartFile certificate) throws Exception {
+                                                           @RequestBody SellerProductDTO sellerProductDto) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -152,15 +182,15 @@ public class SellerController {
         SellerProduct existingSellerProduct = sellerProductRepository.findById(spId)
                 .orElseThrow(() -> new RuntimeException("SellerProduct not found for SP ID: " + spId));
 
-        if (productImage1 != null && !productImage1.isEmpty()) {
-            sellerProductDto.setProductImage1(productImage1);
-        }
-        if (productImage2 != null && !productImage2.isEmpty()) {
-            sellerProductDto.setProductImage2(productImage2);
-        }
-        if (certificate != null && !certificate.isEmpty()) {
-            sellerProductDto.setCertificationFile(certificate);
-        }
+//        if (productImage1 != null && !productImage1.isEmpty()) {
+//            sellerProductDto.setProductImage1(productImage1);
+//        }
+//        if (productImage2 != null && !productImage2.isEmpty()) {
+//            sellerProductDto.setProductImage2(productImage2);
+//        }
+//        if (certificate != null && !certificate.isEmpty()) {
+//            sellerProductDto.setCertificationFile(certificate);
+//        }
 
         SellerProduct updatedSellerProduct = sellerBuyerService.editSellerProduct(existingSellerProduct, sellerProductDto);
 
