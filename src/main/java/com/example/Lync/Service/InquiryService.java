@@ -13,6 +13,8 @@ public interface InquiryService {
 
     List<InquiryDTO> buyerGetsAllInquiry(String buyerUId);
 
+    List<InquiryDTO> buyerGetsInquiries(String buyerUId);
+
     InquiryDTO buyerGetsInquiryById(String buyerUId, String qId);
 
     List<InquiryDTO> adminGetAllInquiry(); //Admin get all inquiry

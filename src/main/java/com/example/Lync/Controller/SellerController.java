@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com", "https://another-domain.com"})
 
@@ -210,13 +211,13 @@ public class SellerController {
         return ResponseEntity.ok(inquiryService.sellerNewInquiries(sellerDetails.getUserId()));
     }
 
-    @GetMapping("/sellerOpenInquiry/{snId}")
+    @GetMapping("/getInquiryById/{snId}")
     public ResponseEntity<SellerReceiveInquiryDTO> sellerOpenInquiry(@PathVariable Long snId) throws Exception {
         return ResponseEntity.ok(inquiryService.sellerOpenInquiry(snId));
     }
 
     @PostMapping("/sellerNegotiate/{snId}")
-    public ResponseEntity<String> sellerNegotiatePrice(@PathVariable Long snId, @RequestBody Double amount){
+    public ResponseEntity<String> sellerNegotiatePrice(@PathVariable Long snId, @RequestBody Map<String, Double> requestBody){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -224,6 +225,7 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        Double amount = requestBody.get("amount");
         String message = inquiryService.sellerNegotiatePrice(snId, sellerDetails.getUserId(), amount);
         return ResponseEntity.ok(message);
     }

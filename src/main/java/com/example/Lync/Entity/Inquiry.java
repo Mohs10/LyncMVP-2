@@ -19,7 +19,7 @@ public class Inquiry {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String qId;
-    private String buyerUId; // Reference to buyer (User)
+    private String buyerId; // Reference to buyer (User)
     private Long osId;
 
     // Product details

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 
 @CrossOrigin(origins = {"http://localhost:5173", "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com", "https://another-domain.com"})
@@ -146,7 +147,9 @@ public class AdminController {
     }
 
     @PostMapping("/sendFinalPrice/{snId}")
-    public ResponseEntity<String> sendFinalPrice(@PathVariable Long snId, @RequestBody Double amount){
+    public ResponseEntity<String> sendFinalPrice(@PathVariable Long snId, @RequestBody Map<String, Double> requestBody){
+
+        Double amount =  requestBody.get("amount");
 
         String message = inquiryService.adminFinalPriceToSeller(snId, amount);
         return ResponseEntity.ok(message);

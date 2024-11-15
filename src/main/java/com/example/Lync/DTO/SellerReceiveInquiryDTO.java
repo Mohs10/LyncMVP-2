@@ -13,8 +13,14 @@ import java.time.LocalTime;
 public class SellerReceiveInquiryDTO {
     private String qId;
     private Long productId; // Reference to Product
+    private String productName;
+    private String FormName;
+    private String varietyName;
     private String sellerUId; // Reference to seller (User)
+    private String sellerName;
     private String type;
+    private Long productFormId; // ID for the form of the product
+    private Long productVarietyId;
 
     //Order Specification
     private Double quantity;

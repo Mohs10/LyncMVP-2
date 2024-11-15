@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface InquiryRepository extends JpaRepository<Inquiry, String> {
@@ -15,4 +16,8 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
 
     @Query("SELECT i FROM Inquiry i WHERE i.qId= :qId")
     Inquiry findByQId(String qId);
+
+    @Query("SELECT i FROM Inquiry i WHERE i.buyerId = :buyerId")
+    List<Inquiry> findByBuyerId(@Param("buyerId") String buyerUId);
+
 }

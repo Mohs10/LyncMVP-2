@@ -180,9 +180,10 @@ public class BuyerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        List<InquiryDTO> DTOs = inquiryService.buyerGetsAllInquiry(sellerDetails.getUserId());
+        System.out.println("Controller sellerDetails : " + sellerDetails);
+//        List<InquiryDTO> DTOs = inquiryService.buyerGetsAllInquiry(sellerDetails.getUserId());
 
-        return ResponseEntity.ok(DTOs);
+        return ResponseEntity.ok(inquiryService.buyerGetsInquiries(sellerDetails.getUserId()));
     }
 
     @GetMapping("/buyerGetsInquiryById/{qId}")
