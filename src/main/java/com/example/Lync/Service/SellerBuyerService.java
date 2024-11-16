@@ -1,5 +1,6 @@
 package com.example.Lync.Service;
 
+import com.example.Lync.DTO.PriceRangeProjection;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.FavouriteCategory;
@@ -60,5 +61,8 @@ public interface SellerBuyerService {
 
         public Optional<SellerProduct> getSellerProductById(String spId);
     public  SellerProductDTO toDTO(SellerProduct sellerProduct);
+
+    PriceRangeProjection priceRangeByProductId(Long productId);
+
     List<String> allEmail();
     }

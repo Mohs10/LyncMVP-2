@@ -4,6 +4,7 @@ import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.AuthRequest;
 import com.example.Lync.DTO.OTP_DTO;
+import com.example.Lync.DTO.PriceRangeProjection;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
@@ -295,5 +296,14 @@ public class LoginController {
             return ResponseEntity.ok("Email number is available.");
         }
     }
+
+
+    @GetMapping("/priceRange/{productId}")
+    public ResponseEntity<PriceRangeProjection> priceRange(@PathVariable Long productId) {
+        PriceRangeProjection priceRange = sellerBuyerService.priceRangeByProductId(productId);
+        return ResponseEntity.ok(priceRange);
+    }
+
+
 
 }
