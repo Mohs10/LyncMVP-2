@@ -225,7 +225,8 @@ public class AdminController {
     }
 
     @PostMapping("/adminSentFinalPriceToBuyer/{qId}")
-    public ResponseEntity<String> finalPriceToBuyer(@PathVariable String qId, @RequestBody Double amount) {
+    public ResponseEntity<String> finalPriceToBuyer(@PathVariable String qId, @RequestBody Map<String, Double> requestBody) {
+        Double amount = requestBody.get("kishan");
         String message = inquiryService.adminFinalPriceToBuyer(qId, amount);
         return ResponseEntity.ok(message);
     }

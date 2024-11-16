@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 @CrossOrigin(origins = {"http://localhost:5173", "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com", "https://another-domain.com"})
 @RestController
@@ -212,13 +213,14 @@ public class BuyerController {
     }
 
     @PostMapping("/buyerNegotiatePrice/{qId}")
-    public ResponseEntity<String> negotiatePrice(@PathVariable String qId, @RequestBody Double amount){
+    public ResponseEntity<String> negotiatePrice(@PathVariable String qId, @RequestBody Map<String, Double> requestBody) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        Double amount = requestBody.get("amount");
         String message = inquiryService.buyerNegotiatePrice(qId, sellerDetails.getUserId(), amount);
         return ResponseEntity.ok(message);
     }

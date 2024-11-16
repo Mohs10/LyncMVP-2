@@ -888,7 +888,7 @@ public class InquiryServiceImpl implements InquiryService {
         negotiate.setStatus("Buyer negotiated the price.");
         buyerNegotiateRepository.save(negotiate);
 
-        return "You negotiated with the amount of" + amount;
+        return "You negotiated with the amount of " + amount;
     }
 
     @Override
