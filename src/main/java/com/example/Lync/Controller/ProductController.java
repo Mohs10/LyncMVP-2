@@ -52,9 +52,12 @@ public class ProductController {
     @PostMapping("/products/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Product> addProduct(@RequestBody ProductDTO productDTO) {
+        System.out.println(productDTO);
         try {
             // Call the service layer to save the product
             Product product = productService.addProduct(productDTO);
+
+            System.out.println(product);
             return new ResponseEntity<>(product, HttpStatus.CREATED);  // Return the created product
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -64,6 +67,8 @@ public class ProductController {
     @PostMapping("/uploadProductImage/{productId}")
     public ResponseEntity<String> uploadProductImage(@PathVariable Long productId,
                                                      @RequestParam("productImage") MultipartFile productImage) throws IOException {
+
+        System.out.println("HereImage");
         try {
             if (productImage != null && !productImage.isEmpty()) {
                 // Upload the product image and update the product with the image URL
@@ -227,8 +232,7 @@ public class ProductController {
     @PostMapping("/editProduct/{productId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Product> editProduct(@PathVariable("productId") Long productId,
-                                               @RequestPart("productDTO") ProductDTO productDTO,
-                                               @RequestParam(value = "productImage", required = false) MultipartFile productImage) throws Exception {
+                                               @RequestBody ProductDTO productDTO) throws Exception {
 
         // Retrieve the existing product from the database
         Product existingProduct = productRepository.findById(productId)
