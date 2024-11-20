@@ -82,9 +82,9 @@ public class InquiryController {
 //        return ResponseEntity.ok("Rejected Inquiry for ID" + qId);
 //    }
 
-    @PostMapping("/sellerOrderSample/{qId}")
-    public ResponseEntity<String> sellerOrderSample(@PathVariable String qId, @RequestBody SampleOrderDTO sampleOrderDTO) throws Exception {
-        inquiryService.sellerOrderSample(qId, sampleOrderDTO);
-        return ResponseEntity.ok("Sample Ordered for ID" + qId);
-    }
+//    @PostMapping("/sellerOrderSample/{qId}")
+//    public ResponseEntity<String> sellerOrderSample(@PathVariable String qId, @RequestBody SampleOrderDTO sampleOrderDTO) throws Exception {
+//        inquiryService.sellerOrderSample(qId, sampleOrderDTO);
+//        return ResponseEntity.ok("Sample Ordered for ID" + qId);
+//    }
 }

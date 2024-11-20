@@ -65,4 +65,8 @@ public interface SellerBuyerService {
     PriceRangeProjection priceRangeByProductId(Long productId);
 
     List<String> allEmail();
+
+    String enableWaiveSampleFree(String userId, Boolean enable);
+
+    String disableWaiveSampleFree(String userId, Boolean disable);
     }

@@ -976,7 +976,27 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     }
 
+    @Override
+    public String enableWaiveSampleFree(String userId, Boolean enable) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("SellerBuyer not found with ID: " + userId));
 
+        sellerBuyer.setWaiveSampleFree(enable);
+        sellerBuyerRepository.save(sellerBuyer);
+
+        return "Sample order fee has been waived off.";
+    }
+
+    @Override
+    public String disableWaiveSampleFree(String userId, Boolean disable) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("SellerBuyer not found with ID: " + userId));
+
+        sellerBuyer.setWaiveSampleFree(disable);
+        sellerBuyerRepository.save(sellerBuyer);
+
+        return "Sample order fee has been added.";
+    }
 
 
 

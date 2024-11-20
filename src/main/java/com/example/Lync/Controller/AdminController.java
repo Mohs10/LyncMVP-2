@@ -175,6 +175,18 @@ public class AdminController {
         return ResponseEntity.ok(addresses);
     }
 
+    @PostMapping("/enableWaiveSampleFree/{userId}")
+    public ResponseEntity<String> enableWaive(@PathVariable String userId, @RequestParam Boolean enable){
+        String message = sellerBuyerService.enableWaiveSampleFree(userId, enable);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/disableWaiveSampleFree/{userId}")
+    public ResponseEntity<String> disableWaive(@PathVariable String userId, @RequestParam Boolean disable){
+        String message = sellerBuyerService.enableWaiveSampleFree(userId, disable);
+        return ResponseEntity.ok(message);
+    }
+
 
 
 

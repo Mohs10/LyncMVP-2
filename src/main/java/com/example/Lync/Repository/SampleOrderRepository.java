@@ -6,11 +6,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface SampleOrderRepository extends JpaRepository<SampleOrder, String> {
-    @Query("SELECT COUNT(s) FROM SampleOrder s WHERE s.sODate= :currentDate")
+    @Query("SELECT COUNT(s) FROM SampleOrder s WHERE s.buyerRequestDate= :currentDate")
     Long countSampleOrderByCurrentDate(@Param("currentDate") LocalDate currentDate);
 
-    @Query("SELECT s FROM SampleOrder s WHERE s.soId= :soId")
-    SampleOrder findBySoId(String soId);
+    @Query("SELECT s FROM SampleOrder s WHERE s.buyerUId = :buyerUId")
+    List<SampleOrder> findAllByBuyerUId(@Param("buyerUId") String buyerUId);
+
+    @Query("SELECT s FROM SampleOrder s WHERE s.sellerUId = :sellerUId")
+    List<SampleOrder> findAllBySellerUId(@Param("sellerUId") String sellerUId);
+
 }

@@ -12,19 +12,57 @@ import java.time.temporal.ChronoUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SampleOrderDTO {
-    //SampleOrder Table
-    private String soId;
-//    private String qId;
-//    private String buyerUId;
-//    private String sellerUId;
-//    private Long productId;
-    private Double sOQuantity;
-    private String stockLocation;
-    private String deliveryLocation;
 
-    //OrderStatus Table
+    private String soId;
+    private String qId;
+    private String buyerUId;
+    private String buyerName;
+    private String sellerUId;
+    private String sellerName;
+
+    private Long productId;
+    private String productName;
+    private Long productFormId;
+    private String productFormName;
+    private Long productVarietyId;
+    private String varietyName;
+
+    private Double buyerQuantity;
+    private Long buyerAddressId;
+    private Double buyerAmount;
+    private LocalDate buyerRequestDate;
+    private LocalTime buyerRequestTime;
+
+    private String adminSendQtyToSeller;
+    private Long adminAddressId;
+    private LocalDate adminSendToSellerDate;
+    private LocalTime adminSendToSellerTime;
+
+    private LocalDate sellerRespondDate;
+    private LocalTime sellerRespondTime;
+
+    private LocalDate sellerPackagingDate;
+    private LocalTime sellerPackagingTime;
+
+    private LocalDate sellerDispatchDate;
+    private LocalTime sellerDispatchTime;
+
+    private LocalDate adminReceiveDate;
+    private LocalTime adminReceiveTime;
+
+    private LocalDate adminProcessingDate;
+    private LocalTime adminProcessingTime;
+
+    private LocalDate adminDispatchDate;
+    private LocalTime adminDispatchTime;
+
+    private LocalDate buyerReceiveDate;
+    private LocalTime buyerReceiveTime;
+
+    private LocalDate buyerApproveDate;
+    private LocalTime buyerApproveTime;
+
+    private LocalDate buyerRejectDate;
+    private LocalTime buyerRejectTime;
     private String status;
-    private String description;
-    private String imageUrl;
-    private String location;
 }

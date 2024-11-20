@@ -1,8 +1,7 @@
 package com.example.Lync.Entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Data
 @Entity
@@ -53,13 +53,13 @@ public class Inquiry {
     private LocalDate specifyDeliveryDate;
 
     //Product Specification
-    private Double chalkyGrains;
-    private String grainSize;
-    private Double kettValue;
-    private Double moistureContent;
-    private String brokenGrain;
-    private String admixing;
-    private String dd;
+//    private Double chalkyGrains;
+//    private String grainSize;
+//    private Double kettValue;
+//    private Double moistureContent;
+//    private String brokenGrain;
+//    private String admixing;
+//    private String dd;
 
 
     private LocalDate raiseDate = LocalDate.now();
@@ -73,5 +73,13 @@ public class Inquiry {
     private LocalTime sentTime;
     private String unit;
     // Getters and Setters
+
+    @ManyToMany
+    @JoinTable(
+            name = "inquiry_specifications",
+            joinColumns = @JoinColumn(name = "q_id"),
+            inverseJoinColumns = @JoinColumn(name = "inquiry_specification_id")
+    )
+    private List<InquirySpecification> specifications;
 }
 

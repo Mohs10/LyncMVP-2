@@ -1,5 +1,6 @@
 package com.example.Lync.DTO;
 
+import com.example.Lync.Entity.SellerNegotiate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -81,6 +82,7 @@ public class InquiryDTO {
 
     private List<String> sellerUIds; //Inquiry can be sent to multiple seller, so this is to capture sellers list.
     private Long adminAddressId;
+    private List<SellerNegotiateDTO> sellerNegotiations;
 
     //Buyer Negotiate
     private Double adminInitialPrice;
@@ -95,4 +97,9 @@ public class InquiryDTO {
     private LocalDate afpDate;
     private LocalTime afpTime;
     private String status;
+
+
+    //List of dynamic Specifications
+    private List<SpecificationDTO> specifications;
+
 }

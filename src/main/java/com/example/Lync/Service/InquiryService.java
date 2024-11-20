@@ -1,13 +1,12 @@
 package com.example.Lync.Service;
 
-import com.example.Lync.DTO.InquiryDTO;
-import com.example.Lync.DTO.SampleOrderDTO;
-import com.example.Lync.DTO.SellerProductDTO;
-import com.example.Lync.DTO.SellerReceiveInquiryDTO;
+import com.example.Lync.DTO.*;
 
 import java.util.List;
 
 public interface InquiryService {
+
+    List<SpecificationDTO> buyerGetsSpecificationsByProductId(Long productId);
 
     String buyerAddInquiry(InquiryDTO inquiryDTO, String buyerUId) throws Exception; //buyer raise inquiry
 
@@ -53,5 +52,45 @@ public interface InquiryService {
 
     void sellerRejectQuery(String qId, String description) throws Exception;
 
-    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
+
+//    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
+
+    String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception;
+
+    List<SampleOrderDTO> buyerGetsAllSampleOrders(String buyerUId);
+
+    SampleOrderDTO buyerGetsSampleOrderById(String soId, String buyerUId);
+
+    List<SampleOrderDTO> adminGetsAllSampleOrders();
+
+    SampleOrderDTO adminGetsSampleOrderById(String soId);
+
+    String adminSendsSampleOrderToSeller(String soId, SampleOrderDTO sampleOrderDTO) throws Exception;
+
+    List<SampleOrderDTO> sellerGetsAllSampleOrders(String sellerUId);
+
+    SampleOrderDTO sellerGetsSampleOrderById(String soId, String sellerUId);
+
+    String sellerApproveSampleOrder(String soId, String sellerUId);
+
+    String sellerDeclineSampleOrder(String soId, String sellerUId);
+
+    String sellerPackagingSample(String soId, String sellerUId);
+
+    String sellerDispatchSampleToAdmin(String soId, String sellerUId);
+
+    String adminReceivedSample(String soId);
+
+    String adminProcessingSample(String soId);
+
+    String adminDispatchToBuyer(String soId);
+
+    String buyerReceivedSample(String soId);
+
+    String buyerApprovedSample(String soId, String buyerUId);
+
+    String buyerRejectedSample(String soId, String buyerUId);
+
+
+
 }

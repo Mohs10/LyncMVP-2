@@ -21,10 +21,47 @@ public class SampleOrder {
     private String qId;
     private String buyerUId;
     private String sellerUId;
+
     private Long productId;
-    private Double sOQuantity;
-    private LocalDate sODate = LocalDate.now();
-    private LocalTime sOTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
-    private String stockLocation;
-    private String deliveryLocation;
+    private Long productFormId;
+    private Long productVarietyId;
+
+    private Double buyerQuantity;
+    private Long buyerAddressId;
+    private Double buyerAmount;
+    private LocalDate buyerRequestDate;
+    private LocalTime buyerRequestTime;
+
+    private String adminSendQtyToSeller;
+    private Long adminAddressId;
+    private LocalDate adminSendToSellerDate;
+    private LocalTime adminSendToSellerTime;
+
+    private LocalDate sellerRespondDate;
+    private LocalTime sellerRespondTime;
+
+    private LocalDate sellerPackagingDate;
+    private LocalTime sellerPackagingTime;
+
+    private LocalDate sellerDispatchDate;
+    private LocalTime sellerDispatchTime;
+
+    private LocalDate adminReceiveDate;
+    private LocalTime adminReceiveTime;
+
+    private LocalDate adminProcessingDate;
+    private LocalTime adminProcessingTime;
+
+    private LocalDate adminDispatchDate;
+    private LocalTime adminDispatchTime;
+
+    private LocalDate buyerReceiveDate;
+    private LocalTime buyerReceiveTime;
+
+    private LocalDate buyerApproveDate;
+    private LocalTime buyerApproveTime;
+
+    private LocalDate buyerRejectDate;
+    private LocalTime buyerRejectTime;
+    private String status;
 }
