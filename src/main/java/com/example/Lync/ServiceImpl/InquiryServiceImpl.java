@@ -124,6 +124,23 @@ public class InquiryServiceImpl implements InquiryService {
                 .map(neg -> {
                     SellerNegotiateDTO dto = new SellerNegotiateDTO();
                     dto.setSellerUId(neg.getSellerUId());
+                    SellerBuyer seller = sellerBuyerRepository.findById(neg.getSellerUId())
+                            .orElseThrow(() -> new RuntimeException("Seller not found with given ID : " + neg.getSellerUId()));
+                    dto.setSellerName(seller.getFullName());
+                    dto.setEmail(seller.getEmail());
+                    dto.setPhoneNumber(seller.getPhoneNumber());
+                    dto.setAdminCountry(seller.getCountry());
+                    dto.setAdminState(seller.getState());
+                    dto.setAdminCity(seller.getCity());
+                    dto.setAdminPinCode(seller.getPinCode());
+                    dto.setAdminAddress(seller.getAddress());
+
+                    SellerProduct sellerProduct = sellerProductRepository.findBySellerIdAndProductId(neg.getSellerUId(), inquiry.getProductId())
+                            .orElseThrow(() -> new RuntimeException("SellerProduct not found."));
+                    dto.setAvailableAmount(sellerProduct.getAvailableAmount());
+                    dto.setMaxPrice(sellerProduct.getMaxPrice());
+                    dto.setMinPrice(sellerProduct.getMinPrice());
+
                     dto.setAdminInitialPrice(neg.getAdminInitialPrice());
                     dto.setAipDate(neg.getAipDate());
                     dto.setAipTime(neg.getAipTime());

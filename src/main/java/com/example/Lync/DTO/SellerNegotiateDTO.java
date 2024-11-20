@@ -13,6 +13,20 @@ import java.time.LocalTime;
 public class SellerNegotiateDTO {
 
     private String sellerUId;
+    private String sellerName;
+    private String email;
+    private String phoneNumber;
+    private String adminCountry;
+    private String adminState;
+    private String adminCity;
+    private String adminPinCode;
+    private String adminAddress;
+
+    //seller Product
+    private Double availableAmount;
+    private Double maxPrice;
+    private Double minPrice;
+
     private Double adminInitialPrice;
     private LocalDate aipDate;
     private LocalTime aipTime;
