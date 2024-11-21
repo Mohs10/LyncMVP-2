@@ -223,6 +223,12 @@ public class AdminController {
         return ResponseEntity.ok(message);
     }
 
+    @PostMapping("/adminRejectedSeller/{snId}")
+    public ResponseEntity<String> rejectedSeller(@PathVariable Long snId){
+        String message = inquiryService.adminRejectSeller(snId);
+        return ResponseEntity.ok(message);
+    }
+
     @PostMapping("/adminQuoteToBuyer/{qId}")
     public ResponseEntity<String> quoteToBuyer(@PathVariable String qId, @RequestBody InquiryDTO inquiryDTO){
         String message = inquiryService.adminQuoteToBuyer(qId, inquiryDTO);

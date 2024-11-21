@@ -42,6 +42,8 @@ public interface InquiryService {
 
     String adminSelectsSeller(Long snId);
 
+    String adminRejectSeller(Long snId);
+
     String adminQuoteToBuyer(String qId, InquiryDTO inquiryDTO);
 
     String buyerNegotiatePrice(String qId, String buyerUId, Double amount);

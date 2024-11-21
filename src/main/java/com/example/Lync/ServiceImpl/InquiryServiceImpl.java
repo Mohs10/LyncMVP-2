@@ -954,9 +954,21 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setSellerUId(sellerNegotiate.getSellerUId());
         inquiry.setSentDate(LocalDate.now());
         inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        inquiry.setSellerFinalPrice(sellerNegotiate.getAdminFinalPrice());
+        if(sellerNegotiate.getAdminFinalPrice() != null){
+            inquiry.setSellerFinalPrice(sellerNegotiate.getAdminFinalPrice());
+        }else{
+            inquiry.setSellerFinalPrice(sellerNegotiate.getSellerNegotiatePrice());
+        }
         inquiryRepository.save(inquiry);
         return "Seller with ID : " + sellerNegotiate.getSellerUId() + " is selected for the Query";
+    }
+
+    @Override
+    public String adminRejectSeller(Long snId) {
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
+        sellerNegotiate.setStatus("Admin Rejected for Query");
+        sellerNegotiateRepository.save(sellerNegotiate);
+        return "Seller with ID : " + sellerNegotiate.getSellerUId() + " is rejected for the Query";
     }
 
     @Override
