@@ -46,7 +46,8 @@ public class SecurityConfig {
                     config.setAllowedOrigins(List.of(
                             "http://localhost:5173",
                             "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
-                            "https://another-domain.com"
+                            "https://another-domain.com",
+                            "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com"
                     )); // Add multiple origins
                      config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH")); // Allowed methods
                     config.setAllowedHeaders(List.of("*")); // Allowed headers
