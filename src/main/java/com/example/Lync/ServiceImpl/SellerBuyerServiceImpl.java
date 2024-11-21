@@ -1,10 +1,7 @@
 package com.example.Lync.ServiceImpl;
 
 import com.example.Lync.Config.S3Service;
-import com.example.Lync.DTO.PriceRangeProjection;
-import com.example.Lync.DTO.SellerBuyerDTO;
-import com.example.Lync.DTO.SellerProductDTO;
-import com.example.Lync.DTO.SpecificationDTO;
+import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
 
 import com.example.Lync.Repository.*;
@@ -45,6 +42,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final VarietyRepository varietyRepository;
     private final SellerProductSpecificationRepository sellerProductSpecificationRepository;
     private final S3Service s3Service;
+    private final SellerBuyerAddressRepository sellerBuyerAddressRepository;
 
     private static final AtomicInteger serialNumber = new AtomicInteger(1); // Initialize starting value
 
@@ -53,7 +51,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -65,6 +63,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.varietyRepository = varietyRepository;
         this.sellerProductSpecificationRepository = sellerProductSpecificationRepository;
         this.s3Service = s3Service;
+        this.sellerBuyerAddressRepository = sellerBuyerAddressRepository;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
     private final Map<String, SellerBuyer> sellerBuyerEmailCache = new HashMap<>();
@@ -998,10 +997,35 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         return "Sample order fee has been added.";
     }
 
+    @Override
+    public String addAddress(String userId, SellerBuyerAddressDTO sellerBuyerAddressDTO) {
+        SellerBuyerAddress sellerBuyerAddress = new SellerBuyerAddress();
+        sellerBuyerAddress.setUId(userId);
+        sellerBuyerAddress.setAddress(sellerBuyerAddressDTO.getAddress());
+        sellerBuyerAddress.setCity(sellerBuyerAddressDTO.getCity());
+        sellerBuyerAddress.setState(sellerBuyerAddressDTO.getState());
+        sellerBuyerAddress.setCountry(sellerBuyerAddressDTO.getCountry());
+        sellerBuyerAddress.setPincode(sellerBuyerAddressDTO.getPincode());
+        sellerBuyerAddressRepository.save(sellerBuyerAddress);
+        return "Address added successfully";
+    }
 
-
-
-
+    @Override
+    public List<SellerBuyerAddressDTO> userGetsAddresses(String userId) {
+        List<SellerBuyerAddress> sellerBuyerAddresses = sellerBuyerAddressRepository.findByUId(userId);
+        List<SellerBuyerAddressDTO> sellerBuyerAddressDTOS = new ArrayList<>();
+        for(SellerBuyerAddress sellerBuyerAddress : sellerBuyerAddresses){
+            SellerBuyerAddressDTO dto = new SellerBuyerAddressDTO();
+            dto.setUaId(sellerBuyerAddress.getUaId());
+            dto.setUId(sellerBuyerAddress.getUId());
+            dto.setAddress(sellerBuyerAddress.getAddress());
+            dto.setCity(sellerBuyerAddress.getCity());
+            dto.setCountry(sellerBuyerAddress.getCountry());
+            dto.setPincode(sellerBuyerAddress.getPincode());
+            sellerBuyerAddressDTOS.add(dto);
+        }
+        return sellerBuyerAddressDTOS;
+    }
 
 
 }

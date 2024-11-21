@@ -1,6 +1,7 @@
 package com.example.Lync.Service;
 
 import com.example.Lync.DTO.PriceRangeProjection;
+import com.example.Lync.DTO.SellerBuyerAddressDTO;
 import com.example.Lync.DTO.SellerBuyerDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.Entity.FavouriteCategory;
@@ -69,4 +70,9 @@ public interface SellerBuyerService {
     String enableWaiveSampleFree(String userId, Boolean enable);
 
     String disableWaiveSampleFree(String userId, Boolean disable);
+
+    String addAddress(String userId, SellerBuyerAddressDTO sellerBuyerAddressDTO);
+
+    List<SellerBuyerAddressDTO> userGetsAddresses(String userId);
+
     }

@@ -2,10 +2,7 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
-import com.example.Lync.DTO.InquiryDTO;
-import com.example.Lync.DTO.SampleOrderDTO;
-import com.example.Lync.DTO.SellerProductDTO;
-import com.example.Lync.DTO.SellerReceiveInquiryDTO;
+import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
@@ -214,6 +211,28 @@ public class SellerController {
         return ResponseEntity.ok(sellerProductDTOList); // Return the list of products with HTTP 200 OK
     }
 
+    @PostMapping("/sellerAddAddress")
+    public ResponseEntity<String> addAddress(@RequestBody SellerBuyerAddressDTO sellerBuyerAddressDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = sellerBuyerService.addAddress(sellerDetails.getUserId(), sellerBuyerAddressDTO);
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/myAddresses")
+    public ResponseEntity<List<SellerBuyerAddressDTO>> getAddress(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<SellerBuyerAddressDTO> addressDTOS = sellerBuyerService.userGetsAddresses(sellerDetails.getUserId());
+        return ResponseEntity.ok(addressDTOS);
+    }
+
 
 
 
@@ -244,7 +263,12 @@ public class SellerController {
 
     @GetMapping("/getInquiryById/{snId}")
     public ResponseEntity<SellerReceiveInquiryDTO> sellerOpenInquiry(@PathVariable Long snId) throws Exception {
-        return ResponseEntity.ok(inquiryService.sellerOpenInquiry(snId));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return ResponseEntity.ok(inquiryService.sellerOpenInquiry(snId, sellerDetails.getUserId()));
     }
 
     @PostMapping("/sellerNegotiate/{snId}")

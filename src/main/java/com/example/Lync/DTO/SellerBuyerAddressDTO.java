@@ -1,20 +1,13 @@
-package com.example.Lync.Entity;
+package com.example.Lync.DTO;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SellerBuyerAddress {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class SellerBuyerAddressDTO {
     private Long uaId;
 
     private String uId; // Reference to userId
@@ -25,7 +18,4 @@ public class SellerBuyerAddress {
     private String state;
     private String country;
     private Integer pincode;
-
-    // Getters and Setters
 }
-

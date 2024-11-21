@@ -2,10 +2,7 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
-import com.example.Lync.DTO.FavoriteProductAndCategory_DTO;
-import com.example.Lync.DTO.InquiryDTO;
-import com.example.Lync.DTO.PriceRangeProjection;
-import com.example.Lync.DTO.SampleOrderDTO;
+import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
@@ -160,6 +157,28 @@ public class BuyerController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());  // Handle errors
         }
+    }
+
+    @PostMapping("/buyerAddAddress")
+    public ResponseEntity<String> addAddress(@RequestBody SellerBuyerAddressDTO sellerBuyerAddressDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = sellerBuyerService.addAddress(sellerDetails.getUserId(), sellerBuyerAddressDTO);
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/myAddresses")
+    public ResponseEntity<List<SellerBuyerAddressDTO>> getAddress(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<SellerBuyerAddressDTO> addressDTOS = sellerBuyerService.userGetsAddresses(sellerDetails.getUserId());
+        return ResponseEntity.ok(addressDTOS);
     }
 
 

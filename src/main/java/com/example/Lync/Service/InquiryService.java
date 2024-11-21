@@ -32,7 +32,7 @@ public interface InquiryService {
 
     void buyerRejectsInquiries(String qId, String description, String buyerUId) throws Exception; //Buyer can reject status 1, 2 inquiries
 
-    SellerReceiveInquiryDTO sellerOpenInquiry(Long snId) throws Exception;
+    SellerReceiveInquiryDTO sellerOpenInquiry(Long snId, String sellerUId) throws Exception;
 
     String sellerNegotiatePrice(Long snId, String sellerUId, Double amount);
 

@@ -118,6 +118,20 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setImageUrl(orderStatus.getImageUrl());
         inquiryDTO.setLocation(orderStatus.getLocation());
 
+        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
+        inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
+        inquiryDTO.setComment(negotiate.getComment());
+        inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
+        inquiryDTO.setAipDate(negotiate.getAipDate());
+        inquiryDTO.setAipTime(negotiate.getAipTime());
+        inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
+        inquiryDTO.setBnpDate(negotiate.getBnpDate());
+        inquiryDTO.setBnpTime(negotiate.getBnpTime());
+        inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
+        inquiryDTO.setAfpDate(negotiate.getAfpDate());
+        inquiryDTO.setAfpTime(negotiate.getAfpTime());
+        inquiryDTO.setStatus(negotiate.getStatus());
+
         // Fetch SellerNegotiates and map them
         List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
         List<SellerNegotiateDTO> negotiationDTOs = negotiations.stream()
@@ -687,7 +701,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public InquiryDTO adminGetInquiryByQId(String qId) throws Exception {
 //        Inquiry inquiry = inquiryRepository.findByQId(qId);
-        Inquiry inquiry = inquiryQIdCache.get(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId);
         if(inquiry == null){
             throw new Exception("Inquiry not found with qId: " + qId);
         }
@@ -866,7 +880,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public SellerReceiveInquiryDTO sellerOpenInquiry(Long snId) throws Exception {
+    public SellerReceiveInquiryDTO sellerOpenInquiry(Long snId, String sellerUId) throws Exception {
         SellerReceiveInquiryDTO sellerReceiveInquiryDTO = new SellerReceiveInquiryDTO();
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
         Inquiry inquiry = inquiryQIdCache.get(sellerNegotiate.getQId());
@@ -945,23 +959,53 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String adminSelectsSeller(Long snId) {
-        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
-        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId());
+        // Fetch the SellerNegotiate entity by snId or throw an exception if not found
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(() -> new RuntimeException("SellerNegotiate not found with ID: " + snId));
 
+        // Fetch the Inquiry entity associated with the QId
+        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId());
+        if (inquiry == null) {
+            throw new RuntimeException("Inquiry not found for QId: " + sellerNegotiate.getQId());
+        }
+
+        // Check if a seller has already been selected for the inquiry
+        if (inquiry.getSellerUId() != null) {
+            throw new RuntimeException("Seller with ID: " + inquiry.getSellerUId()
+                    + " has already been selected for this inquiry. "
+                    + "Seller ID: " + sellerNegotiate.getSellerUId() + " cannot be selected.");
+        }
+
+        // Update the SellerNegotiate entity to "Selected Seller"
         sellerNegotiate.setStatus("Selected Seller");
         sellerNegotiateRepository.save(sellerNegotiate);
 
+        // Update the Inquiry entity with the selected seller details
         inquiry.setSellerUId(sellerNegotiate.getSellerUId());
         inquiry.setSentDate(LocalDate.now());
         inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        if(sellerNegotiate.getAdminFinalPrice() != null){
+
+        // Set the final price in the Inquiry based on availability of Admin's final price
+        if (sellerNegotiate.getAdminFinalPrice() != null) {
             inquiry.setSellerFinalPrice(sellerNegotiate.getAdminFinalPrice());
-        }else{
+        } else {
             inquiry.setSellerFinalPrice(sellerNegotiate.getSellerNegotiatePrice());
         }
+
+        // Create and save the OrderStatus entity
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOId(sellerNegotiate.getQId());
+        orderStatus.setStatus(statusRepository.findSMeaningBySId(19L)); // Assuming 19L corresponds to the required status
+        orderStatusRepository.save(orderStatus);
+
+        // Update the Inquiry with the new order status
+        inquiry.setOsId(orderStatus.getOsId());
+        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(19L));
         inquiryRepository.save(inquiry);
-        return "Seller with ID : " + sellerNegotiate.getSellerUId() + " is selected for the Query";
+
+        return "Seller with ID: " + sellerNegotiate.getSellerUId() + " is selected for the Query.";
     }
+
 
     @Override
     public String adminRejectSeller(Long snId) {
@@ -979,6 +1023,7 @@ public class InquiryServiceImpl implements InquiryService {
         buyerNegotiate.setBuyerUId(inquiry.getBuyerId());
         buyerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
         buyerNegotiate.setComment(inquiryDTO.getComment());
+        buyerNegotiate.setPaymentTerm(inquiryDTO.getPaymentTerm());
         buyerNegotiate.setAipDate(LocalDate.now());
         buyerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         buyerNegotiate.setStatus("Admin sent the quotation to buyer.");
@@ -1015,7 +1060,13 @@ public class InquiryServiceImpl implements InquiryService {
         negotiate.setStatus("Buyer has accepted the query.");
         buyerNegotiateRepository.save(negotiate);
 
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOId(qId);
+        orderStatus.setStatus(statusRepository.findSMeaningBySId(7L));
+        orderStatusRepository.save(orderStatus);
+
         Inquiry inquiry = inquiryQIdCache.get(qId);
+        inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(7L));
         inquiry.setBuyerFinalPrice(negotiate.getAdminFinalPrice());
         inquiryRepository.save(inquiry);
