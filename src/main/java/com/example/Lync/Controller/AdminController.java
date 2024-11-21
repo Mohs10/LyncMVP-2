@@ -2,19 +2,14 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
-import com.example.Lync.DTO.InquiryDTO;
-import com.example.Lync.DTO.SellerBuyerDTO;
-import com.example.Lync.DTO.SellerProductDTO;
-import com.example.Lync.DTO.UserInfoDTO;
+import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.AdminAddress;
+import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
 import org.springframework.http.HttpStatus;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,9 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.DataInput;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -242,5 +235,46 @@ public class AdminController {
         String message = inquiryService.adminFinalPriceToBuyer(qId, amount);
         return ResponseEntity.ok(message);
     }
+
+    @GetMapping("/adminSampleOrders")
+    public ResponseEntity<List<SampleOrderDTO>> adminSampleOrders(){
+        return ResponseEntity.ok(inquiryService.adminGetsAllSampleOrders());
+    }
+
+    @GetMapping("/adminSampleOrderById/{soId}")
+    public ResponseEntity<SampleOrderDTO> adminSampleOrder(@PathVariable String soId){
+        return ResponseEntity.ok(inquiryService.adminGetsSampleOrderById(soId));
+    }
+
+    @PostMapping("/adminSendSampleOrderToSeller/{soId}")
+    public ResponseEntity<String> sampleOrderToSeller(@PathVariable String soId, @RequestBody SampleOrderDTO sampleOrderDTO) throws Exception {
+        String message = inquiryService.adminSendsSampleOrderToSeller(soId, sampleOrderDTO);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminReceivedSample/{soId}")
+    public ResponseEntity<String> adminReceivedSample(@PathVariable String soId){
+        String message = inquiryService.adminReceivedSample(soId);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminProcessingSample/{soId}")
+    public ResponseEntity<String> processingSample(@PathVariable String soId){
+        String message = inquiryService.adminProcessingSample(soId);
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/adminDispatchToBuyer/{soId}")
+    public ResponseEntity<String> dispatchToBuyer(@PathVariable String soId){
+        String message = inquiryService.adminDispatchToBuyer(soId);
+        return ResponseEntity.ok(message);
+    }
+
+
+
+
+
+
+
 
 }

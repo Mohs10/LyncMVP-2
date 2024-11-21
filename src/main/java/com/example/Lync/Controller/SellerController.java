@@ -3,6 +3,7 @@ package com.example.Lync.Controller;
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.InquiryDTO;
+import com.example.Lync.DTO.SampleOrderDTO;
 import com.example.Lync.DTO.SellerProductDTO;
 import com.example.Lync.DTO.SellerReceiveInquiryDTO;
 import com.example.Lync.Entity.SellerBuyer;
@@ -265,7 +266,6 @@ public class SellerController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
@@ -280,5 +280,81 @@ public class SellerController {
         inquiryService.sellerRejectQuery(qId, description);
         return ResponseEntity.ok("Rejected Inquiry for ID" + qId);
     }
+
+    @GetMapping("/sellerGetsSampleOrders")
+    public ResponseEntity<List<SampleOrderDTO>> sellerSampleOrders(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return ResponseEntity.ok(inquiryService.sellerGetsAllSampleOrders(sellerDetails.getUserId()));
+    }
+
+    @GetMapping("/sellerSampleOrderById/{soId}")
+    public ResponseEntity<SampleOrderDTO> sellerSampleOrderById(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return ResponseEntity.ok(inquiryService.sellerGetsSampleOrderById(soId, sellerDetails.getUserId()));
+    }
+
+    @PostMapping("/sellerApproveSampleOrder/{soId}")
+    public ResponseEntity<String> approveSampleOrder(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String s = inquiryService.sellerApproveSampleOrder(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(s);
+    }
+
+    @PostMapping("/sellerDeclineSampleOrder/{soId}")
+    public ResponseEntity<String> declineSampleOrder(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerDeclineSampleOrder(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/sellerPackagingSample/{soId}")
+    public ResponseEntity<String> packagingSample(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerPackagingSample(soId,sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/sellerDispatchSample/{soId}")
+    public ResponseEntity<String> sellerDispatchSample(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerDispatchSampleToAdmin(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

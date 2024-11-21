@@ -1557,7 +1557,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public String buyerReceivedSample(String soId) {
+    public String buyerReceivedSample(String soId, String buyerUId) {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 

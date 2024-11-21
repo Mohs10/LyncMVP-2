@@ -264,4 +264,51 @@ public class BuyerController {
 
         return ResponseEntity.ok(inquiryService.buyerGetsAllSampleOrders(sellerDetails.getUserId()));
     }
+
+    @GetMapping("/buyerSampleOrderById/{soId}")
+    public ResponseEntity<SampleOrderDTO> buyerSampleOrderById(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return ResponseEntity.ok(inquiryService.buyerGetsSampleOrderById(soId, sellerDetails.getUserId()));
+    }
+
+    @PostMapping("/buyerReceivedSample/{soId}")
+    public ResponseEntity<String> receivedSample(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerReceivedSample(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/buyerApprovedSample/{soId}")
+    public ResponseEntity<String> approvedSample(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerApprovedSample(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("/buyerRejectedSample/{soId}")
+    public ResponseEntity<String> rejectedSample(@PathVariable String soId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerRejectedSample(soId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+
+
+
 }

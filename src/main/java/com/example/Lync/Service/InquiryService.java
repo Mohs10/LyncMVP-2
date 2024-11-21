@@ -85,7 +85,7 @@ public interface InquiryService {
 
     String adminDispatchToBuyer(String soId);
 
-    String buyerReceivedSample(String soId);
+    String buyerReceivedSample(String soId, String buyerUId);
 
     String buyerApprovedSample(String soId, String buyerUId);
 
