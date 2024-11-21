@@ -1157,7 +1157,7 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrder.setProductFormId(inquiry.getProductFormId());
         sampleOrder.setProductVarietyId(inquiry.getProductVarietyId());
 
-        sampleOrder.setBuyerQuantity(sampleOrder.getBuyerQuantity());
+        sampleOrder.setBuyerQuantity(sampleOrderDTO.getBuyerQuantity());
         sampleOrder.setBuyerAddressId(sampleOrderDTO.getBuyerAddressId());
         sampleOrder.setBuyerAmount(sampleOrderDTO.getBuyerAmount());
         sampleOrder.setBuyerRequestDate(LocalDate.now());
@@ -1268,10 +1268,15 @@ public class InquiryServiceImpl implements InquiryService {
                             .orElseThrow(() -> new RuntimeException("Buyer not found with Id : " + sampleOrder.getBuyerUId()))
                             .getFullName();
                     sampleOrderDTO.setBuyerName(buyerName);
-                    String sellerName = sellerBuyerRepository.findById(sampleOrder.getSellerUId())
-                            .orElseThrow(() -> new RuntimeException("Seller not found with Id : " + sampleOrder.getSellerUId()))
-                            .getFullName();
-                    sampleOrderDTO.setSellerName(sellerName);
+
+                    if (sampleOrder.getSellerUId() != null) {
+                        String sellerName = sellerBuyerRepository.findById(sampleOrder.getSellerUId())
+                                .orElseThrow(() -> new RuntimeException("Seller not found with Id: " + sampleOrder.getSellerUId()))
+                                .getFullName();
+                        sampleOrderDTO.setSellerName(sellerName);
+                    } else {
+                        sampleOrderDTO.setSellerName("N/A"); // Default or fallback value
+                    }
 
                     Product product = productRepository.findById(sampleOrder.getProductId())
                             .orElseThrow(() -> new RuntimeException("Product not found for ID: " + sampleOrder.getProductId()));
@@ -1321,10 +1326,14 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Buyer not found with Id : " + sampleOrder.getBuyerUId()))
                 .getFullName();
         sampleOrderDTO.setBuyerName(buyerName);
-        String sellerName = sellerBuyerRepository.findById(sampleOrder.getSellerUId())
-                .orElseThrow(() -> new RuntimeException("Seller not found with Id : " + sampleOrder.getSellerUId()))
-                .getFullName();
-        sampleOrderDTO.setSellerName(sellerName);
+        if (sampleOrder.getSellerUId() != null) {
+            String sellerName = sellerBuyerRepository.findById(sampleOrder.getSellerUId())
+                    .orElseThrow(() -> new RuntimeException("Seller not found with Id: " + sampleOrder.getSellerUId()))
+                    .getFullName();
+            sampleOrderDTO.setSellerName(sellerName);
+        } else {
+            sampleOrderDTO.setSellerName("N/A"); // Default or fallback value
+        }
 
         Product product = productRepository.findById(sampleOrder.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + sampleOrder.getProductId()));
@@ -1389,7 +1398,7 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public List<SampleOrderDTO> sellerGetsAllSampleOrders(String sellerUId) {
-        return sampleOrderRepository.findAllByBuyerUId(sellerUId).stream()
+        return sampleOrderRepository.findAllBySellerUId(sellerUId).stream()
                 .map(sampleOrder -> {
                     SampleOrderDTO sampleOrderDTO = new SampleOrderDTO();
                     sampleOrderDTO.setSoId(sampleOrder.getSoId());
@@ -1594,7 +1603,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(14L));
         inquiryRepository.save(inquiry);
-        return "You started Processing";
+        return "You started Processing the Sample";
     }
 
     @Override
@@ -1616,7 +1625,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(15L));
         inquiryRepository.save(inquiry);
-        return "You dispatched packaging Sample";
+        return "You dispatched the Sample";
     }
 
     @Override

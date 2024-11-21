@@ -1022,6 +1022,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
             dto.setCity(sellerBuyerAddress.getCity());
             dto.setCountry(sellerBuyerAddress.getCountry());
             dto.setPincode(sellerBuyerAddress.getPincode());
+            dto.setState(sellerBuyerAddress.getState());
             sellerBuyerAddressDTOS.add(dto);
         }
         return sellerBuyerAddressDTOS;

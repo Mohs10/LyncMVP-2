@@ -312,6 +312,7 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        System.out.println(username);
         return ResponseEntity.ok(inquiryService.sellerGetsAllSampleOrders(sellerDetails.getUserId()));
     }
 
