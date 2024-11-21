@@ -402,7 +402,7 @@ public class ProductServiceImpl implements ProductService {
     {
         CertificationDTO certificationDTO =  new CertificationDTO();
         certificationDTO.setCertificationName(certification.getCertificationName());
-//        certificationDTO.setIsCertified(certification.getIsCertified());
+        certificationDTO.setIsCertified(certification.getIsCertified());
 
         return certificationDTO;
     }
