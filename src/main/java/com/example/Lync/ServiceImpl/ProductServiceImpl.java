@@ -238,6 +238,9 @@ public class ProductServiceImpl implements ProductService {
         List<Form> forms = formRepository.findAllById(productDTO.getFormIds());
         existingProduct.setForms(forms);
 
+
+        certificationRepository.deleteAllByProductId(existingProduct.getProductId()); // Assuming a method exists in your repository to delete certifications by product ID
+
         // Update certifications
         List<Certification> certifications = new ArrayList<>();
         for (CertificationDTO certificationDTO : productDTO.getCertifications()) {
