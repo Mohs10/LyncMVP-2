@@ -801,8 +801,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     // Method to generate a unique spId
     public static String generateUniqueSpId() {
         // Get the current year
-        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
-        String year = yearFormat.format(new Date());
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String year = dateTimeFormat.format(new Date());
 
         // Get the serial number and increment it atomically
         int serial = serialNumber.getAndIncrement();

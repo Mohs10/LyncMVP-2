@@ -48,6 +48,7 @@ public class SellerReceiveInquiryDTO {
     private String dd;
 
     //SellerNegotiate
+    private Long snId;
     private Double adminInitialPrice;
     private LocalDate aipDate;
     private LocalTime aipTime;

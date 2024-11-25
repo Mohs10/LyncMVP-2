@@ -235,6 +235,8 @@ public class InquiryServiceImpl implements InquiryService {
 
         Inquiry inquiry = inquiryQIdCache.get(sellerNegotiate.getQId());
 
+        sellerReceiveInquiryDTO.setSnId(sellerNegotiate.getSnId());
+        sellerReceiveInquiryDTO.setQId(inquiry.getQId());
         sellerReceiveInquiryDTO.setProductId(inquiry.getProductId());
         sellerReceiveInquiryDTO.setSellerUId(sellerNegotiate.getSellerUId());
         sellerReceiveInquiryDTO.setQuantity(inquiry.getQuantity());
@@ -451,14 +453,8 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public List<InquiryDTO> buyerGetsInquiries(String buyerUId) {
-//        System.out.println("Fetching inquiries for buyerUId: " + buyerUId);
-
-
         // Fetch inquiries for the specific buyer
         List<Inquiry> inquiries = inquiryRepository.findByBuyerId(buyerUId);
-//        System.out.println("Fetched inquiries: " + inquiries);
-
-//        return null;
 
         List<InquiryDTO> inquiryDTOS = new ArrayList<>();
 
@@ -469,49 +465,59 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setBuyerUId(inquiry.getBuyerId());
                 inquiryDTO.setProductId(inquiry.getProductId());
 
-                // Debugging prints
-//                System.out.println("Product ID from DTO: " + inquiryDTO.getProductId());
-//                System.out.println("Product ID from Inquiry: " + inquiry.getProductId());
-
                 // Fetch product from repository
                 Product product = productRepository.findById(inquiry.getProductId())
                         .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
 
-
-                // Debugging print
-//                System.out.println("Fetched Product: " + product);
-
                 // Set product-related fields
                 inquiryDTO.setProductName(product.getProductName());
                 inquiryDTO.setVarietyName(
-                        product.getVarieties().stream().map(Variety::getVarietyName).toList().toString()
+                        product.getVarieties().stream()
+                                .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId()))
+                                .findFirst()
+                                .map(Variety::getVarietyName)
+                                .orElse(null)
                 );
                 inquiryDTO.setFormName(
-                        product.getForms().stream().map(Form::getFormName).toList().toString()
+                        product.getForms().stream()
+                                .filter(form -> form.getFormId().equals(inquiry.getProductFormId()))
+                                .findFirst()
+                                .map(Form::getFormName)
+                                .orElse(null)
                 );
 
-                // Set other fields
                 inquiryDTO.setProductFormId(inquiry.getProductFormId());
                 inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
                 inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
 
-                // Debugging prints
-//                System.out.println("Service Buyer UId: " + buyerUId);
-//                System.out.println("Service Inquiry: " + inquiryRepository.findAll());
+                // Fetch specifications for the inquiry
+                List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
 
-                // Add to the list
+                // Map specifications to SpecificationDTO
+                List<SpecificationDTO> specificationDTOs = specifications.stream()
+                        .map(spec -> {
+                            SpecificationDTO dto = new SpecificationDTO();
+                            dto.setSpecificationName(spec.getSpecificationName());
+                            dto.setSpecificationValue(spec.getSpecificationValue());
+                            dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                            return dto;
+                        })
+                        .toList();
+
+                inquiryDTO.setSpecifications(specificationDTOs);
+
+                // Add the InquiryDTO to the list
                 inquiryDTOS.add(inquiryDTO);
 
             } catch (Exception e) {
                 // Handle any exceptions and log the error
-//                System.err.println("Error processing inquiry with QId " + inquiry.getQId() + ": " + e.getMessage());
+                System.err.println("Error processing inquiry with QId " + inquiry.getQId() + ": " + e.getMessage());
             }
         }
 
-
         return inquiryDTOS;
-
     }
+
 
 
     @Override
@@ -554,14 +560,21 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setPincode(inquiry.getPincode());
         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
 
-        //Product Specification
-//        inquiryDTO.setChalkyGrains(inquiry.getChalkyGrains());
-//        inquiryDTO.setGrainSize(inquiry.getGrainSize());
-//        inquiryDTO.setKettValue(inquiry.getKettValue());
-//        inquiryDTO.setMoistureContent(inquiry.getMoistureContent());
-//        inquiryDTO.setBrokenGrain(inquiry.getBrokenGrain());
-//        inquiryDTO.setAdmixing(inquiry.getAdmixing());
-//        inquiryDTO.setDd(inquiry.getDd());
+// Fetch specifications for the inquiry
+        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+        // Map specifications to SpecificationDTO
+        List<SpecificationDTO> specificationDTOs = specifications.stream()
+                .map(spec -> {
+                    SpecificationDTO dto = new SpecificationDTO();
+                    dto.setSpecificationName(spec.getSpecificationName());
+                    dto.setSpecificationValue(spec.getSpecificationValue());
+                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                    return dto;
+                })
+                .toList();
+
+        inquiryDTO.setSpecifications(specificationDTOs);
 
         inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
         inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
@@ -906,10 +919,12 @@ public class InquiryServiceImpl implements InquiryService {
     public SellerReceiveInquiryDTO sellerOpenInquiry(Long snId, String sellerUId) throws Exception {
         SellerReceiveInquiryDTO sellerReceiveInquiryDTO = new SellerReceiveInquiryDTO();
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
-        Inquiry inquiry = inquiryQIdCache.get(sellerNegotiate.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Id : " + sellerNegotiate.getQId()));
 
         sellerReceiveInquiryDTO.setQId(sellerNegotiate.getQId());
-        sellerReceiveInquiryDTO.setProductId(sellerReceiveInquiryDTO.getProductId());
+        sellerReceiveInquiryDTO.setSnId(sellerNegotiate.getSnId());
+        sellerReceiveInquiryDTO.setProductId(inquiry.getProductId());
         sellerReceiveInquiryDTO.setSellerUId(sellerNegotiate.getSellerUId());
         sellerReceiveInquiryDTO.setSellerName(sellerBuyerRepository.findById(sellerNegotiate.getSellerUId()).orElseThrow(null).getFullName());
 
