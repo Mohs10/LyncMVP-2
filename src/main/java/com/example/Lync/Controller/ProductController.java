@@ -95,12 +95,12 @@ public class ProductController {
     }
 
     // ---------------- Category Endpoints ---------------- //
-    @PostMapping("/categories/add")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-
-    public ResponseEntity<String> addCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.addCategory(category));
-    }
+//    @PostMapping("/categories/add")
+////    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//
+//    public ResponseEntity<String> addCategory(@RequestBody Category category) {
+//        return ResponseEntity.ok(categoryService.addCategory(category));
+//    }
 
     @GetMapping("/categories/all")
     public List<Category> getAllCategories() {

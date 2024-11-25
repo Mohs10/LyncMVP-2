@@ -83,6 +83,7 @@ public class InquiryDTO {
     private List<String> sellerUIds; //Inquiry can be sent to multiple seller, so this is to capture sellers list.
     private Long adminAddressId;
     private List<SellerNegotiateDTO> sellerNegotiations;
+    private String avgLeadTime;
 
     //Buyer Negotiate
     private Double adminInitialPrice;

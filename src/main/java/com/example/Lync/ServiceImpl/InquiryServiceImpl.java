@@ -764,8 +764,9 @@ public class InquiryServiceImpl implements InquiryService {
                     sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
                     sellerNegotiate.setAipDate(LocalDate.now());
                     sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//                    sellerNegotiate.setInstruction(inquiryDTO.getDescription());
+                    sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
                     sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
+
                     sellerNegotiate.setStatus("Inquiry send to Seller");
                     sellerNegotiateRepository.save(sellerNegotiate);
 
