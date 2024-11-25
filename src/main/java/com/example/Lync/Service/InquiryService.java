@@ -1,6 +1,7 @@
 package com.example.Lync.Service;
 
 import com.example.Lync.DTO.*;
+import com.example.Lync.Entity.SellerBuyer;
 
 import java.util.List;
 
@@ -92,6 +93,8 @@ public interface InquiryService {
     String buyerApprovedSample(String soId, String buyerUId);
 
     String buyerRejectedSample(String soId, String buyerUId);
+
+    List<SellerBuyer> buyersHavingCheque();
 
 
 

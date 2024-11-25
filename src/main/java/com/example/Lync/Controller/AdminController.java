@@ -276,7 +276,10 @@ public class AdminController {
         return ResponseEntity.ok(message);
     }
 
-
+    @GetMapping("/adminCheckBuyersWithCancelCheque")
+    public ResponseEntity<List<SellerBuyer>> buyersWithCheque(){
+        return ResponseEntity.ok(inquiryService.buyersHavingCheque());
+    }
 
 
 

@@ -118,19 +118,38 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setImageUrl(orderStatus.getImageUrl());
         inquiryDTO.setLocation(orderStatus.getLocation());
 
+        // Fetch BuyerNegotiate entity
         BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
-        inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
-        inquiryDTO.setComment(negotiate.getComment());
-        inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
-        inquiryDTO.setAipDate(negotiate.getAipDate());
-        inquiryDTO.setAipTime(negotiate.getAipTime());
-        inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
-        inquiryDTO.setBnpDate(negotiate.getBnpDate());
-        inquiryDTO.setBnpTime(negotiate.getBnpTime());
-        inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
-        inquiryDTO.setAfpDate(negotiate.getAfpDate());
-        inquiryDTO.setAfpTime(negotiate.getAfpTime());
-        inquiryDTO.setStatus(negotiate.getStatus());
+
+        if (negotiate != null) {
+            inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
+            inquiryDTO.setComment(negotiate.getComment());
+            inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
+            inquiryDTO.setAipDate(negotiate.getAipDate());
+            inquiryDTO.setAipTime(negotiate.getAipTime());
+            inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
+            inquiryDTO.setBnpDate(negotiate.getBnpDate());
+            inquiryDTO.setBnpTime(negotiate.getBnpTime());
+            inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
+            inquiryDTO.setAfpDate(negotiate.getAfpDate());
+            inquiryDTO.setAfpTime(negotiate.getAfpTime());
+            inquiryDTO.setStatus(negotiate.getStatus());
+        } else {
+            // Set fields to null or provide default values
+            inquiryDTO.setAdminInitialPrice(null);
+            inquiryDTO.setComment(null);
+            inquiryDTO.setPaymentTerm(null);
+            inquiryDTO.setAipDate(null);
+            inquiryDTO.setAipTime(null);
+            inquiryDTO.setBuyerNegotiatePrice(null);
+            inquiryDTO.setBnpDate(null);
+            inquiryDTO.setBnpTime(null);
+            inquiryDTO.setAdminFinalPrice(null);
+            inquiryDTO.setAfpDate(null);
+            inquiryDTO.setAfpTime(null);
+            inquiryDTO.setStatus(null);
+        }
+
 
         // Fetch SellerNegotiates and map them
         List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
@@ -497,14 +516,16 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public InquiryDTO buyerGetsInquiryById(String buyerUId, String qId) {
-        Inquiry inquiry = inquiryQIdCache.get(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         InquiryDTO inquiryDTO = new InquiryDTO();
 
         //Order Specification
         inquiryDTO.setQId(qId);
         inquiryDTO.setBuyerUId(inquiry.getBuyerId());
         inquiryDTO.setProductId(inquiry.getProductId());
-        Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
+        Product product = productRepository.findById(inquiry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found with product Id : " + inquiry.getProductId()));
         inquiryDTO.setProductName(product.getProductName());
         inquiryDTO.setVarietyName(product.getVarieties().stream().map(Variety::getVarietyName).toList().toString());
         inquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
@@ -701,7 +722,8 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public InquiryDTO adminGetInquiryByQId(String qId) throws Exception {
 //        Inquiry inquiry = inquiryRepository.findByQId(qId);
-        Inquiry inquiry = inquiryRepository.findByQId(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         if(inquiry == null){
             throw new Exception("Inquiry not found with qId: " + qId);
         }
@@ -964,7 +986,8 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("SellerNegotiate not found with ID: " + snId));
 
         // Fetch the Inquiry entity associated with the QId
-        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sellerNegotiate.getQId()));
         if (inquiry == null) {
             throw new RuntimeException("Inquiry not found for QId: " + sellerNegotiate.getQId());
         }
@@ -1017,7 +1040,8 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String adminQuoteToBuyer(String qId, InquiryDTO inquiryDTO) {
-        Inquiry inquiry = inquiryRepository.findByQId(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         BuyerNegotiate buyerNegotiate = new BuyerNegotiate();
         buyerNegotiate.setQId(qId);
         buyerNegotiate.setBuyerUId(inquiry.getBuyerId());
@@ -1487,7 +1511,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(9L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(9L));
         inquiryRepository.save(inquiry);
@@ -1508,7 +1533,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(10L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(10L));
         inquiryRepository.save(inquiry);
@@ -1531,7 +1557,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(11L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(11L));
         inquiryRepository.save(inquiry);
@@ -1554,7 +1581,8 @@ public class InquiryServiceImpl implements InquiryService {
             orderStatus.setStatus(statusRepository.findSMeaningBySId(12L));
             orderStatusRepository.save(orderStatus);
 
-            Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+            Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                    .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
             inquiry.setOsId(orderStatus.getOsId());
             inquiry.setOrderStatus(statusRepository.findSMeaningBySId(12L));
             inquiryRepository.save(inquiry);
@@ -1576,7 +1604,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(13L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(13L));
         inquiryRepository.save(inquiry);
@@ -1599,7 +1628,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(14L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(14L));
         inquiryRepository.save(inquiry);
@@ -1621,7 +1651,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(15L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(15L));
         inquiryRepository.save(inquiry);
@@ -1643,7 +1674,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(16L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(16L));
         inquiryRepository.save(inquiry);
@@ -1665,7 +1697,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(17L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(17L));
         inquiryRepository.save(inquiry);
@@ -1687,15 +1720,24 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(18L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(18L));
         inquiryRepository.save(inquiry);
         return "You rejected the sample";
     }
 
+    @Override
+    public List<SellerBuyer> buyersHavingCheque() {
+        return sellerBuyerRepository.findAll().stream()
+                .filter(sellerBuyer ->  sellerBuyer.getCancelledChequeUrl() != null)
+                .collect(Collectors.toList());
+    }
 
 }
+
+
 
 
 

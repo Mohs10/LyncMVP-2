@@ -15,7 +15,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
     Long countInquiryByCurrentDate(@Param("currentDate")LocalDate currentDate);
 
     @Query("SELECT i FROM Inquiry i WHERE i.qId= :qId")
-    Inquiry findByQId(String qId);
+    Optional<Inquiry> findByQId(String qId);
 
     @Query("SELECT i FROM Inquiry i WHERE i.buyerId = :buyerId")
     List<Inquiry> findByBuyerId(@Param("buyerId") String buyerUId);
