@@ -92,14 +92,21 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setPincode(inquiry.getPincode());
         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
 
-        //Product Specification
-//        inquiryDTO.setChalkyGrains(inquiry.getChalkyGrains());
-//        inquiryDTO.setGrainSize(inquiry.getGrainSize());
-//        inquiryDTO.setKettValue(inquiry.getKettValue());
-//        inquiryDTO.setMoistureContent(inquiry.getMoistureContent());
-//        inquiryDTO.setBrokenGrain(inquiry.getBrokenGrain());
-//        inquiryDTO.setAdmixing(inquiry.getAdmixing());
-//        inquiryDTO.setDd(inquiry.getDd());
+// Fetch specifications for the inquiry
+        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+        // Map specifications to SpecificationDTO
+        List<SpecificationDTO> specificationDTOs = specifications.stream()
+                .map(spec -> {
+                    SpecificationDTO dto = new SpecificationDTO();
+                    dto.setSpecificationName(spec.getSpecificationName());
+                    dto.setSpecificationValue(spec.getSpecificationValue());
+                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                    return dto;
+                })
+                .toList();
+
+        inquiryDTO.setSpecifications(specificationDTOs);
 
         inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
         inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
@@ -253,6 +260,21 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
 
+        // Fetch specifications for the inquiry
+        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+        // Map specifications to SpecificationDTO
+        List<SpecificationDTO> specificationDTOs = specifications.stream()
+                .map(spec -> {
+                    SpecificationDTO dto = new SpecificationDTO();
+                    dto.setSpecificationName(spec.getSpecificationName());
+                    dto.setSpecificationValue(spec.getSpecificationValue());
+                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                    return dto;
+                })
+                .toList();
+
+        sellerReceiveInquiryDTO.setSpecifications(specificationDTOs);
 
         return sellerReceiveInquiryDTO;
     }
@@ -661,14 +683,24 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setPincode(inquiry.getPincode());
                 inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
 
-                // Set product specifications
-//                inquiryDTO.setChalkyGrains(inquiry.getChalkyGrains());
-//                inquiryDTO.setGrainSize(inquiry.getGrainSize());
-//                inquiryDTO.setKettValue(inquiry.getKettValue());
-//                inquiryDTO.setMoistureContent(inquiry.getMoistureContent());
-//                inquiryDTO.setBrokenGrain(inquiry.getBrokenGrain());
-//                inquiryDTO.setAdmixing(inquiry.getAdmixing());
-//                inquiryDTO.setDd(inquiry.getDd());
+                // Fetch specifications for the inquiry
+                List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+                // Map specifications to SpecificationDTO
+                List<SpecificationDTO> specificationDTOs = specifications.stream()
+                        .map(spec -> {
+                            SpecificationDTO dto = new SpecificationDTO();
+                            dto.setSpecificationName(spec.getSpecificationName());
+                            dto.setSpecificationValue(spec.getSpecificationValue());
+                            dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                            return dto;
+                        })
+                        .toList();
+
+                inquiryDTO.setSpecifications(specificationDTOs);
+
+                // Add the InquiryDTO to the list
+                inquiryDTOS.add(inquiryDTO);
 
                 // Set raise details
                 inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
@@ -959,6 +991,21 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAfpTime(sellerNegotiate.getAfpTime());
         sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
 
+        // Fetch specifications for the inquiry
+        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+        // Map specifications to SpecificationDTO
+        List<SpecificationDTO> specificationDTOs = specifications.stream()
+                .map(spec -> {
+                    SpecificationDTO dto = new SpecificationDTO();
+                    dto.setSpecificationName(spec.getSpecificationName());
+                    dto.setSpecificationValue(spec.getSpecificationValue());
+                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                    return dto;
+                })
+                .toList();
+
+        sellerReceiveInquiryDTO.setSpecifications(specificationDTOs);
 
         return sellerReceiveInquiryDTO;
     }

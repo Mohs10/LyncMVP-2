@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -62,4 +63,6 @@ public class SellerReceiveInquiryDTO {
     private LocalTime afpTime;
     private String status;
 
+    //List of dynamic Specifications
+    private List<SpecificationDTO> specifications;
 }
