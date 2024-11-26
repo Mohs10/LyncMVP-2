@@ -699,9 +699,6 @@ public class InquiryServiceImpl implements InquiryService {
 
                 inquiryDTO.setSpecifications(specificationDTOs);
 
-                // Add the InquiryDTO to the list
-                inquiryDTOS.add(inquiryDTO);
-
                 // Set raise details
                 inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
                 inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
