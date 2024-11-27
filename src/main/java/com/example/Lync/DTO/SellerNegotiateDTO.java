@@ -12,6 +12,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class SellerNegotiateDTO {
 
+    private Long snId;
     private String sellerUId;
     private String sellerName;
     private String email;
