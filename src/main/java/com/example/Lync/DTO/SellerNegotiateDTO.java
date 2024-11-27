@@ -27,6 +27,7 @@ public class SellerNegotiateDTO {
     private Double availableAmount;
     private Double maxPrice;
     private Double minPrice;
+    private String originOfProduce;
 
     private Double adminInitialPrice;
     private LocalDate aipDate;

@@ -59,6 +59,8 @@ public interface InquiryService {
 
     String buyerAcceptQuery(String qId, String buyerUId);
 
+    String buyerRejectedQuery(String qId, String buyerUId);
+
 //    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
 
     String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception;

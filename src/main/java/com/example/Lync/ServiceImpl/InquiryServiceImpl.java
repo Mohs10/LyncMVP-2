@@ -48,162 +48,7 @@ public class InquiryServiceImpl implements InquiryService {
         }
     }
 
-    private InquiryDTO mapToAdminDTO(Inquiry inquiry){
-        InquiryDTO inquiryDTO = new InquiryDTO();
-        inquiryDTO.setQId(inquiry.getQId());
-        inquiryDTO.setBuyerUId(inquiry.getBuyerId());
-        inquiryDTO.setProductId(inquiry.getProductId());
 
-        Product product = productRepository.findById(inquiry.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
-        inquiryDTO.setProductName(product.getProductName());
-        inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
-        inquiryDTO.setVarietyName(product.getVarieties().stream()
-                        .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
-                        .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
-        inquiryDTO.setProductFormId(inquiry.getProductFormId());
-        inquiryDTO.setFormName(product.getForms().stream()
-                .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
-                .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
-
-
-        //Order Specification
-        inquiryDTO.setQuantity(inquiry.getQuantity());
-        inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
-        inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
-//        inquiryDTO.setCertificate(inquiry.getCertificate());
-        inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
-        inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
-        inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
-        inquiryDTO.setNpop(inquiry.getNpop());
-        inquiryDTO.setNop(inquiry.getNop());
-        inquiryDTO.setEu(inquiry.getEu());
-        inquiryDTO.setGsdc(inquiry.getGsdc());
-        inquiryDTO.setIpm(inquiry.getIpm());
-        inquiryDTO.setOther(inquiry.getOther());
-        inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
-        inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
-        inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
-        inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
-        inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
-        inquiryDTO.setCountry(inquiry.getCountry());
-        inquiryDTO.setState(inquiry.getState());
-        inquiryDTO.setCity(inquiry.getCity());
-        inquiryDTO.setPincode(inquiry.getPincode());
-        inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
-
-// Fetch specifications for the inquiry
-        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
-
-        // Map specifications to SpecificationDTO
-        List<SpecificationDTO> specificationDTOs = specifications.stream()
-                .map(spec -> {
-                    SpecificationDTO dto = new SpecificationDTO();
-                    dto.setSpecificationName(spec.getSpecificationName());
-                    dto.setSpecificationValue(spec.getSpecificationValue());
-                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
-                    return dto;
-                })
-                .toList();
-
-        inquiryDTO.setSpecifications(specificationDTOs);
-
-        inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
-        inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
-        inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
-        inquiryDTO.setSellerUId(inquiry.getSellerUId());
-        inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-        inquiryDTO.setSentDate(inquiry.getSentDate());
-        inquiryDTO.setSentTime(inquiry.getSentTime());
-        inquiryDTO.setUnit(inquiry.getUnit());
-
-        OrderStatus orderStatus = orderStatusRepository.findByOsId(inquiry.getOsId());
-        inquiryDTO.setOsId(orderStatus.getOsId());
-        inquiryDTO.setDate(orderStatus.getDate());
-        inquiryDTO.setTime(orderStatus.getTime());
-        inquiryDTO.setDescription(orderStatus.getDescription());
-        inquiryDTO.setImageUrl(orderStatus.getImageUrl());
-        inquiryDTO.setLocation(orderStatus.getLocation());
-
-        // Fetch BuyerNegotiate entity
-        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
-
-        if (negotiate != null) {
-            inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
-            inquiryDTO.setComment(negotiate.getComment());
-            inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
-            inquiryDTO.setAipDate(negotiate.getAipDate());
-            inquiryDTO.setAipTime(negotiate.getAipTime());
-            inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
-            inquiryDTO.setBnpDate(negotiate.getBnpDate());
-            inquiryDTO.setBnpTime(negotiate.getBnpTime());
-            inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
-            inquiryDTO.setAfpDate(negotiate.getAfpDate());
-            inquiryDTO.setAfpTime(negotiate.getAfpTime());
-            inquiryDTO.setStatus(negotiate.getStatus());
-        } else {
-            // Set fields to null or provide default values
-            inquiryDTO.setAdminInitialPrice(null);
-            inquiryDTO.setComment(null);
-            inquiryDTO.setPaymentTerm(null);
-            inquiryDTO.setAipDate(null);
-            inquiryDTO.setAipTime(null);
-            inquiryDTO.setBuyerNegotiatePrice(null);
-            inquiryDTO.setBnpDate(null);
-            inquiryDTO.setBnpTime(null);
-            inquiryDTO.setAdminFinalPrice(null);
-            inquiryDTO.setAfpDate(null);
-            inquiryDTO.setAfpTime(null);
-            inquiryDTO.setStatus(null);
-        }
-
-
-        // Fetch SellerNegotiates and map them
-        List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
-        List<SellerNegotiateDTO> negotiationDTOs = negotiations.stream()
-                .map(neg -> {
-                    SellerNegotiateDTO dto = new SellerNegotiateDTO();
-                    dto.setSellerUId(neg.getSellerUId());
-                    SellerBuyer seller = sellerBuyerRepository.findById(neg.getSellerUId())
-                            .orElseThrow(() -> new RuntimeException("Seller not found with given ID : " + neg.getSellerUId()));
-                    dto.setSellerName(seller.getFullName());
-                    dto.setEmail(seller.getEmail());
-                    dto.setPhoneNumber(seller.getPhoneNumber());
-                    dto.setAdminCountry(seller.getCountry());
-                    dto.setAdminState(seller.getState());
-                    dto.setAdminCity(seller.getCity());
-                    dto.setAdminPinCode(seller.getPinCode());
-                    dto.setAdminAddress(seller.getAddress());
-
-                    SellerProduct sellerProduct = sellerProductRepository.findBySellerIdAndProductId(neg.getSellerUId(), inquiry.getProductId())
-                            .orElseThrow(() -> new RuntimeException("SellerProduct not found."));
-                    dto.setAvailableAmount(sellerProduct.getAvailableAmount());
-                    dto.setMaxPrice(sellerProduct.getMaxPrice());
-                    dto.setMinPrice(sellerProduct.getMinPrice());
-
-                    dto.setSnId(neg.getSnId());
-                    dto.setAdminInitialPrice(neg.getAdminInitialPrice());
-                    dto.setAipDate(neg.getAipDate());
-                    dto.setAipTime(neg.getAipTime());
-                    dto.setAvgLeadTime(neg.getAvgLeadTime());
-                    dto.setAdminDeliveryAddress(neg.getAdminDeliveryAddress());
-                    dto.setInstruction(neg.getInstruction());
-                    dto.setSellerNegotiatePrice(neg.getSellerNegotiatePrice());
-                    dto.setSnpDate(neg.getSnpDate());
-                    dto.setSnpTime(neg.getSnpTime());
-                    dto.setAdminFinalPrice(neg.getAdminFinalPrice());
-                    dto.setAfpDate(neg.getAfpDate());
-                    dto.setAfpTime(neg.getAfpTime());
-                    dto.setStatus(neg.getStatus());
-                    dto.setAdminAddressId(neg.getAdminAddressId());
-                    return dto;
-                })
-                .toList();
-        inquiryDTO.setSellerNegotiations(negotiationDTOs);
-
-        return inquiryDTO;
-
-    }
 
     private InquiryDTO mapToSellerDTO(Inquiry inquiry){
         InquiryDTO inquiryDTO = new InquiryDTO();
@@ -768,23 +613,361 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public InquiryDTO adminGetInquiryByQId(String qId) throws Exception {
-//        Inquiry inquiry = inquiryRepository.findByQId(qId);
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        if(inquiry == null){
-            throw new Exception("Inquiry not found with qId: " + qId);
-        }
+
         return mapToAdminDTO(inquiry);
     }
 
 
+    private InquiryDTO mapToAdminDTO(Inquiry inquiry) {
+        InquiryDTO inquiryDTO = new InquiryDTO();
+        inquiryDTO.setQId(inquiry.getQId());
+        inquiryDTO.setBuyerUId(inquiry.getBuyerId());
+        inquiryDTO.setProductId(inquiry.getProductId());
+
+        Product product = productRepository.findById(inquiry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+        inquiryDTO.setProductName(product.getProductName());
+        inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+        inquiryDTO.setVarietyName(product.getVarieties().stream()
+                .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
+                .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
+        inquiryDTO.setProductFormId(inquiry.getProductFormId());
+        inquiryDTO.setFormName(product.getForms().stream()
+                .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
+                .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+
+        // Map other inquiry fields
+        inquiryDTO.setQuantity(inquiry.getQuantity());
+        inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
+        inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
+        inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
+        inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
+        inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
+        inquiryDTO.setNpop(inquiry.getNpop());
+        inquiryDTO.setNop(inquiry.getNop());
+        inquiryDTO.setEu(inquiry.getEu());
+        inquiryDTO.setGsdc(inquiry.getGsdc());
+        inquiryDTO.setIpm(inquiry.getIpm());
+        inquiryDTO.setOther(inquiry.getOther());
+        inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
+        inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+        inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
+        inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
+        inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
+        inquiryDTO.setCountry(inquiry.getCountry());
+        inquiryDTO.setState(inquiry.getState());
+        inquiryDTO.setCity(inquiry.getCity());
+        inquiryDTO.setPincode(inquiry.getPincode());
+        inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+        inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
+        inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
+        inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
+        inquiryDTO.setSellerUId(inquiry.getSellerUId());
+        inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+        inquiryDTO.setSentDate(inquiry.getSentDate());
+        inquiryDTO.setSentTime(inquiry.getSentTime());
+        inquiryDTO.setUnit(inquiry.getUnit());
+
+        // Fetch specifications for the inquiry
+        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+        // Map specifications to SpecificationDTO
+        List<SpecificationDTO> specificationDTOs = specifications.stream()
+                .map(spec -> {
+                    SpecificationDTO dto = new SpecificationDTO();
+                    dto.setSpecificationName(spec.getSpecificationName());
+                    dto.setSpecificationValue(spec.getSpecificationValue());
+                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                    return dto;
+                })
+                .toList();
+
+        inquiryDTO.setSpecifications(specificationDTOs);
+
+
+        // Fetch OrderStatus
+        OrderStatus orderStatus = orderStatusRepository.findByOsId(inquiry.getOsId());
+        inquiryDTO.setOsId(orderStatus.getOsId());
+        inquiryDTO.setDate(orderStatus.getDate());
+        inquiryDTO.setTime(orderStatus.getTime());
+        inquiryDTO.setDescription(orderStatus.getDescription());
+        inquiryDTO.setImageUrl(orderStatus.getImageUrl());
+        inquiryDTO.setLocation(orderStatus.getLocation());
+
+        // Fetch and map SellerNegotiates
+        List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
+        List<SellerNegotiateDTO> negotiationDTOs = negotiations.stream()
+                .flatMap(neg -> {
+                    // Fetch all SellerProducts for the given sellerId and productId
+                    List<SellerProduct> sellerProducts = sellerProductRepository.findBySellerIdAndProductId(neg.getSellerUId(), inquiry.getProductId());
+
+                    if (sellerProducts.isEmpty()) {
+                        throw new RuntimeException("SellerProduct not found for sellerId: " + neg.getSellerUId() + " and productId: " + inquiry.getProductId());
+                    }
+
+                    // For each SellerProduct, create a SellerNegotiateDTO
+                    return sellerProducts.stream().map(sellerProduct -> {
+                        SellerNegotiateDTO dto = new SellerNegotiateDTO();
+                        dto.setSellerUId(neg.getSellerUId());
+
+                        // Fetch and map seller details
+                        SellerBuyer seller = sellerBuyerRepository.findById(neg.getSellerUId())
+                                .orElseThrow(() -> new RuntimeException("Seller not found for ID: " + neg.getSellerUId()));
+                        dto.setSellerName(seller.getFullName());
+                        dto.setEmail(seller.getEmail());
+                        dto.setPhoneNumber(seller.getPhoneNumber());
+                        dto.setAdminCountry(seller.getCountry());
+                        dto.setAdminState(seller.getState());
+                        dto.setAdminCity(seller.getCity());
+                        dto.setAdminPinCode(seller.getPinCode());
+                        dto.setAdminAddress(seller.getAddress());
+
+                        // Set specific SellerProduct details
+                        dto.setAvailableAmount(sellerProduct.getAvailableAmount());
+                        dto.setMaxPrice(sellerProduct.getMaxPrice());
+                        dto.setMinPrice(sellerProduct.getMinPrice());
+                        dto.setOriginOfProduce(sellerProduct.getOriginOfProduce());
+
+                        // Map negotiation-specific fields
+                        dto.setSnId(neg.getSnId());
+                        dto.setAdminInitialPrice(neg.getAdminInitialPrice());
+                        dto.setAipDate(neg.getAipDate());
+                        dto.setAipTime(neg.getAipTime());
+                        dto.setAvgLeadTime(neg.getAvgLeadTime());
+                        dto.setAdminDeliveryAddress(neg.getAdminDeliveryAddress());
+                        dto.setInstruction(neg.getInstruction());
+                        dto.setSellerNegotiatePrice(neg.getSellerNegotiatePrice());
+                        dto.setSnpDate(neg.getSnpDate());
+                        dto.setSnpTime(neg.getSnpTime());
+                        dto.setAdminFinalPrice(neg.getAdminFinalPrice());
+                        dto.setAfpDate(neg.getAfpDate());
+                        dto.setAfpTime(neg.getAfpTime());
+                        dto.setStatus(neg.getStatus());
+                        dto.setAdminAddressId(neg.getAdminAddressId());
+                        return dto;
+                    });
+                })
+                .toList();
+        inquiryDTO.setSellerNegotiations(negotiationDTOs);
+
+        // Fetch BuyerNegotiate entity
+        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
+
+        if (negotiate != null) {
+            inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
+            inquiryDTO.setComment(negotiate.getComment());
+            inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
+            inquiryDTO.setAipDate(negotiate.getAipDate());
+            inquiryDTO.setAipTime(negotiate.getAipTime());
+            inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
+            inquiryDTO.setBnpDate(negotiate.getBnpDate());
+            inquiryDTO.setBnpTime(negotiate.getBnpTime());
+            inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
+            inquiryDTO.setAfpDate(negotiate.getAfpDate());
+            inquiryDTO.setAfpTime(negotiate.getAfpTime());
+            inquiryDTO.setStatus(negotiate.getStatus());
+        } else {
+            // Set fields to null or provide default values
+            inquiryDTO.setAdminInitialPrice(null);
+            inquiryDTO.setComment(null);
+            inquiryDTO.setPaymentTerm(null);
+            inquiryDTO.setAipDate(null);
+            inquiryDTO.setAipTime(null);
+            inquiryDTO.setBuyerNegotiatePrice(null);
+            inquiryDTO.setBnpDate(null);
+            inquiryDTO.setBnpTime(null);
+            inquiryDTO.setAdminFinalPrice(null);
+            inquiryDTO.setAfpDate(null);
+            inquiryDTO.setAfpTime(null);
+            inquiryDTO.setStatus(null);
+        }
+
+        return inquiryDTO;
+    }
+
+
+
+
+
+//    private InquiryDTO mapToAdminDTO(Inquiry inquiry){
+//        System.out.println("map to dto Inquiry" + inquiry);
+//        InquiryDTO inquiryDTO = new InquiryDTO();
+//        System.out.println("map to Dto InquiryDTO" + inquiryDTO);
+//        inquiryDTO.setQId(inquiry.getQId());
+//        inquiryDTO.setBuyerUId(inquiry.getBuyerId());
+//        inquiryDTO.setProductId(inquiry.getProductId());
+//
+//        Product product = productRepository.findById(inquiry.getProductId())
+//                .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+//        System.out.println("maptoDto" + product);
+//        inquiryDTO.setProductName(product.getProductName());
+//        inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+//        inquiryDTO.setVarietyName(product.getVarieties().stream()
+//                .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
+//                .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
+//        inquiryDTO.setProductFormId(inquiry.getProductFormId());
+//        inquiryDTO.setFormName(product.getForms().stream()
+//                .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
+//                .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+//
+//
+//        //Order Specification
+//        inquiryDTO.setQuantity(inquiry.getQuantity());
+//        inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
+//        inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
+////        inquiryDTO.setCertificate(inquiry.getCertificate());
+//        inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
+//        inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
+//        inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
+//        inquiryDTO.setNpop(inquiry.getNpop());
+//        inquiryDTO.setNop(inquiry.getNop());
+//        inquiryDTO.setEu(inquiry.getEu());
+//        inquiryDTO.setGsdc(inquiry.getGsdc());
+//        inquiryDTO.setIpm(inquiry.getIpm());
+//        inquiryDTO.setOther(inquiry.getOther());
+//        inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
+//        inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+//        inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
+//        inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
+//        inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
+//        inquiryDTO.setCountry(inquiry.getCountry());
+//        inquiryDTO.setState(inquiry.getState());
+//        inquiryDTO.setCity(inquiry.getCity());
+//        inquiryDTO.setPincode(inquiry.getPincode());
+//        inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+//
+// Fetch specifications for the inquiry
+//        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+//        System.out.println(specifications);
+//
+//        // Map specifications to SpecificationDTO
+//        List<SpecificationDTO> specificationDTOs = specifications.stream()
+//                .map(spec -> {
+//                    SpecificationDTO dto = new SpecificationDTO();
+//                    dto.setSpecificationName(spec.getSpecificationName());
+//                    dto.setSpecificationValue(spec.getSpecificationValue());
+//                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+//                    return dto;
+//                })
+//                .toList();
+//
+//        inquiryDTO.setSpecifications(specificationDTOs);
+//
+//        inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
+//        inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
+//        inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
+//        inquiryDTO.setSellerUId(inquiry.getSellerUId());
+//        inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+//        inquiryDTO.setSentDate(inquiry.getSentDate());
+//        inquiryDTO.setSentTime(inquiry.getSentTime());
+//        inquiryDTO.setUnit(inquiry.getUnit());
+//
+//        OrderStatus orderStatus = orderStatusRepository.findByOsId(inquiry.getOsId());
+//        inquiryDTO.setOsId(orderStatus.getOsId());
+//        inquiryDTO.setDate(orderStatus.getDate());
+//        inquiryDTO.setTime(orderStatus.getTime());
+//        inquiryDTO.setDescription(orderStatus.getDescription());
+//        inquiryDTO.setImageUrl(orderStatus.getImageUrl());
+//        inquiryDTO.setLocation(orderStatus.getLocation());
+//        System.out.println(orderStatus);
+//
+//        // Fetch SellerNegotiates and map them
+//        List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
+//
+//
+//
+//        List<SellerNegotiateDTO> negotiationDTOs = negotiations.stream()
+//                .map(neg -> {
+//                    SellerNegotiateDTO dto = new SellerNegotiateDTO();
+//                    dto.setSellerUId(neg.getSellerUId());
+//                    SellerBuyer seller = sellerBuyerRepository.findById(neg.getSellerUId())
+//                            .orElseThrow(() -> new RuntimeException("Seller not found with given ID : " + neg.getSellerUId()));
+//                    dto.setSellerName(seller.getFullName());
+//                    dto.setEmail(seller.getEmail());
+//                    dto.setPhoneNumber(seller.getPhoneNumber());
+//                    dto.setAdminCountry(seller.getCountry());
+//                    dto.setAdminState(seller.getState());
+//                    dto.setAdminCity(seller.getCity());
+//                    dto.setAdminPinCode(seller.getPinCode());
+//                    dto.setAdminAddress(seller.getAddress());
+//
+//                    SellerProduct sellerProduct = sellerProductRepository.findBySellerIdAndProductId(neg.getSellerUId(), inquiry.getProductId())
+//                            .orElseThrow(() -> new RuntimeException("SellerProduct not found."));
+//                    System.out.println(sellerProduct);
+//                    dto.setAvailableAmount(sellerProduct.getAvailableAmount());
+//                    dto.setMaxPrice(sellerProduct.getMaxPrice());
+//                    dto.setMinPrice(sellerProduct.getMinPrice());
+//
+//                    dto.setSnId(neg.getSnId());
+//                    dto.setAdminInitialPrice(neg.getAdminInitialPrice());
+//                    dto.setAipDate(neg.getAipDate());
+//                    dto.setAipTime(neg.getAipTime());
+//                    dto.setAvgLeadTime(neg.getAvgLeadTime());
+//                    dto.setAdminDeliveryAddress(neg.getAdminDeliveryAddress());
+//                    dto.setInstruction(neg.getInstruction());
+//                    dto.setSellerNegotiatePrice(neg.getSellerNegotiatePrice());
+//                    dto.setSnpDate(neg.getSnpDate());
+//                    dto.setSnpTime(neg.getSnpTime());
+//                    dto.setAdminFinalPrice(neg.getAdminFinalPrice());
+//                    dto.setAfpDate(neg.getAfpDate());
+//                    dto.setAfpTime(neg.getAfpTime());
+//                    dto.setStatus(neg.getStatus());
+//                    dto.setAdminAddressId(neg.getAdminAddressId());
+//                    return dto;
+//                })
+//                .toList();
+//        inquiryDTO.setSellerNegotiations(negotiationDTOs);
+//
+//
+//
+       // Fetch BuyerNegotiate entity
+//        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
+//        System.out.println(negotiate);
+//
+//        if (negotiate != null) {
+//            inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
+//            inquiryDTO.setComment(negotiate.getComment());
+//            inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
+//            inquiryDTO.setAipDate(negotiate.getAipDate());
+//            inquiryDTO.setAipTime(negotiate.getAipTime());
+//            inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
+//            inquiryDTO.setBnpDate(negotiate.getBnpDate());
+//            inquiryDTO.setBnpTime(negotiate.getBnpTime());
+//            inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
+//            inquiryDTO.setAfpDate(negotiate.getAfpDate());
+//            inquiryDTO.setAfpTime(negotiate.getAfpTime());
+//            inquiryDTO.setStatus(negotiate.getStatus());
+//        } else {
+//            // Set fields to null or provide default values
+//            inquiryDTO.setAdminInitialPrice(null);
+//            inquiryDTO.setComment(null);
+//            inquiryDTO.setPaymentTerm(null);
+//            inquiryDTO.setAipDate(null);
+//            inquiryDTO.setAipTime(null);
+//            inquiryDTO.setBuyerNegotiatePrice(null);
+//            inquiryDTO.setBnpDate(null);
+//            inquiryDTO.setBnpTime(null);
+//            inquiryDTO.setAdminFinalPrice(null);
+//            inquiryDTO.setAfpDate(null);
+//            inquiryDTO.setAfpTime(null);
+//            inquiryDTO.setStatus(null);
+//        }
+//
+//
+//
+//        System.out.println("map to Dto InquiryDTO" + inquiryDTO);
+//        return inquiryDTO;
+//
+//    }
+
+
+
     @Override
     public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
-        System.out.println("Checking InquiryDTO in service" + inquiryDTO);
-        System.out.println(qId);
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        System.out.println("Checking InquiryDTO in service" + inquiry);
 
         List<String> successfulSellers = new ArrayList<>();
 
@@ -1157,7 +1340,7 @@ public class InquiryServiceImpl implements InquiryService {
         negotiate.setBuyerNegotiatePrice(amount);
         negotiate.setBnpDate(LocalDate.now());
         negotiate.setBnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        negotiate.setStatus("Buyer negotiated the price.");
+        negotiate.setStatus("Buyer negotiated the price");
         buyerNegotiateRepository.save(negotiate);
 
         return "You negotiated with the amount of " + amount;
@@ -1169,9 +1352,9 @@ public class InquiryServiceImpl implements InquiryService {
         negotiate.setAdminFinalPrice(amount);
         negotiate.setAfpDate(LocalDate.now());
         negotiate.setAfpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        negotiate.setStatus("The final amount sent by the admin to the buyer: " + amount);
+        negotiate.setStatus("Admin Sent the Final Price");
         buyerNegotiateRepository.save(negotiate);
-        return "admin sent the final price to buyer";
+        return "You sent the final price to buyer";
     }
 
     @Override
@@ -1189,12 +1372,35 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(7L));
-        inquiry.setBuyerFinalPrice(negotiate.getAdminFinalPrice());
+        if(negotiate.getAdminFinalPrice() != null) {
+            inquiry.setBuyerFinalPrice(negotiate.getAdminFinalPrice());
+        } else {
+            inquiry.setBuyerFinalPrice(negotiate.getAdminInitialPrice());
+        }
         inquiryRepository.save(inquiry);
 
         return "You accepted the Query";
     }
 
+    @Override
+    public String buyerRejectedQuery(String qId, String buyerUId) {
+        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(qId);
+        negotiate.setStatus("Buyer has rejected the query.");
+        buyerNegotiateRepository.save(negotiate);
+
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOId(qId);
+        orderStatus.setStatus(statusRepository.findSMeaningBySId(6L));
+        orderStatusRepository.save(orderStatus);
+
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+        inquiry.setOsId(orderStatus.getOsId());
+        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(6L));
+        inquiryRepository.save(inquiry);
+
+        return "You rejected the Query";
+    }
 
 
 //    @Override
