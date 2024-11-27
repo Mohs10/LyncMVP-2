@@ -254,6 +254,8 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAdminAddressId(sellerNegotiate.getAdminAddressId());
         sellerReceiveInquiryDTO.setSellerName(sellerBuyerRepository.findById(sellerNegotiate.getSellerUId()).orElseThrow(null).getFullName());
         sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
+        sellerReceiveInquiryDTO.setSellerNegotiatePrice(sellerNegotiate.getSellerNegotiatePrice());
+        sellerReceiveInquiryDTO.setAdminFinalPrice(sellerNegotiate.getAdminFinalPrice());
 
 
         Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
