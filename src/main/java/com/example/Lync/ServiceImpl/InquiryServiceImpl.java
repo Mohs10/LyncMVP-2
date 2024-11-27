@@ -240,7 +240,8 @@ public class InquiryServiceImpl implements InquiryService {
     private SellerReceiveInquiryDTO mapToSellerViewList(SellerNegotiate sellerNegotiate){
         SellerReceiveInquiryDTO sellerReceiveInquiryDTO = new SellerReceiveInquiryDTO();
 
-        Inquiry inquiry = inquiryQIdCache.get(sellerNegotiate.getQId());
+        Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sellerNegotiate.getQId()));
 
         sellerReceiveInquiryDTO.setSnId(sellerNegotiate.getSnId());
         sellerReceiveInquiryDTO.setQId(inquiry.getQId());
@@ -775,7 +776,12 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
-        Inquiry inquiry = inquiryQIdCache.get(qId);
+        System.out.println("Checking InquiryDTO in service" + inquiryDTO);
+        System.out.println(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+        System.out.println("Checking InquiryDTO in service" + inquiry);
+
         List<String> successfulSellers = new ArrayList<>();
 
         // Get all sellers selling the specified product
@@ -921,10 +927,8 @@ public class InquiryServiceImpl implements InquiryService {
     //Buyer can reject status 1, 2 inquiries
     @Override
     public void buyerRejectsInquiries(String qId, String description, String buyerUId) throws Exception {
-        Inquiry inquiry = inquiryQIdCache.get(qId);
-        if(inquiry == null){
-            throw new Exception("Inquiry not found with qId: " + qId);
-        }
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
 
         if(inquiry.getOrderStatus().equals(statusRepository.findSMeaningBySId(1L)) || //Buyer Raised Inquiry
                 inquiry.getOrderStatus().equals(statusRepository.findSMeaningBySId(2L))) { //Admin sent inquiry to seller
@@ -1149,7 +1153,8 @@ public class InquiryServiceImpl implements InquiryService {
         orderStatus.setStatus(statusRepository.findSMeaningBySId(7L));
         orderStatusRepository.save(orderStatus);
 
-        Inquiry inquiry = inquiryQIdCache.get(qId);
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(7L));
         inquiry.setBuyerFinalPrice(negotiate.getAdminFinalPrice());
@@ -1162,10 +1167,8 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public void sellerRejectQuery(String qId, String description) throws Exception {
 //        Inquiry inquiry = inquiryRepository.findByQId(qId);
-        Inquiry inquiry = inquiryQIdCache.get(qId);
-        if(inquiry == null){
-            throw new Exception("Inquiry not found with qId: " + qId);
-        }
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(4L));
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1220,10 +1223,8 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = new SampleOrder();
         OrderStatus orderStatus = new OrderStatus();
 
-        Inquiry inquiry = inquiryQIdCache.get(qId);
-        if(inquiry == null){
-            throw new Exception("Inquiry not found with qId: " + qId);
-        }
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
 
         LocalDate currentDate = LocalDate.now();
 
@@ -1455,10 +1456,8 @@ public class InquiryServiceImpl implements InquiryService {
     public String adminSendsSampleOrderToSeller(String soId, SampleOrderDTO sampleOrderDTO) throws Exception {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
-        Inquiry inquiry = inquiryQIdCache.get(sampleOrder.getQId());
-        if(inquiry == null){
-            throw new Exception("Inquiry not found with qId: " + sampleOrder.getQId());
-        }
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
 
         sampleOrder.setSellerUId(inquiry.getSellerUId());
         sampleOrder.setAdminSendQtyToSeller(sampleOrderDTO.getAdminSendQtyToSeller());
