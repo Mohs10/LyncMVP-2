@@ -181,6 +181,7 @@ public class InquiryServiceImpl implements InquiryService {
                     dto.setMaxPrice(sellerProduct.getMaxPrice());
                     dto.setMinPrice(sellerProduct.getMinPrice());
 
+                    dto.setSnId(neg.getSnId());
                     dto.setAdminInitialPrice(neg.getAdminInitialPrice());
                     dto.setAipDate(neg.getAipDate());
                     dto.setAipTime(neg.getAipTime());
