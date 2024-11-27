@@ -310,6 +310,31 @@ public class SellerController {
         return ResponseEntity.ok(message);
     }
 
+    @PostMapping("/acceptAdminPrice/{snId}")
+    public ResponseEntity<String> acceptAdminPrice(@PathVariable Long snId) throws Exception {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        String message= inquiryService.sellerAcceptAdminPrice(snId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
+
+    @PostMapping("/rejectAdminPrice/{snId}")
+    public ResponseEntity<String> rejectAdminPrice(@PathVariable Long snId) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerRejectAdminPrice(snId, sellerDetails.getUserId() );
+        return ResponseEntity.ok(message);
+    }
+
     @GetMapping("/sellerGetsSampleOrders")
     public ResponseEntity<List<SampleOrderDTO>> sellerSampleOrders(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

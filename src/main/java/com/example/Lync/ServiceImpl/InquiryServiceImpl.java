@@ -1016,6 +1016,26 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
+    public String sellerRejectQuery(Long snId, String sellerUId) throws Exception {
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        sellerNegotiate.setStatus("Seller Rejected the Inquiry");
+        sellerNegotiateRepository.save(sellerNegotiate);
+        return "You Rejected the Inquiry";
+    }
+
+    @Override
+    public String sellerAcceptInquiry(Long snId, String buyerUId) throws Exception {
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        sellerNegotiate.setStatus("Seller Accepted the Inquiry");
+        sellerNegotiateRepository.save(sellerNegotiate);
+        return "You Accepted the Inquiry";
+    }
+
+    @Override
     public String sellerNegotiatePrice(Long snId, String sellerUId, Double amount) {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
         sellerNegotiate.setSellerNegotiatePrice(amount);
@@ -1037,15 +1057,24 @@ public class InquiryServiceImpl implements InquiryService {
         return "You gave the final price of :" + amount;
     }
 
-
     @Override
-    public String sellerAcceptInquiry(Long snId, String buyerUId) throws Exception {
+    public String sellerAcceptAdminPrice(Long snId, String sellerUId) {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
 
-        sellerNegotiate.setStatus("Seller Accepted the Inquiry");
+        sellerNegotiate.setStatus("Seller Accepted Admin Price");
         sellerNegotiateRepository.save(sellerNegotiate);
-        return "You Accepted the Inquiry";
+        return "You Accepted the Admin Price";
+    }
+
+    @Override
+    public String sellerRejectAdminPrice(Long snId, String sellerUId) {
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        sellerNegotiate.setStatus("Seller Rejected Admin Price");
+        sellerNegotiateRepository.save(sellerNegotiate);
+        return "You Rejected the Admin Price";
     }
 
     @Override
@@ -1167,15 +1196,6 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
 
-    @Override
-    public String sellerRejectQuery(Long snId, String sellerUId) throws Exception {
-        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
-                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
-
-        sellerNegotiate.setStatus("Seller Rejected the Inquiry");
-        sellerNegotiateRepository.save(sellerNegotiate);
-        return "You Rejected the Inquiry";
-    }
 
 //    @Override
 //    public void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception {

@@ -35,11 +35,17 @@ public interface InquiryService {
 
     SellerReceiveInquiryDTO sellerOpenInquiry(Long snId, String sellerUId) throws Exception;
 
+    String sellerRejectQuery(Long snId, String sellerUId) throws Exception;
+
+    String sellerAcceptInquiry(Long snId, String buyerUId) throws Exception;
+
     String sellerNegotiatePrice(Long snId, String sellerUId, Double amount);
 
     String adminFinalPriceToSeller(Long snId, Double amount);
 
-    String sellerAcceptInquiry(Long snId, String buyerUId) throws Exception;
+    String sellerAcceptAdminPrice(Long snId, String sellerUId);
+
+    String sellerRejectAdminPrice(Long snId, String sellerUId);
 
     String adminSelectsSeller(Long snId);
 
@@ -52,9 +58,6 @@ public interface InquiryService {
     String adminFinalPriceToBuyer(String qId, Double amount);
 
     String buyerAcceptQuery(String qId, String buyerUId);
-
-    String sellerRejectQuery(Long snId, String sellerUId) throws Exception;
-
 
 //    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
 
