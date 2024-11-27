@@ -299,10 +299,15 @@ public class SellerController {
     }
 
 
-    @PostMapping("/sellerRejectQuery/{qId}")
-    public ResponseEntity<String> sellerRejectQuery(@PathVariable String qId, @RequestBody String description) throws Exception {
-        inquiryService.sellerRejectQuery(qId, description);
-        return ResponseEntity.ok("Rejected Inquiry for ID" + qId);
+    @PostMapping("/sellerRejectQuery/{snId}")
+    public ResponseEntity<String> sellerRejectQuery(@PathVariable Long snId) throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.sellerRejectQuery(snId, sellerDetails.getUserId() );
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping("/sellerGetsSampleOrders")

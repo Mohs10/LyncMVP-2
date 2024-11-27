@@ -253,6 +253,7 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAdminInitialPrice(sellerNegotiate.getAdminInitialPrice());
         sellerReceiveInquiryDTO.setAdminAddressId(sellerNegotiate.getAdminAddressId());
         sellerReceiveInquiryDTO.setSellerName(sellerBuyerRepository.findById(sellerNegotiate.getSellerUId()).orElseThrow(null).getFullName());
+        sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
 
 
         Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
@@ -1037,7 +1038,8 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String sellerAcceptInquiry(Long snId, String buyerUId) throws Exception {
-        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
 
         sellerNegotiate.setStatus("Seller Accepted the Inquiry");
         sellerNegotiateRepository.save(sellerNegotiate);
@@ -1053,9 +1055,7 @@ public class InquiryServiceImpl implements InquiryService {
         // Fetch the Inquiry entity associated with the QId
         Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId())
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sellerNegotiate.getQId()));
-        if (inquiry == null) {
-            throw new RuntimeException("Inquiry not found for QId: " + sellerNegotiate.getQId());
-        }
+
 
         // Check if a seller has already been selected for the inquiry
         if (inquiry.getSellerUId() != null) {
@@ -1166,20 +1166,13 @@ public class InquiryServiceImpl implements InquiryService {
 
 
     @Override
-    public void sellerRejectQuery(String qId, String description) throws Exception {
-//        Inquiry inquiry = inquiryRepository.findByQId(qId);
-        Inquiry inquiry = inquiryRepository.findByQId(qId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(4L));
+    public String sellerRejectQuery(Long snId, String sellerUId) throws Exception {
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
 
-        OrderStatus orderStatus = new OrderStatus();
-        orderStatus.setOId(qId);
-        orderStatus.setStatus(statusRepository.findSMeaningBySId(4L));
-        orderStatus.setDescription(description);
-        orderStatusRepository.save(orderStatus);
-
-        inquiry.setOsId(orderStatus.getOsId());
-        inquiryRepository.save(inquiry);
+        sellerNegotiate.setStatus("Seller Rejected the Inquiry");
+        sellerNegotiateRepository.save(sellerNegotiate);
+        return "You Rejected the Inquiry";
     }
 
 //    @Override

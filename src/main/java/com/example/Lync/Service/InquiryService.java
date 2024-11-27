@@ -53,7 +53,7 @@ public interface InquiryService {
 
     String buyerAcceptQuery(String qId, String buyerUId);
 
-    void sellerRejectQuery(String qId, String description) throws Exception;
+    String sellerRejectQuery(Long snId, String sellerUId) throws Exception;
 
 
 //    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
