@@ -145,6 +145,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getAllProducts() {
 
+        Product product =productRepository.findById(20241128617901L).get();
+
+        System.out.println(product);
+
         return productRepository.findByActiveProductTrue().stream().map(this::toDTO) // Using helper method
                 .collect(Collectors.toList());
     }
@@ -220,28 +224,72 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
-    @Override
-    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws IOException {
-        // Update fields of the existing product with new data from productDTO
-        existingProduct.setProductName(productDTO.getProductName());
-        existingProduct.setHsnCode(productDTO.getHsnCode());
-        existingProduct.setProductDescription(productDTO.getProductDescription());
+//    @Override
+//    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws IOException {
+//
+//
+//        System.out.println();
+//        // Update fields of the existing product with new data from productDTO
+//        existingProduct.setProductName(productDTO.getProductName());
+//        existingProduct.setHsnCode(productDTO.getHsnCode());
+//        existingProduct.setProductDescription(productDTO.getProductDescription());
+//
+//        // Retrieve the category, varieties, forms, and certifications again in case they have changed
+//        Category category = categoryRepository.findById(productDTO.getCategoryId())
+//                .orElseThrow(() -> new RuntimeException("Category not found"));
+//        existingProduct.setCategory(category);
+//
+//        List<Variety> varieties = varietyRepository.findAllById(productDTO.getVarietyIds());
+//        System.out.println(varieties);
+//
+//        existingProduct.setVarieties(varieties);
+//
+//        List<Form> forms = formRepository.findAllById(productDTO.getFormIds());
+//        System.out.println(forms);
+//        existingProduct.setForms(forms);
+//
+//
+//        certificationRepository.deleteAllByProductId(existingProduct.getProductId()); // Assuming a method exists in your repository to delete certifications by product ID
+//
+//        // Update certifications
+//        List<Certification> certifications = new ArrayList<>();
+//        for (CertificationDTO certificationDTO : productDTO.getCertifications()) {
+//            Certification certification = new Certification();
+//            certification.setCertificationName(certificationDTO.getCertificationName());
+//            certification.setIsCertified(certificationDTO.getIsCertified());
+//            certifications.add(certificationRepository.save(certification));  // Save each certification
+//        }
+//        existingProduct.setCertifications(certifications);
+//
+//        // Update specifications
+//        List<Specification> specifications = new ArrayList<>();
+//        for (SpecificationDTO specificationDTO : productDTO.getSpecifications()) {
+//            Specification specification = new Specification();
+//            specification.setSpecificationName(specificationDTO.getSpecificationName());
+//            specification.setSpecificationValue(specificationDTO.getSpecificationValue());
+//            specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
+//            specifications.add(specificationRepository.save(specification));
+//        }
+//        existingProduct.setSpecifications(specifications);
+//       Product updatedProduct= productRepository.save(existingProduct);
+//        System.out.println("updatedProduct:"+updatedProduct);
+//        // Save the updated product
+//        return updatedProduct;
+//    }
 
-        // Retrieve the category, varieties, forms, and certifications again in case they have changed
+@Override
+  public   Product editProduct(Long productId, ProductDTO productDTO)
+    {
         Category category = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
-        existingProduct.setCategory(category);
 
         List<Variety> varieties = varietyRepository.findAllById(productDTO.getVarietyIds());
-        existingProduct.setVarieties(varieties);
-
         List<Form> forms = formRepository.findAllById(productDTO.getFormIds());
-        existingProduct.setForms(forms);
 
 
-        certificationRepository.deleteAllByProductId(existingProduct.getProductId()); // Assuming a method exists in your repository to delete certifications by product ID
+//        certificationRepository.deleteAllByProductId(existingProduct.getProductId()); // Assuming a method exists in your repository to delete certifications by product ID
 
-        // Update certifications
+        // Map certifications
         List<Certification> certifications = new ArrayList<>();
         for (CertificationDTO certificationDTO : productDTO.getCertifications()) {
             Certification certification = new Certification();
@@ -249,9 +297,7 @@ public class ProductServiceImpl implements ProductService {
             certification.setIsCertified(certificationDTO.getIsCertified());
             certifications.add(certificationRepository.save(certification));  // Save each certification
         }
-        existingProduct.setCertifications(certifications);
 
-        // Update specifications
         List<Specification> specifications = new ArrayList<>();
         for (SpecificationDTO specificationDTO : productDTO.getSpecifications()) {
             Specification specification = new Specification();
@@ -260,17 +306,25 @@ public class ProductServiceImpl implements ProductService {
             specification.setSpecificationValueUnits(specificationDTO.getSpecificationValueUnits());
             specifications.add(specificationRepository.save(specification));
         }
-        existingProduct.setSpecifications(specifications);
 
-        // Update product image if a new one is provided
-//        if (productDTO.getProductImage() != null) {
-//            String profilePictureUrl = s3Service.uploadProductImage(existingProduct.getProductId(), productDTO.getProductImage());
-//            existingProduct.setProductImageUrl(profilePictureUrl);
-//        }
+        Product product=productRepository.findById(productId).orElseThrow(null);
 
-        // Save the updated product
-        return productRepository.save(existingProduct);
+        product.setProductName(productDTO.getProductName());
+        product.setHsnCode(productDTO.getHsnCode());
+        product.setCategory(category);
+        product.setVarieties(varieties);
+        product.setForms(forms);
+        product.setProductImageUrl(productDTO.getProductImageUrl());
+        product.setProductDescription(productDTO.getProductDescription());
+        product.setCertifications(certifications);  // Set the certifications
+        product.setSpecifications(specifications);
+        return product;
     }
+
+
+
+
+
 
 
     @Override
@@ -361,6 +415,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private  ProductDTO toDTO(Product product) {
+
+        if (Long.valueOf(20241128617901L).equals(product.getProductId())) {
+            System.out.println(product);
+        }
+
         ProductDTO dto = new ProductDTO();
 
         dto.setProductId(product.getProductId());

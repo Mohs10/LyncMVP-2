@@ -23,7 +23,8 @@ public interface ProductService {
     public List<Product> getSortedProductsByCategory(Long categoryId, String sortBy);
     public List<Product> findByCategoryId(Long categoryId);
 
-    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws Exception;
+//    public Product editProduct(Product existingProduct, ProductDTO productDTO) throws Exception;
+    Product editProduct(Long productId, ProductDTO productDTO);
 
     void allActive();
 
