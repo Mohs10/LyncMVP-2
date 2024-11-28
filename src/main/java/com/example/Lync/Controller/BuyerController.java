@@ -255,10 +255,23 @@ public class BuyerController {
         String message = inquiryService.buyerAcceptQuery(qId, sellerDetails.getUserId());
         return ResponseEntity.ok(message);
     }
+
+    @PostMapping("/buyerRejectQuery/{qId}")
+    public ResponseEntity<String> rejectQuery(@PathVariable String qId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = inquiryService.buyerRejectedQuery(qId, sellerDetails.getUserId());
+        return ResponseEntity.ok(message);
+    }
+
     @GetMapping("/priceRange/{productId}")
     public ResponseEntity<PriceRangeProjection> priceRange(@PathVariable Long productId) {
 
         PriceRangeProjection priceRange = sellerBuyerService.priceRangeByProductId(productId);
+        System.out.println(priceRange);
         return ResponseEntity.ok(priceRange);
     }
 

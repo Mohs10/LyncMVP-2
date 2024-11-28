@@ -63,6 +63,10 @@ public interface InquiryService {
 
 //    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
 
+
+
+
+
     String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception;
 
     List<SampleOrderDTO> buyerGetsAllSampleOrders(String buyerUId);
