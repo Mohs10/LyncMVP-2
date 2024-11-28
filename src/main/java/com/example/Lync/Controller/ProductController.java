@@ -235,7 +235,7 @@ public class ProductController {
                                                @RequestBody ProductDTO productDTO) throws Exception {
 
 
-        // Call the service layer to update the product
+        // Call the service layer to update the productbbb
         Product updatedProduct = productService.editProduct(productId,productDTO);
 
         System.out.println(updatedProduct);
