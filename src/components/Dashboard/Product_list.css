@@ -1,0 +1,176 @@
+
+.custom-table {
+ 
+ 
+ 
+ 
+  opacity: 100% !important; /* Opacity set to 100% */
+  text-align: left !important;
+
+  color: #212529;
+  border-collapse: collapse;
+  padding-left: 20px !important;
+}
+
+
+
+.custom-table td {
+  
+  vertical-align: middle !important;
+ 
+  font-size: 12px !important;
+  
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 400 !important; /* Regular weight */
+  padding:10px;
+}
+
+.custom-table th {
+  text-align: left !important;
+  background-color: #F6F6F6 !important;
+  color: #1E1E1E !important;
+  font-size: 14px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 400 !important; /* Regular weight */
+  
+  padding: 10px; /* Add padding for better spacing */
+  
+}
+.custom-table tbody tr{
+  border-bottom: 2px #E9E9E9 !important;
+}
+
+/* .custom-table tbody tr:hover {
+  background-color: #160404 !important;
+} */
+
+/* Responsive table */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 576px) {
+  /* Stack table cells on smaller screens */
+  .custom-table thead {
+    display: none;
+  }
+
+  .custom-table tr {
+    display: block;
+  }
+
+  .custom-table td {
+    display: flex;
+    justify-content: space-between;
+   
+  }
+
+  .custom-table td:before {
+    content: attr(data-label); /* Use data-label to display header */
+    font-weight: bold;
+  }
+}
+/* Table row hover effect */
+/* Table row hover effect */
+.custom-table tbody tr:hover {
+ 
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+  cursor: pointer; /* Optional: change cursor to pointer on hover */
+}
+
+/* Product image styling */
+.product-image {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 15px !important;
+  object-fit: cover !important;
+  margin-right: 15px;
+}
+
+/* Stock badges */
+.badge-stock {
+  border: 1px solid !important;
+  background-color: transparent !important;
+  padding: 5px 10px !important;
+  border-radius: 5px !important;
+  font-weight: bold !important;
+  display: inline-block !important;
+  width: auto !important;
+}
+
+.in-stock {
+  border-color: green !important;
+  color: green !important;
+}
+
+.out-of-stock {
+  border-color: red !important;
+  color: red !important;
+}
+
+/* Action buttons styling */
+.btn-action {
+  border: none !important;
+  background: none !important;
+  font-size: 16px !important;
+  padding: 5px !important;
+}
+
+.btn-action:hover {
+  color: #010508 !important;
+  cursor: pointer !important;
+}
+
+/* Header background styling */
+.table-header {
+  
+  padding: 1px !important;
+  
+}
+/* Custom styles for filter buttons */
+.btn-group .btn {
+  
+  border-color: #dcdcdc; /* Light border color */
+  color: #000; /* Text color */
+  
+}
+
+.btn-group .btn.active {
+  background-color: #f8f9fa; /* Light background for active state */
+  border: 1px solid #B9B9B9; /* Active border color */
+  color: #202122; /* Active text color */
+  box-shadow: 0 0 0 1px #D3D3D3; /* Stroke effect with the specified color */
+}
+
+
+.btn-group .btn:hover {
+  background-color: #f0f0f0; /* Background color on hover */
+}
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #e6ffe6;
+  color: #070707 !important;
+  border: 1px solid #00FF11;
+}
+
+.badge.in-stock {
+  color: #070707 !important;
+  font-weight: 300 !important;
+  font-size: 12px !important;
+  background-color: #e6ffe6; /* light green background */
+  border: 1px solid #00FF11;
+}
+
+.badge.out-of-stock {
+  color: #070707 !important;
+  font-weight: 300 !important;
+  font-size: 12px !important;
+  background-color: #ffe6e6; /* light red background */
+  border: 1px solid #FF4548;
+}

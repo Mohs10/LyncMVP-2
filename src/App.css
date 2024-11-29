@@ -1,0 +1,1294 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css'); /* Font Awesome for icons */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  /* background-image: url('./assets/image.png'); */
+  background-size: cover; /* Ensure the image covers the entire background */
+  background-position: center;
+  height: 100vh; /* Set to full viewport height */
+}
+
+::selection {
+  background: rgba(26,188,156,0.3);
+}
+
+.containers {
+  max-width: 700px;
+ width: 100%;
+  padding: 0 10px;
+  margin: 100px auto;
+  position: relative;
+}
+.container {
+  max-width: 1050px !important;
+ 
+}
+.wrapper {
+  width: 100%;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1; /* Ensures the form is behind the logo */
+}
+
+.wrapper .logo {
+  position: absolute;
+  top: 140px; /* Adjust this value to control overlap of the logo */
+  left: 50%;
+  transform: translateX(-50%);
+ 
+  padding: 15px; /* Padding around the logo for cleaner design */
+  border-radius: 50%; /* Makes the logo container round */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+  z-index: 2; /* Ensures the logo stays on top of the form */
+}
+
+.wrapper .logo img {
+  width: 80px; /* Adjust logo size */
+  height: 80px;
+}
+
+.wrapper .title {
+  height: 200px;
+  background-image: url('./assets/one.png'); /* Title background image */
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #070808;
+  position: relative;
+}
+.heading {
+  text-align: center; /* Centers the heading text horizontally */
+  font-size: 20px; /* Adjust the size of the heading */
+  font-weight: 400; /* Makes the heading bold */
+  color: #f3f0f0; /* Darker text color for visibility */
+  margin-bottom: 20px; /* Adds space between the heading and input fields */
+}
+
+.wrapper form {
+  padding: 50px 150px;
+  background-color: black;
+  position: relative;
+  border-radius: 0 0 5px 5px; /* Keeps the form's bottom rounded */
+  z-index: 1; /* Ensures form stays behind the logo */
+}
+
+.wrapper form .row {
+  height: 45px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.wrapper form .row input {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding-left: 60px;
+  border-radius: 35px;
+  border: 1px solid lightgrey;
+  font-size: 16px;
+  transition: all 0.1s ease;
+}
+
+form .row input:focus {
+  border-color: #16a085;
+  box-shadow: inset 0px 0px 2px 2px rgba(26,188,156,0.25);
+}
+
+form .row input::placeholder {
+  color: #f0e221;
+}
+
+/* Custom width for form fields */
+
+
+input[type="text"], input[type="password"] {
+  /* width: 352px !important;  */
+ 
+  padding: 10px 10px;
+ 
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* When input is focused, increase its size */
+input[type="text"]:focus, input[type="password"]:focus {
+
+  border-color: #e9db15 !important; /* Change border color */
+  outline: none;
+  font-size: 12px; /* Slightly increase font size */
+}
+form .row input:focus {
+  outline: none;
+  border-color: #fbc02d;
+}
+.wrapper form .row i {
+  position: absolute;
+  left: 10px; /* Adjust based on icon size */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #0e0505;
+  z-index: 1; /* Ensure the icon is above the input field */
+  pointer-events: none; /* Make sure the icon doesn't interfere with input clicks */
+}
+/* Button Styling */
+.row.button input[type="submit"] {
+  background: linear-gradient(to right, #fbc02d, #fff8e1); /* Yellow-white gradient */
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #000;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100px;
+  margin: 0 auto;
+  display: block; /* Ensures margin auto works */
+  transition: background-color 0.3s ease;
+}
+
+.row.button input[type="submit"]:hover {
+  background: linear-gradient(to right, #fbc02d, #ffe082); /* Darker yellow-white on hover */
+}
+
+.row.button input[type="submit"]:focus {
+  outline: none;
+}
+.error {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+/* ---------------Sidebar CSS-------------- */
+.sidebar {
+  background-color: #212529; /* Dark background color */
+ 
+  max-width: 250px;
+  height: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 80px; /* Set collapsed width */
+  
+  overflow-y: auto; /* Add vertical scrolling if content exceeds height */
+}
+.logo-icon {
+  height: 80px;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  width: 100%; /* Make the image fill the container */
+  height: auto; /* Keep the aspect ratio of the image */
+  border-radius: 50%; /* Make the image circular */
+  object-fit: cover; /* Ensure the image covers the entire container */
+}
+
+
+.nav-link {
+  font-size: 1rem;
+  padding: 0.75rem;
+  margin-left: 16px; /* Increase the left padding for more space */
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  color: #7f8183 !important;
+}
+
+.collapsed .nav-link {
+  font-size: 0.875rem; /* Adjust font size for collapsed view */
+  padding: 0.5rem;
+  margin-left: 0; /* Remove left margin in collapsed state */
+}
+
+.collapsed .nav-item {
+  text-align: center; /* Center align items in collapsed state */
+}
+
+.rotate-180 {
+  transform: rotate(180deg); /* Rotate the collapse icon */
+}
+
+.nav-link:hover {
+  background-color: transparent;
+  color: white;
+}
+
+.nav-link.active {
+  color: white; /* Active item font color */
+  font-size: 1.1rem; /* Slightly larger font size */
+  margin-left: 5px; /* 5px margin for the active item */
+  background-color: transparent; /* Transparent background */
+  border-left: 5px solid #ffc107; /* Yellow left border */
+}
+
+.nav-link.active .fa-icon {
+  color: #ffc107; /* Yellow icon for active item */
+}
+
+.nav-item {
+  margin-bottom: 5px; /* 5px gap between items */
+}
+
+.mt-auto .nav-link {
+  margin-top: 2rem; /* Adjust this value to increase the margin-top for the Log Out item */
+}
+
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.text-secondary {
+  color: #6c757d !important; /* Default secondary color */
+}
+
+.bg-dark {
+  background-color: #212529 !important;
+}
+
+.text-light {
+  color: #f8f9fa !important;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+}
+
+.text-dark {
+  color: #212529 !important;
+}
+/* -----------product css-------------- */
+/* Main container adjustments */
+/* Main container adjustments */
+.container-fluid {
+ 
+padding-left:80px !important;
+padding-right:80px !important;
+
+
+}
+/* Custom button styling */
+.custom-button {
+  background-color: #ffc107; /* Yellow background */
+  border: 1px solid #6c757d; /* Gray border */
+  margin-right: 5px; /* Margin for spacing between buttons */
+  padding: 6px 12px; /* Padding for a comfortable button size */
+  border-radius: 4px; /* Rounded corners for a smoother look */
+  font-size: 14px; /* Font size for consistency */
+}
+
+/* Styling for card elements */
+.card {
+  border: 1px solid #d3d3d3 !important; /* Updated border with stroke color */
+  border-radius: 0.25rem !important;
+  box-shadow: 0 0.125rem 0.25rem #B5B5B5 !important;
+  padding-left: 55px !important;
+  padding-right: 55px !important;
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+}
+
+
+/* In your CSS file */
+.custom-search-bar {
+  border: 2px solid #ffeb3b; /* Change this color to your custom color */
+}
+
+/* Subtitles (like General Information, Product Media, etc.) */
+.card h4 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* Semi-bold */
+  font-size: 20px; /* Font size */
+  color: #000; /* Black color */
+}
+
+/* Form label styling */
+.form-group label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Regular weight */
+  font-size: 12px;
+  color: #333; /* Optional: Adjust the color as needed */
+}
+
+
+/* Input fields */
+.form-control {
+
+  
+height: 42px;
+  border-radius: 4px; /* Rounded corners */
+  padding: 10px; /* Add padding inside the input */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a slight shadow to inputs */
+  
+  color: black !important; /* Ensures the text is visible */
+  border: 1px solid #ccc !important; /* Adds a border for consistency */
+  padding: 8px; /* Adds padding for a better look */
+}
+
+/* Upload box styling */
+.upload-box {
+  border: 2px dashed #ddd; /* Dashed border */
+  padding: 10px;
+  text-align: center;
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: #ffeb3b; /* Yellow for the button */
+  border: none;
+  color: #000;
+  font-weight: 600; /* Semi-bold */
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+/* Adjusting the button hover effect */
+.btn-primary:hover {
+  background-color: #f0c930; /* Slightly darker yellow on hover */
+}
+
+/* Optional: Add spacing between form sections */
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+/* Styling the placeholder text */
+.form-control::placeholder {
+  font-size: 12px;        /* Smaller font size */
+  color: #B0B0B0 !important;         /* Light gray color for placeholder */
+  font-weight: 500;       /* Medium weight for placeholder */
+  opacity: 1;             /* Ensures full opacity (default is sometimes less) */
+}
+/* 
+-----------product-mediaa css-------------- */ 
+.product-media-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.upload-box {
+  border: 2px dashed #d3d3d3;
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-placeholder {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #d3d3d3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.upload-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.file-input {
+  display: none; /* Hide the input field */
+}
+
+.media-info {
+  flex-grow: 1;
+}
+
+.ms-3 {
+  margin-left: 1rem; /* Adjust margin for spacing between the upload box and the label */
+}
+/* ----------Product-list--------- */
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align content inside the card to the left */
+}
+
+.card-icon {
+  font-size: 22px;
+  color: #4b4949;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: #5a5858 !important;
+}
+
+.card-number {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Media Queries for Smaller Screens */
+@media (max-width: 768px) {
+  .col-md-4 {
+    flex: 1 1 100%; /* Full width on smaller screens */
+  }
+}
+
+
+/* ---------Back-Button-------------- */
+/* Back.css */
+.back-button {
+  background-color: black; /* Black background */
+  color: white; /* White icon */
+  border: none; /* No border */
+  border-radius: 4px; /* Slightly rounded corners for a square look */
+  padding: 8px; /* Padding to ensure the button is square */
+  font-size: 16px; /* Icon size */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 32px; /* Set width for square shape */
+  height: 32px; /* Set height for square shape */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional shadow */
+  position: relative; /* To position it within the content */
+  z-index: 10;
+  margin-bottom: 5px;
+}
+
+.back-button:hover {
+  background-color: #333; /* Slightly lighter on hover */
+}
+
+.back-button:focus {
+  outline: none; /* Remove focus outline */
+}
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+
+
+option {
+  background-color: white !important; /* White background for options */
+  color: black !important; /* Ensures text is black */
+}
+/* Custom pagination styles */
+.pagination-custom {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-item {
+  cursor: pointer;
+  
+}
+
+.page-link {
+  padding: 0.5rem 0.5rem;
+  color: #141001 !important; /* Text color */
+  background-color: rgb(65, 63, 63) ; /* Background color */
+  border: 1px solid rgb(88, 88, 88) !important; /* Border color */
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px !important;
+ 
+}
+
+
+.page-item.active .page-link {
+  background-color: #ffc107; /* Background color for the active page */
+  color: rgb(36, 31, 4) !important; /* Text color for the active page */
+  font-weight: bold;
+}
+.password-row {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 20px; /* Adjust this value to align the icon properly */
+  top: 30%;
+  
+  transform: translatex(90%);
+  cursor: pointer;
+}
+
+/* -----------icon-css----------- */
+.validation-badge {
+  display: inline-block;         /* Keep it inline with text */
+  padding: 0.25em 0.5em;        /* Small padding */
+  font-size: 0.75rem;           /* Smaller font size */
+  color: white;                 /* Text color */
+  background-color: #dc3545;    /* Red background for errors */
+  border-radius: 0.5rem;        /* Rounded corners */
+  margin-top: 0.25rem;          /* Space above the badge */
+}
+/* NotFound.css */
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  text-align: center;
+}
+
+.not-found-text {
+  font-size: 2em;
+  color: #ff6347; /* Tomato color */
+  animation: fadeIn 2s ease-in-out infinite alternate;
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.button-14px {
+  font-size: 14px !important;
+}
+
+.icon-circle {
+  width: 46px; /* Adjust size as needed */
+  height: 46px; /* Adjust size as needed */
+  border-radius: 50%; /* Makes the icon circular */
+  background-color: #FFD700; /* Yellow background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px; /* Space between the icon and the title */
+}
+
+.icon-circle i {
+  color: #030303; /* Icon color */
+  font-size: 28px; /* Adjust icon size as needed */
+}
+h4 {
+  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-size: 14px;                   /* Font size */
+  font-weight: 600;                  /* Semibold weight */
+  color: #333;                       /* Text color (dark gray) */
+  margin: 0;                         /* Remove default margin */
+  padding-left: 10px;                /* Optional padding for better alignment */
+}
+.card h4 {
+  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-size: 18px;                   /* Font size */
+  font-weight: 600;                  /* Semibold weight */
+  color: #333;                       /* Text color (dark gray) */
+  margin: 0;                         /* Remove default margin */
+}
+label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Regular weight */
+  font-size: 12px;
+  color: #333; /* Optional: Adjust the color as needed */
+  margin-bottom: 5px;
+}
+
+.custom-form {
+  width: 500px;  
+  Height:40px;                  /* Full width of the parent container */
+  padding: 8px 12px;              /* Padding for a comfortable look */
+  border: 1px solid #FFD500;      /* Border color */
+  border-radius: 5px;            /* Rounded corners for a search-like look */
+  font-size: 12px;                /* Font size */
+  outline: none;                  /* Remove default outline */
+  transition: all 0.3s ease;  
+  background-color: #FCFCFC;    /* Smooth transition for hover/focus effects */
+}
+
+.custom-form::placeholder {
+  color: #BDBDBD;                 /* Placeholder text color */
+}
+
+.custom-form:focus {
+  border-color: #FFC107;          /* Change border color on focus */
+  box-shadow: 0 0 5px rgba(255, 213, 0, 0.5); /* Optional shadow effect */
+}
+.search-icon {
+  position: absolute;
+  top: 50%;
+  right: 15px;                  /* Adjust the position from the right edge */
+  transform: translateY(-50%);
+  color: #BDBDBD;               /* Icon color */
+  font-size: 16px;              /* Icon size */
+  pointer-events: none;         /* Make sure the icon doesn't interfere with input */
+} 
+/* Style the select dropdowns */
+.form-control {
+  /* height: 50px !important; */
+  font-size: 12px !important; /* Set font size for select text */
+  color: #333;     /* Set font color */
+  padding: 8px;    /* Adjust padding */
+  border-radius: 4px;
+  background-color: #f9f9f9; /* Optional: light background */
+}
+
+/* Style specific options in the dropdown */
+.form-control option {
+  font-size: 12px;  /* Set font size for option text */
+  color: #555;      /* Color for the dropdown options */
+}
+
+/* Optional: Hover effect on the select box */
+.form-control:hover {
+ 
+  
+
+  cursor: pointer;
+}
+.border-section {
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 16px; /* Padding inside the border */
+}
+.timeline-container {
+  position: relative;
+  margin-left: 20px; /* Space for timeline line */
+}
+.timeline-item {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  position: relative;
+  padding-left: 40px; /* Space for the dot */
+}
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #000;
+  border-radius: 50%;
+  position: absolute;
+  left: -30px; /* Positioning dot outside the card */
+  top: 50%;
+  transform: translateY(-50%);
+}
+.timeline-container::before {
+  content: "";
+  position: absolute;
+  left: -28px; /* Position the line to the far left */
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: transparent; /* Transparent to apply dotted border */
+  border-left: 2px dotted #e0e0e0; /* Dotted vertical line */
+}
+.selected-query {
+  border: 1px solid #222222 !important;
+  border-radius: 3px !important ;
+}
+.poppins-medium-12px {
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; /* Medium weight */
+}
+.testimonial-footer {
+  background-color: #000; /* Black background */
+  
+  border-radius: 5px !important;
+  font-family: 'Poppins', sans-serif !important; /* Use Poppins font */
+}
+
+.testimonial-info {
+  margin-bottom: 0;
+}
+
+.testimonial-info strong {
+  font-weight: 600; /* SemiBold weight for name */
+  color: white; /* White text for name */
+  font-size: 14px; /* Adjust size for the name */
+}
+
+.testimonial-info div {
+  font-weight: 400; /* Regular weight for organization */
+  color: #ccc; /* Light gray color for the organization */
+  font-size: 12px; /* Adjust size for organization */
+}
+
+
+
+/* Adjust the button icons */
+.testimonial-footer button {
+  
+  color: white;
+}
+
+
+.testimonial-footer .d-flex {
+  margin-left: auto; /* Align buttons to the right */
+}
+/* Testimonial Text Styling */
+.testimonial-text {
+  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-weight: 400; /* Regular weight */
+  font-size: 12px; /* Set font size to 12px */
+  color: #333; /* Adjust text color to dark gray (you can change it as needed) */
+  line-height: 1.5; /* Optional: Adds some space between lines of text for readability */
+}
+/* Button Styles */
+.edit-button {
+  background-color: white; /* White background */
+  border: 2px solid #0a0a0a !important; /* Yellow border */
+  width: 50px; /* Button size */
+  height: 50px; /* Button size */
+  border-radius: 50%; /* Circular shape */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for elevation */
+  cursor: pointer; /* Pointer cursor */
+  padding: 0; /* Remove default padding */
+}
+
+/* Icon Styles */
+.edit-icon {
+  color: #0a0a09 !important; /* Yellow color for icon */
+  font-size: 1.2rem; /* Slightly larger icon */
+}
+
+/* Custom styles for toggle buttons */
+
+
+
+.metrics-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  text-align: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.products-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+
+
+
+.out-of-stock-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+.yellow-border {
+  border: 1px solid yellow !important;
+}
+.product-description {
+  margin: 0;
+  font-size: 12px !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; /* Medium weight */
+  color: #848282 !important;
+  line-height: 25px;
+}
+.seller-card {
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.seller-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-name {
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: #222222;
+}
+
+.seller-email,
+.seller-phone,
+.seller-address,
+.seller-info {
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  color: #222222;
+  margin: 0;
+}
+
+.seller-card .form-check {
+  top: 10px;
+  right: 10px;
+  z-index: 1; /* Ensure it's above card content */
+}
+
+.seller-card .form-check-label {
+  font-size: 12px;
+  color: grey;
+}
+.custom-card {
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border-radius: 30px; /* Custom rounded border radius */
+  border: 1px solid #050505; /* Border styling */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  text-align: center;
+}
+/* Center-align container */
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ 
+}
+
+/* Button styles */
+.add-address-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 10px;
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #fff; /* White background */
+  color: #000; /* Black text */
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  width: 100%; /* Full width of parent */
+}
+
+.add-address-button:hover {
+  background-color: #f7f7f7; /* Slightly darker background on hover */
+  border-color: #000; /* Darker border on hover */
+}
+
+.plus-icon {
+  font-size: 20px;
+  margin-right: 8px; /* Space between "+" and text */
+  font-weight: bold;
+  color: #000; /* Black "+" icon */
+}
+/* Container for the cards */
+
+/* Individual card styling */
+/* .card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.card.selected {
+  border: 2px solid #007bff; 
+} */
+
+/* Text inside the card */
+.card h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.card p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Title styling */
+.modal-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+/* Close button styling */
+.modal .close {
+  position: absolute;
+  top: 10px; /* Adjust to provide spacing from the top */
+  right: 10px; /* Adjust to provide spacing from the right */
+  font-size: 24px; /* Larger font size for visibility */
+  color: #000; /* Black color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.modal .close:hover {
+  transform: scale(1.2); /* Slight zoom-in effect on hover */
+  color: #ff0000; /* Change color to red on hover */
+}
+.custom-icon-spacing {
+  margin-right: 10px; /* Adjust the space between the icon and the text */
+}
+
+.selected-card {
+  border: 1px solid black !important; /* Add a black border */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for better visual */
+}
+.heading-with-bar {
+  position: relative;
+  display: inline-block; /* Ensures the underline adjusts to the text width */
+}
+
+.heading-with-bar::after {
+  content: '';
+  display: block;
+  margin: 15px auto 0; /* Adjust spacing as needed */
+  width: 60%; /* Adjust this percentage for the bar width */
+  height: 4px; /* Adjust the thickness of the bar */
+  background-color: #1E1E1E; /* Black color for the bar */
+  margin-left: auto;
+  margin-right: auto;
+  border-top-left-radius: 5px; /* Round top-left corner */
+  border-top-right-radius: 5px; /* Round top-right corner */
+  width: 253px;
+ 
+}
+.custom-filter-container {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #8a8989 !important;
+  
+  padding: 4px;
+ 
+  
+}
+
+.custom-filter-button {
+  background-color: transparent;
+  border: 2px #929292;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+}
+
+.custom-products-dropdown {
+  border: none;
+  background-color: #dddddd;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
+  padding: 6px 10px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+ 
+}
+
+.custom-products-dropdown::after {
+  content: "▼";
+  padding-left: 8px;
+}
+
+.custom-filter-container:hover {
+  border-color: #333; /* Optional: changes border color on hover */
+}
+
+
+
+.badge-in-stock {
+  color: green;
+}
+
+.badge-out-of-stock {
+  color: red;
+}
+
+.alert {
+  background-color: #333 !important; /* Dark background */
+  color: #fff !important; /* White text */
+  border: 2px solid #ffd700 !important; /* Yellow border */
+  border-radius: 8px !important;
+  padding: 10px 20px !important;
+  text-align: center !important; /* Center the text */
+  font-size: 12px !important;
+  display: inline-block !important; /* Fit the content width */
+  margin-bottom: 5px !important; /* Spacing below the alert */
+}
+
+.alert-container {
+  display: flex !important;
+  justify-content: center !important; /* Center the alert within its parent */
+  margin-top: 20px !important;
+}
+
+.button-container {
+  display: flex !important;
+  justify-content: center !important; /* Center the buttons */
+  gap: 10px !important; /* Spacing between the buttons */
+  margin-top: 10px !important;
+}
+.btn-approve {
+  background-color: #e6ffe6 !important; /* Light green background */
+  color: #69f169 !important; /* Dark text */
+  border: 1px solid #00FF11 !important; /* Bright green border */
+  padding: 3px 5px 3px 5px ;
+}
+
+.btn-approve:hover {
+ background-color: #c8f7c8 !important; /* Darker light green on hover */ 
+}
+
+.btn-reject {
+  color: red !important; /* Red text */
+  background-color: #ffe0e0 !important; /* Light red background */
+  border: 1px solid red !important; /* Red border */
+  padding: 3px 5px 3px 5px ;
+}
+
+.btn-reject:hover {
+  background-color: #f7c8c8 !important; /* Darker light red on hover */
+}
+
+
+
+.product-card {
+  border: 1px solid #ddd !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  width: 220px !important;
+  flex: 0 0 auto !important;
+  text-align: center !important;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  margin-top: 15px !important;
+  margin-right: 10px;
+  margin-left: 10px;
+align-items: center;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+
+
+.product-name {
+  margin-top: 10px;
+  font-size: 16px;
+}
+.menu-container {
+  display: inline-block; /* Ensures the container fits its content */
+  padding: 5px;
+  border-radius: 5px;
+  background-color:#cacaca;
+}
+.menu-tab {
+  background-color: #000; /* Black background for buttons */
+  color: #fff; /* White text for buttons */
+  border: none;
+  padding: 10px 15px;
+  margin-right: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.menu-tab.active {
+  background-color: #444; /* Darker color for active tab */
+}
+.btn-slider-container {
+  display: inline-flex;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #f1f1f1;
+  padding: 5px;
+
+}
+.btn-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.btn-toggle.active {
+  background-color: #000;
+  color: white;
+}
+
+/* .btn-toggle:not(.active):hover {
+  background-color: #333; 
+  color: #f5f4f4;
+} */
+
+
+.btn-toggle {
+  background-color: #f0f0f0;
+  border: none;
+  
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.carousel-container {
+  position: relative;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-10%);
+ 
+  color: rgb(31, 29, 29) !important;
+  border: none;
+  font-size: 24px;
+  padding:0 px;
+  z-index: 1;
+}
+
+.carousel-control-prev {
+  left: -90px !important; /* Positioning outside */
+}
+
+.carousel-control-next {
+  right: -80px !important; /* Positioning outside */
+}
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #e6ffe6;
+  color: #070707 !important;
+  border: 1px solid #00FF11;
+}
+.form-label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Regular weight */
+  font-size: 12px;
+  color: #333; /* Optional: Adjust the color as needed */
+}
+.certifications-section {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.certification-item {
+  padding: 5px 10px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.certified {
+  background-color: yellow;
+}
+
+.not-certified {
+  background-color: white;
+}
+
+.certification-item input {
+  margin-right: 10px;
+  accent-color: green;
+}
+/* Add this CSS to your project's stylesheet */
+.variety-box {
+  border: 2px solid yellow; /* Yellow border */
+  padding: 10px 20px; /* Padding for better spacing */
+  text-align: left; /* Center-align text */
+  display: inline-block; /* Prevent full-width display */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Adjust text size */
+  font-weight: 500; /* Slightly bold text */
+  color: black; /* Text color */
+  background-color: white; /* White background */
+}
+
+.checkbox-container {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.custom-checkbox {
+  position: relative;
+}
+
+.custom-checkbox:checked + .form-check-label {
+  background-color: yellow;
+  padding: 5px 10px;
+  border-radius: 5px;
+}

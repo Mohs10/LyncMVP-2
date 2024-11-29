@@ -1,0 +1,40 @@
+{priceDetails && priceDetails.length > 0 ? (
+  priceDetails.map((negotiation) => (
+    <div key={negotiation.snId} className="mb-3">
+      <div className="d-flex justify-content-between align-items-center">
+        <p className="mb-0">
+          <strong>Seller ID:</strong> {negotiation.sellerUId} | 
+          <strong>Negotiation ID:</strong> {negotiation.snId}
+        </p>
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => handleSelectSeller(negotiation.snId)}
+        >
+          {selectedSeller === negotiation.snId ? "Deselect" : "Select"}
+        </button>
+      </div>
+
+      {selectedSeller === negotiation.snId && (
+        <div className="mt-3 p-3 border rounded shadow-sm">
+          <div className="d-flex align-items-center">
+            <input
+              type="number"
+              className="form-control me-2"
+              placeholder="Proposal Final Price"
+              value={proposalPrice}
+              onChange={(e) => setProposalPrice(e.target.value)}
+            />
+            <button
+              className="btn btn-dark"
+              onClick={() => handleProposalSubmit(negotiation.snId)} // Use snId
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  ))
+) : (
+  <p className="text-muted">No negotiations available for this query.</p>
+)}
