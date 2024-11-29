@@ -1,0 +1,199 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Topbar Styling */
+.topbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  background-color: white;
+  box-shadow: 0 4px 2px -2px gray;
+}
+
+/* Sidebar Styling */
+.content-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Sidebar Container */
+.sidebar {
+  background-color: #1E1E1E;
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s ease;
+  z-index: 1056;
+}
+
+.sidebar.collapsed {
+  width: 75px;
+}
+
+/* Logo Section */
+.logo-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.logo-container {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  color: #fff;
+}
+
+/* Navigation Links */
+.nav-link {
+  color: #6b6b6b !important;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-size: 16px;
+  background-color: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link.active {
+  color: #ffffff !important;
+}
+
+.fa-icon {
+  margin-right: 15px;
+}
+
+.sidebar.collapsed .fa-icon {
+  margin-right: 0;
+}
+
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding: 15px 10px;
+}
+
+/* Logout Section */
+.logout-section {
+  margin-top: auto;
+}
+
+/* Middle Content Styling */
+.middle-content {
+  width: 100%;
+  max-width: 800px;
+  max-height: 650px;
+  margin: auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+/* Placeholder Styling */
+.placeholder-custom::placeholder {
+  color: #BDBDBD;
+}
+
+.custom-input::placeholder {
+  color: #BDBDBD !important;
+  opacity: 1;
+}
+
+/* Search Bar Styling */
+.search-bar {
+  width: 500px!important; 
+  margin-right: 120px!important;
+  border: 1px solid #ffcc00; /* Yellow border */
+  border-radius: 5px !important; /* Rounded corners */
+  outline: none;
+  transition: border-color 0.3s;
+  justify-content: center;
+}
+
+/* Search Bar Focus State */
+.search-bar:focus {
+  border-color: #ffcc00; /* Brighten the yellow when focused */
+}
+
+/* Input Group for Search Icon */
+.input-group {
+  position: relative;
+  
+}
+
+.input-group-text.search-icon {
+  background-color: transparent;
+  border: none;
+  color: #333; /* Icon color */
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  /* Adjust Search Bar for Small Screens */
+  .search-bar {
+    width: 200px; /* Reduce size for small screens */
+  }
+
+  /* Adjust Sidebar for Small Screens */
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
+  }
+
+  /* Adjust the Topbar layout for mobile */
+  .topbar {
+    padding: 10px;
+  }
+
+  .middle-content {
+    max-width: 100%;
+    padding: 15px;
+    box-shadow: none;
+  }
+}
+.navbar .container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  margin-right: auto; /* Push the brand to the left */
+}
+

@@ -1,0 +1,138 @@
+.filter-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden; /* Hide the scrollbar of the container */
+  width: 90%;
+  border: none;
+}
+
+.scroll-container {
+  display: flex;
+  /* gap: 2px !important; Space between buttons */
+  /* padding: 5px 0; */
+  flex-shrink: 0;
+  width: max-content; /* Allow container to expand based on content */
+  overflow-x: auto; /* Allow horizontal scrolling */
+  scroll-behavior: smooth; /* Smooth scroll */
+  scrollbar-width: thin; /* Hide scrollbar in Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+  height: 8px; /* Show scrollbar when needed */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #888; /* Style the scrollbar thumb */
+  border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Change thumb color on hover */
+}
+
+.filter-btn {
+  background-color: white;
+  color: black;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  white-space: nowrap;
+  border: none;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.filter-btn:hover {
+  color: #030303;
+  text-shadow: 0 0 5px #fdd835, 0 0 10px #fdd835, 0 0 15px #fdd835, 0 0 20px #fdd835;
+}
+
+/* .scroll-container {
+  display: flex; 
+  overflow-x: auto;
+  scroll-behavior: smooth; 
+  white-space: nowrap; 
+  width: 100%;
+  scrollbar-width: none;
+} */
+
+/* .scroll-arrow {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 10;
+} */
+
+/* .scroll-arrow.left {
+  position: absolute;
+  left: 0;
+}
+
+.scroll-arrow.right {
+  position: absolute;
+  right: 0;
+} */
+.scroll-container {
+  display: flex; /* Make it a flex container */
+  overflow-x: auto;
+  scroll-behavior: smooth; /* Smooth scrolling behavior */
+  white-space: nowrap; /* Ensure the items do not wrap to the next line */
+  width: calc(100% - 50px); /* Adjust width to leave space for arrows */
+  margin: 0 auto; /* Center the container */
+  /* padding: 0 30px; Add padding to prevent overlap with arrows */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.scroll-arrow {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scroll-arrow.left {
+  left: 0;
+}
+
+.scroll-arrow.right {
+  right: 0;
+}
+
+
+.scroll-arrow:hover {
+  color: #000;
+}
+
+/* Show scrollbar only when hovering over the container */
+.filter-buttons:hover .scroll-container::-webkit-scrollbar {
+  height: 8px; /* Show scrollbar when hovering */
+}
+
+
+   /* Product Cards */
+   .product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  @keyframes glow {
+    0% {
+      text-shadow: 0 0 5px #fdd835, 0 0 10px #fdd835, 0 0 15px #fdd835, 0 0 20px #fdd835,
+        0 0 25px #fdd835, 0 0 30px #fdd835, 0 0 35px #fdd835;
+    }
+    100% {
+      text-shadow: 0 0 5px #fdd835, 0 0 10px #fdd835, 0 0 15px #fdd835, 0 0 20px #fdd835,
+        0 0 25px #fdd835, 0 0 30px #fdd835, 0 0 35px #fdd835;
+    }
+  }
+  
