@@ -66,7 +66,7 @@ const ViewProduct = () => {
 
   if (loading) return <p>Loading product details...</p>;
   if (errorMessage) return <p className="text-danger">{errorMessage}</p>;
-
+//div
   return (
     <div className="d-flex flex-column">
       <Topbar title="View Product" userName="Neha Sharma" showSearchBar={false} />
