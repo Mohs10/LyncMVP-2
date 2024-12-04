@@ -359,7 +359,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     }
 
 
-    private SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer) {
+    public SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer) {
         if (sellerBuyer == null) {
             return null; // Handle null input
         }

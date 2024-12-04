@@ -68,7 +68,7 @@ public class SellerController {
 
     @GetMapping("/details")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<SellerBuyer> sellerDetails() {
+    public ResponseEntity<SellerBuyerDTO> sellerDetails() {
         // Get the Authentication object
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Get the username from the Authentication object
@@ -78,9 +78,10 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        SellerBuyerDTO sellerBuyerDTO = sellerBuyerService.convertToSellerBuyerDTO(sellerDetails);
 
         // Return the seller details wrapped in ResponseEntity
-        return ResponseEntity.ok(sellerDetails);
+        return ResponseEntity.ok(sellerBuyerDTO);
     }
 
 

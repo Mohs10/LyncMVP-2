@@ -62,7 +62,7 @@ public class BuyerController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<SellerBuyer> buyerDetails() {
+    public ResponseEntity<SellerBuyerDTO> buyerDetails() {
         // Get the Authentication object
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -79,8 +79,10 @@ public class BuyerController {
                 new RuntimeException("Buyer details not found for email: " + username)
         );
 
+        SellerBuyerDTO sellerBuyerDTO = sellerBuyerService.convertToSellerBuyerDTO(sellerDetails);
+
         // Return the seller details wrapped in ResponseEntity
-        return ResponseEntity.ok(sellerDetails);
+        return ResponseEntity.ok(sellerBuyerDTO);
     }
 
     @PutMapping(value = "/editUser")
