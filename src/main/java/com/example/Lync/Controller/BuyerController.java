@@ -62,7 +62,7 @@ public class BuyerController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<SellerBuyer> buyerDetails() {
+    public ResponseEntity<SellerBuyerDTO> buyerDetails() {
         // Get the Authentication object
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -79,11 +79,29 @@ public class BuyerController {
                 new RuntimeException("Buyer details not found for email: " + username)
         );
 
+        SellerBuyerDTO sellerBuyerDTO = sellerBuyerService.convertToSellerBuyerDTO(sellerDetails);
+
         // Return the seller details wrapped in ResponseEntity
-        return ResponseEntity.ok(sellerDetails);
+        return ResponseEntity.ok(sellerBuyerDTO);
     }
 
+    @PutMapping(value = "/editUser")
+    @PreAuthorize("hasAuthority('ROLE_BUYER')")
 
+    public ResponseEntity<String> editUserDetails(@RequestBody SellerBuyerDTO sellerBuyerDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the username from the Authentication object
+        String username = authentication.getName();
+
+        // Fetch SellerBuyer details based on email (username)
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        sellerBuyerService.editSellerBuyer(sellerDetails.getUserId(), sellerBuyerDTO);
+        System.out.println(sellerBuyerDTO);
+        return ResponseEntity.ok("User Details Edited Successfully");
+    }
 
 
 

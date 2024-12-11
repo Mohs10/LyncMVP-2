@@ -66,7 +66,7 @@ public class ProductController {
 
     @PostMapping("/uploadProductImage/{productId}")
     public ResponseEntity<String> uploadProductImage(@PathVariable Long productId,
-                                                     @RequestParam("productImage") MultipartFile productImage) throws IOException {
+                                                     @RequestParam("productImage") MultipartFile productImage)  {
 
         System.out.println("HereImage");
         try {
@@ -234,18 +234,11 @@ public class ProductController {
     public ResponseEntity<Product> editProduct(@PathVariable("productId") Long productId,
                                                @RequestBody ProductDTO productDTO) throws Exception {
 
-        // Retrieve the existing product from the database
-        Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-//        // Update the product details based on the incoming ProductDTO
-//        if (productImage != null && !productImage.isEmpty()) {
-//            // If a new image is uploaded, set it
-//            productDTO.setProductImage(productImage);
-//        }
+        // Call the service layer to update the productbbb
+        Product updatedProduct = productService.editProduct(productId,productDTO);
 
-        // Call the service layer to update the product
-        Product updatedProduct = productService.editProduct(existingProduct, productDTO);
+        System.out.println(updatedProduct);
 
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);  // Return the updated product
     }
