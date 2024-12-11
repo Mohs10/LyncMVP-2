@@ -26,20 +26,25 @@ public class SampleOrderDTO {
     private String productFormName;
     private Long productVarietyId;
     private String varietyName;
+    // Product image
+    private String productImageUrl;
 
     private Double buyerQuantity;
+    private String buyerUnit;
     private Long buyerAddressId;
     private Double buyerAmount;
     private LocalDate buyerRequestDate;
     private LocalTime buyerRequestTime;
 
     private String adminSendQtyToSeller;
+    private String adminUnit;
     private Long adminAddressId;
+    private LocalDate adminEDDToSeller;
     private LocalDate adminSendToSellerDate;
     private LocalTime adminSendToSellerTime;
-
-    private LocalDate sellerRespondDate;
-    private LocalTime sellerRespondTime;
+//
+//    private LocalDate sellerRespondDate;
+//    private LocalTime sellerRespondTime;
 
     private LocalDate sellerPackagingDate;
     private LocalTime sellerPackagingTime;

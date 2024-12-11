@@ -26,6 +26,9 @@ public class InquiryDTO {
     private String productName;
     private String FormName;
     private String varietyName;
+    // Product image
+    private String productImageUrl;
+
 
     //Order Specification
     private Double quantity;
@@ -53,13 +56,13 @@ public class InquiryDTO {
     private LocalDate specifyDeliveryDate;
 
     //Product Specification
-    private Double chalkyGrains;
-    private String grainSize;
-    private Double kettValue;
-    private Double moistureContent;
-    private String brokenGrain;
-    private String admixing;
-    private String dd;
+//    private Double chalkyGrains;
+//    private String grainSize;
+//    private Double kettValue;
+//    private Double moistureContent;
+//    private String brokenGrain;
+//    private String admixing;
+//    private String dd;
 
     private LocalDate raiseDate = LocalDate.now();
     private LocalTime raiseTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);

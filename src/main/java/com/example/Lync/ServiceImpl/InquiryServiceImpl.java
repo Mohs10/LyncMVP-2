@@ -1,5 +1,6 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
 import com.example.Lync.Repository.*;
@@ -33,6 +34,7 @@ public class InquiryServiceImpl implements InquiryService {
     private FormRepository formRepository;
     private VarietyRepository varietyRepository;
     private InquirySpecificationRepository inquirySpecificationRepository;
+    private  S3Service s3Service;
 
     private final Map<String, Inquiry> inquiryQIdCache = new HashMap<>();
 
@@ -1055,14 +1057,28 @@ public class InquiryServiceImpl implements InquiryService {
 
     //Admin checks all sellers selling a particular product
     @Override
-    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId) {
-        List<SellerProduct> sellerProducts = sellerProductRepository
-                .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
-        List<SellerProductDTO> productDTOS = sellerProducts.stream()
+    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
+        List<SellerProduct> sellerProducts = new ArrayList<>();
+        sellerProducts = sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
+
+        if(sellerProducts.isEmpty()) {
+            sellerProducts = sellerProductRepository
+                    .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
+        }
+        if(sellerProducts.isEmpty()){
+            sellerProducts = sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId);
+        }
+
+        if(sellerProducts.isEmpty()){
+            sellerProducts = sellerProductRepository.findByPId(productId);
+        }
+
+        return sellerProducts.stream()
                 .map(sellerBuyerService::toDTO) // Method reference
                 .collect(Collectors.toList());
 
-//        for(SellerProduct sellerProduct : sellerProducts){
+    }
+    //        for(SellerProduct sellerProduct : sellerProducts){
 //            SellerProductDTO dto = new SellerProductDTO();
 //            Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found with ID :" + productId));
 //            SellerBuyer sellerBuyer = sellerBuyerRepository.findById(sellerProduct.getSellerId()).orElseThrow(() -> new RuntimeException("Seller not found with ID: " + sellerProduct.getSellerId()));
@@ -1079,8 +1095,6 @@ public class InquiryServiceImpl implements InquiryService {
 //
 //            productDTOS.add(dto);
 //        }
-        return productDTOS;
-    }
 
 
     @Override
@@ -1458,18 +1472,19 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrder.setSoId(soId);
         sampleOrder.setQId(qId);
         sampleOrder.setBuyerUId(inquiry.getBuyerId());
-//        sampleOrder.setSellerUId(inquiry.getSellerUId());
+//        sampleOrder.setSellerUId(inquiry.getSellerUId()); //excluded because; without admin send SO to seller, seller will get notified of the SO.
 
         sampleOrder.setProductId(inquiry.getProductId());
         sampleOrder.setProductFormId(inquiry.getProductFormId());
         sampleOrder.setProductVarietyId(inquiry.getProductVarietyId());
 
         sampleOrder.setBuyerQuantity(sampleOrderDTO.getBuyerQuantity());
+        sampleOrder.setBuyerUnit(sampleOrderDTO.getBuyerUnit());
         sampleOrder.setBuyerAddressId(sampleOrderDTO.getBuyerAddressId());
         sampleOrder.setBuyerAmount(sampleOrderDTO.getBuyerAmount());
         sampleOrder.setBuyerRequestDate(LocalDate.now());
         sampleOrder.setBuyerRequestTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Buyer Requested for Sample");
+        sampleOrder.setCurrentStatus("Buyer Requested for Sample");
         sampleOrderRepository.save(sampleOrder);
 
         orderStatus.setOId(qId);
@@ -1511,11 +1526,16 @@ public class InquiryServiceImpl implements InquiryService {
                             .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
 
                     sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
+                    sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
                     sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
                     sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
+
                     sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
                     sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
-                    sampleOrderDTO.setStatus(sampleOrder.getStatus());
+
+
+
+                    sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
                 return sampleOrderDTO;
                 })
@@ -1552,11 +1572,44 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
 
         sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
+        sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
         sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
         sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
         sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
         sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
-        sampleOrderDTO.setStatus(sampleOrder.getStatus());
+
+        sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
+        sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
+        sampleOrderDTO.setAdminEDDToSeller(sampleOrder.getAdminEDDToSeller());
+//
+//        sampleOrderDTO.setSellerRespondDate(sampleOrder.getSellerRespondDate());
+//        sampleOrderDTO.setSellerRespondTime(sampleOrder.getSellerRespondTime());
+
+        sampleOrderDTO.setSellerPackagingDate(sampleOrder.getSellerPackagingDate());
+        sampleOrderDTO.setSellerPackagingTime(sampleOrder.getSellerPackagingTime());
+
+        sampleOrderDTO.setSellerDispatchDate(sampleOrder.getSellerDispatchDate());
+        sampleOrderDTO.setSellerDispatchTime(sampleOrder.getSellerDispatchTime());
+
+        sampleOrderDTO.setAdminReceiveDate(sampleOrder.getAdminReceiveDate());
+        sampleOrderDTO.setAdminReceiveTime(sampleOrder.getAdminReceiveTime());
+
+        sampleOrderDTO.setAdminProcessingDate(sampleOrder.getAdminProcessingDate());
+        sampleOrderDTO.setAdminProcessingTime(sampleOrder.getAdminProcessingTime());
+
+        sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
+        sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
+
+        sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
+        sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
+
+        sampleOrderDTO.setBuyerApproveDate(sampleOrder.getBuyerApproveDate());
+        sampleOrderDTO.setBuyerApproveTime(sampleOrder.getBuyerApproveTime());
+
+        sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
+        sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
+
+        sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
 
         return sampleOrderDTO;
@@ -1610,9 +1663,7 @@ public class InquiryServiceImpl implements InquiryService {
                     sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
                     sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
 
-                    sampleOrderDTO.setSellerRespondDate(sampleOrder.getSellerRespondDate());
-                    sampleOrderDTO.setSellerRespondTime(sampleOrder.getSellerRespondTime());
-                    sampleOrderDTO.setStatus(sampleOrder.getStatus());
+                    sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
                     return sampleOrderDTO;
                 })
@@ -1657,20 +1708,129 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
 
         sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
+        sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
         sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
         sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
         sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
         sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
 
         sampleOrderDTO.setAdminSendQtyToSeller(sampleOrder.getAdminSendQtyToSeller());
+        sampleOrderDTO.setAdminUnit(sampleOrder.getAdminUnit());
         sampleOrderDTO.setAdminAddressId(sampleOrder.getAdminAddressId());
+        sampleOrderDTO.setAdminEDDToSeller(sampleOrder.getAdminEDDToSeller());
+        sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
+        sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
+//
+//        sampleOrderDTO.setSellerRespondDate(sampleOrder.getSellerRespondDate());
+//        sampleOrderDTO.setSellerRespondTime(sampleOrder.getSellerRespondTime());
+
+        sampleOrderDTO.setSellerPackagingDate(sampleOrder.getSellerPackagingDate());
+        sampleOrderDTO.setSellerPackagingTime(sampleOrder.getSellerPackagingTime());
+
+        sampleOrderDTO.setSellerDispatchDate(sampleOrder.getSellerDispatchDate());
+        sampleOrderDTO.setSellerDispatchTime(sampleOrder.getSellerDispatchTime());
+
+        sampleOrderDTO.setAdminReceiveDate(sampleOrder.getAdminReceiveDate());
+        sampleOrderDTO.setAdminReceiveTime(sampleOrder.getAdminReceiveTime());
+
+        sampleOrderDTO.setAdminProcessingDate(sampleOrder.getAdminProcessingDate());
+        sampleOrderDTO.setAdminProcessingTime(sampleOrder.getAdminProcessingTime());
+
+        sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
+        sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
+
+        sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
+        sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
+
+        sampleOrderDTO.setBuyerApproveDate(sampleOrder.getBuyerApproveDate());
+        sampleOrderDTO.setBuyerApproveTime(sampleOrder.getBuyerApproveTime());
+
+        sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
+        sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
+
+        sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
+
+        return sampleOrderDTO;
+    }
+
+    @Override
+    public SampleOrderDTO adminGetsSampleOrderByQId(String qId) {
+
+        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Sample Order not found with given qId:" + qId));
+
+        SampleOrderDTO sampleOrderDTO = new SampleOrderDTO();
+
+        sampleOrderDTO.setSoId(sampleOrder.getSoId());
+        sampleOrderDTO.setQId(sampleOrder.getQId());
+        sampleOrderDTO.setBuyerUId(sampleOrder.getBuyerUId());
+        sampleOrderDTO.setSellerUId(sampleOrder.getSellerUId());
+        String buyerName = sellerBuyerRepository.findById(sampleOrder.getBuyerUId())
+                .orElseThrow(() -> new RuntimeException("Buyer not found with Id : " + sampleOrder.getBuyerUId()))
+                .getFullName();
+        sampleOrderDTO.setBuyerName(buyerName);
+        if (sampleOrder.getSellerUId() != null) {
+            String sellerName = sellerBuyerRepository.findById(sampleOrder.getSellerUId())
+                    .orElseThrow(() -> new RuntimeException("Seller not found with Id: " + sampleOrder.getSellerUId()))
+                    .getFullName();
+            sampleOrderDTO.setSellerName(sellerName);
+        } else {
+            sampleOrderDTO.setSellerName("N/A"); // Default or fallback value
+        }
+
+        Product product = productRepository.findById(sampleOrder.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found for ID: " + sampleOrder.getProductId()));
+
+        sampleOrderDTO.setProductId(sampleOrder.getProductId());
+        sampleOrderDTO.setProductName(product.getProductName());
+        sampleOrderDTO.setProductFormId(sampleOrder.getProductFormId());
+        sampleOrderDTO.setProductFormName(product.getForms().stream()
+                .filter(form -> form.getFormId().equals(sampleOrder.getProductFormId())).findFirst()
+                .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + sampleOrder.getProductFormId())).getFormName());
+        sampleOrderDTO.setProductVarietyId(sampleOrder.getProductVarietyId());
+        sampleOrderDTO.setVarietyName(product.getVarieties().stream()
+                .filter(variety -> variety.getVarietyId().equals(sampleOrder.getProductVarietyId())).findFirst()
+                .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
+
+        sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
+        sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
+        sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
+        sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
+        sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
+        sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
+
+        sampleOrderDTO.setAdminSendQtyToSeller(sampleOrder.getAdminSendQtyToSeller());
+        sampleOrderDTO.setAdminUnit(sampleOrder.getAdminUnit());
+        sampleOrderDTO.setAdminAddressId(sampleOrder.getAdminAddressId());
+        sampleOrderDTO.setAdminEDDToSeller(sampleOrder.getAdminEDDToSeller());
         sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
         sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
 
-        sampleOrderDTO.setSellerRespondDate(sampleOrder.getSellerRespondDate());
-        sampleOrderDTO.setSellerRespondTime(sampleOrder.getSellerRespondTime());
-        sampleOrderDTO.setStatus(sampleOrder.getStatus());
+        sampleOrderDTO.setSellerPackagingDate(sampleOrder.getSellerPackagingDate());
+        sampleOrderDTO.setSellerPackagingTime(sampleOrder.getSellerPackagingTime());
 
+        sampleOrderDTO.setSellerDispatchDate(sampleOrder.getSellerDispatchDate());
+        sampleOrderDTO.setSellerDispatchTime(sampleOrder.getSellerDispatchTime());
+
+        sampleOrderDTO.setAdminReceiveDate(sampleOrder.getAdminReceiveDate());
+        sampleOrderDTO.setAdminReceiveTime(sampleOrder.getAdminReceiveTime());
+
+        sampleOrderDTO.setAdminProcessingDate(sampleOrder.getAdminProcessingDate());
+        sampleOrderDTO.setAdminProcessingTime(sampleOrder.getAdminProcessingTime());
+
+        sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
+        sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
+
+        sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
+        sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
+
+        sampleOrderDTO.setBuyerApproveDate(sampleOrder.getBuyerApproveDate());
+        sampleOrderDTO.setBuyerApproveTime(sampleOrder.getBuyerApproveTime());
+
+        sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
+        sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
+
+        sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
         return sampleOrderDTO;
     }
 
@@ -1684,9 +1844,10 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrder.setSellerUId(inquiry.getSellerUId());
         sampleOrder.setAdminSendQtyToSeller(sampleOrderDTO.getAdminSendQtyToSeller());
         sampleOrder.setAdminAddressId(sampleOrderDTO.getAdminAddressId());
+        sampleOrder.setAdminEDDToSeller(sampleOrderDTO.getAdminEDDToSeller());
         sampleOrder.setAdminSendToSellerDate(LocalDate.now());
         sampleOrder.setAdminSendToSellerTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Admin forwarded the sample request to seller.");
+        sampleOrder.setCurrentStatus("Admin forwarded the sample request to seller.");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1768,59 +1929,96 @@ public class InquiryServiceImpl implements InquiryService {
                 .filter(variety -> variety.getVarietyId().equals(sampleOrder.getProductVarietyId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
 
+        String imageUrl = null;
+        if (product.getProductImageUrl() != null) {
+            imageUrl = s3Service.getProductImagePresignedUrl(product.getProductImageUrl());
+        }
+        sampleOrderDTO.setProductImageUrl(imageUrl);
+
+        sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
+        sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
+
         sampleOrderDTO.setAdminSendQtyToSeller(sampleOrder.getAdminSendQtyToSeller());
+        sampleOrderDTO.setAdminUnit(sampleOrder.getAdminUnit());
         sampleOrderDTO.setAdminAddressId(sampleOrder.getAdminAddressId());
+        sampleOrderDTO.setAdminEDDToSeller(sampleOrder.getAdminEDDToSeller());
         sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
         sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
 
-        return  sampleOrderDTO;
+        sampleOrderDTO.setSellerPackagingDate(sampleOrder.getSellerPackagingDate());
+        sampleOrderDTO.setSellerPackagingTime(sampleOrder.getSellerPackagingTime());
+
+        sampleOrderDTO.setSellerDispatchDate(sampleOrder.getSellerDispatchDate());
+        sampleOrderDTO.setSellerDispatchTime(sampleOrder.getSellerDispatchTime());
+
+        sampleOrderDTO.setAdminReceiveDate(sampleOrder.getAdminReceiveDate());
+        sampleOrderDTO.setAdminReceiveTime(sampleOrder.getAdminReceiveTime());
+
+        sampleOrderDTO.setAdminProcessingDate(sampleOrder.getAdminProcessingDate());
+        sampleOrderDTO.setAdminProcessingTime(sampleOrder.getAdminProcessingTime());
+
+        sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
+        sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
+
+        sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
+        sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
+
+        sampleOrderDTO.setBuyerApproveDate(sampleOrder.getBuyerApproveDate());
+        sampleOrderDTO.setBuyerApproveTime(sampleOrder.getBuyerApproveTime());
+
+        sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
+        sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
+
+        sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
+
+        return sampleOrderDTO;
     }
 
-    @Override
-    public String sellerApproveSampleOrder(String soId, String sellerUId) {
-
-        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
-                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
-
-        sampleOrder.setSellerRespondDate(LocalDate.now());
-        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Seller Accepted the sample Order");
-        sampleOrderRepository.save(sampleOrder);
-
-        OrderStatus orderStatus = new OrderStatus();
-        orderStatus.setOId(sampleOrder.getQId());
-        orderStatus.setStatus(statusRepository.findSMeaningBySId(9L));
-        orderStatusRepository.save(orderStatus);
-
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
-                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
-        inquiry.setOsId(orderStatus.getOsId());
-        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(9L));
-        inquiryRepository.save(inquiry);
-
-        return "You accepted the sample order.";
-    }
-
-    @Override
-    public String sellerDeclineSampleOrder(String soId, String sellerUId) {
-        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
-                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
-        sampleOrder.setSellerRespondDate(LocalDate.now());
-        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Seller Declined the sample Order");
-
-        OrderStatus orderStatus = new OrderStatus();
-        orderStatus.setOId(sampleOrder.getQId());
-        orderStatus.setStatus(statusRepository.findSMeaningBySId(10L));
-        orderStatusRepository.save(orderStatus);
-
-        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
-                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
-        inquiry.setOsId(orderStatus.getOsId());
-        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(10L));
-        inquiryRepository.save(inquiry);
-        return "You declined the sample order.";
-    }
+//    @Override
+//    public String sellerApproveSampleOrder(String soId, String sellerUId) {
+//
+//        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
+//                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
+//
+//        sampleOrder.setSellerRespondDate(LocalDate.now());
+//        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+//        sampleOrder.setCurrentStatus("Seller Accepted the sample Order");
+//        sampleOrderRepository.save(sampleOrder);
+//
+//        OrderStatus orderStatus = new OrderStatus();
+//        orderStatus.setOId(sampleOrder.getQId());
+//        orderStatus.setStatus(statusRepository.findSMeaningBySId(9L));
+//        orderStatusRepository.save(orderStatus);
+//
+//        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
+//        inquiry.setOsId(orderStatus.getOsId());
+//        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(9L));
+//        inquiryRepository.save(inquiry);
+//
+//        return "You accepted the sample order.";
+//    }
+//
+//    @Override
+//    public String sellerDeclineSampleOrder(String soId, String sellerUId) {
+//        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
+//                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
+//        sampleOrder.setSellerRespondDate(LocalDate.now());
+//        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+//        sampleOrder.setCurrentStatus("Seller Declined the sample Order");
+//
+//        OrderStatus orderStatus = new OrderStatus();
+//        orderStatus.setOId(sampleOrder.getQId());
+//        orderStatus.setStatus(statusRepository.findSMeaningBySId(10L));
+//        orderStatusRepository.save(orderStatus);
+//
+//        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
+//        inquiry.setOsId(orderStatus.getOsId());
+//        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(10L));
+//        inquiryRepository.save(inquiry);
+//        return "You declined the sample order.";
+//    }
 
     @Override
     public String sellerPackagingSample(String soId, String sellerUId) {
@@ -1830,7 +2028,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setSellerPackagingDate(LocalDate.now());
         sampleOrder.setSellerPackagingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Seller Packaging the sample Order");
+        sampleOrder.setCurrentStatus("Seller Packaging the sample Order");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1854,7 +2052,7 @@ public class InquiryServiceImpl implements InquiryService {
 
             sampleOrder.setSellerDispatchDate(LocalDate.now());
             sampleOrder.setSellerDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-            sampleOrder.setStatus("Seller Dispatched the sample Order");
+            sampleOrder.setCurrentStatus("Seller Dispatched the sample Order");
             sampleOrderRepository.save(sampleOrder);
 
             OrderStatus orderStatus = new OrderStatus();
@@ -1877,7 +2075,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setAdminReceiveDate(LocalDate.now());
         sampleOrder.setAdminReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Admin Received the Sample");
+        sampleOrder.setCurrentStatus("Admin Received the Sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1901,7 +2099,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setAdminProcessingDate(LocalDate.now());
         sampleOrder.setAdminProcessingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Admin Processed the sample");
+        sampleOrder.setCurrentStatus("Admin Processed the sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1924,7 +2122,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setAdminDispatchDate(LocalDate.now());
         sampleOrder.setAdminDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Admin dispatched the sample");
+        sampleOrder.setCurrentStatus("Admin dispatched the sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1947,7 +2145,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setBuyerReceiveDate(LocalDate.now());
         sampleOrder.setBuyerReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Buyer received the sample");
+        sampleOrder.setCurrentStatus("Buyer received the sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1970,7 +2168,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setBuyerApproveDate(LocalDate.now());
         sampleOrder.setBuyerApproveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Buyer approved the sample");
+        sampleOrder.setCurrentStatus("Buyer approved the sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();
@@ -1993,7 +2191,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setBuyerRejectDate(LocalDate.now());
         sampleOrder.setBuyerRejectTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setStatus("Buyer rejected the sample");
+        sampleOrder.setCurrentStatus("Buyer rejected the sample");
         sampleOrderRepository.save(sampleOrder);
 
         OrderStatus orderStatus = new OrderStatus();

@@ -204,8 +204,11 @@ public class AdminController {
     @GetMapping("/sellerSellingProduct/{productId}/{productFormId}/{productVarietyId}")
     public ResponseEntity<List<SellerProductDTO>> sellersSellingProducts(@PathVariable Long productId,
                                                                          @PathVariable Long productFormId,
-                                                                         @PathVariable Long productVarietyId){
-        return ResponseEntity.ok(inquiryService.sellersSellingProduct(productId, productFormId, productVarietyId));
+                                                                         @PathVariable Long productVarietyId,
+                                            @RequestParam(required = false) List<String> specificationNames){
+        List<SellerProductDTO> sellerProductDTOList = inquiryService
+                .sellersSellingProduct(productId, productFormId, productVarietyId, specificationNames != null ? specificationNames : List.of());
+        return ResponseEntity.ok(sellerProductDTOList);
     }
 
     @PostMapping("/sendFinalPrice/{snId}")
@@ -250,6 +253,11 @@ public class AdminController {
     @GetMapping("/adminSampleOrderById/{soId}")
     public ResponseEntity<SampleOrderDTO> adminSampleOrder(@PathVariable String soId){
         return ResponseEntity.ok(inquiryService.adminGetsSampleOrderById(soId));
+    }
+
+    @GetMapping("/adminSampleOrderByQId/{qId}")
+    public ResponseEntity<SampleOrderDTO> adminSampleOrderByQId(@PathVariable String qId){
+        return ResponseEntity.ok(inquiryService.adminGetsSampleOrderByQId(qId));
     }
 
     @PostMapping("/adminSendSampleOrderToSeller/{soId}")

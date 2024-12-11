@@ -22,5 +22,4 @@ public class InquirySpecification {
     private String specificationValue;
     private String specificationValueUnits;
 
-
 }

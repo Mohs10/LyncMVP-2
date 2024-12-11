@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Data
@@ -27,18 +26,21 @@ public class SampleOrder {
     private Long productVarietyId;
 
     private Double buyerQuantity;
+    private String buyerUnit;
     private Long buyerAddressId;
     private Double buyerAmount;
     private LocalDate buyerRequestDate;
     private LocalTime buyerRequestTime;
 
     private String adminSendQtyToSeller;
+    private String adminUnit;
     private Long adminAddressId;
+    private LocalDate adminEDDToSeller;
     private LocalDate adminSendToSellerDate;
     private LocalTime adminSendToSellerTime;
-
-    private LocalDate sellerRespondDate;
-    private LocalTime sellerRespondTime;
+//
+//    private LocalDate sellerRespondDate;
+//    private LocalTime sellerRespondTime;
 
     private LocalDate sellerPackagingDate;
     private LocalTime sellerPackagingTime;
@@ -63,5 +65,5 @@ public class SampleOrder {
 
     private LocalDate buyerRejectDate;
     private LocalTime buyerRejectTime;
-    private String status;
+    private String currentStatus;
 }

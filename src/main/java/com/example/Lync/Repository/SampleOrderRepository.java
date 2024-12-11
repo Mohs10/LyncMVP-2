@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface SampleOrderRepository extends JpaRepository<SampleOrder, String> {
     @Query("SELECT COUNT(s) FROM SampleOrder s WHERE s.buyerRequestDate= :currentDate")
@@ -17,5 +18,8 @@ public interface SampleOrderRepository extends JpaRepository<SampleOrder, String
 
     @Query("SELECT s FROM SampleOrder s WHERE s.sellerUId = :sellerUId")
     List<SampleOrder> findAllBySellerUId(@Param("sellerUId") String sellerUId);
+
+    @Query("SELECT so FROM SampleOrder so WHERE so.qId = :qId")
+    Optional<SampleOrder> findByQId(@Param("qId") String qId);
 
 }

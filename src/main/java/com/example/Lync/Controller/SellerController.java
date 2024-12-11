@@ -355,28 +355,28 @@ public class SellerController {
         );
         return ResponseEntity.ok(inquiryService.sellerGetsSampleOrderById(soId, sellerDetails.getUserId()));
     }
-
-    @PostMapping("/sellerApproveSampleOrder/{soId}")
-    public ResponseEntity<String> approveSampleOrder(@PathVariable String soId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
-                new RuntimeException("SellerBuyer details not found for email: " + username)
-        );
-        String s = inquiryService.sellerApproveSampleOrder(soId, sellerDetails.getUserId());
-        return ResponseEntity.ok(s);
-    }
-
-    @PostMapping("/sellerDeclineSampleOrder/{soId}")
-    public ResponseEntity<String> declineSampleOrder(@PathVariable String soId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
-                new RuntimeException("SellerBuyer details not found for email: " + username)
-        );
-        String message = inquiryService.sellerDeclineSampleOrder(soId, sellerDetails.getUserId());
-        return ResponseEntity.ok(message);
-    }
+//
+//    @PostMapping("/sellerApproveSampleOrder/{soId}")
+//    public ResponseEntity<String> approveSampleOrder(@PathVariable String soId){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+//                new RuntimeException("SellerBuyer details not found for email: " + username)
+//        );
+//        String s = inquiryService.sellerApproveSampleOrder(soId, sellerDetails.getUserId());
+//        return ResponseEntity.ok(s);
+//    }
+//
+//    @PostMapping("/sellerDeclineSampleOrder/{soId}")
+//    public ResponseEntity<String> declineSampleOrder(@PathVariable String soId){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+//                new RuntimeException("SellerBuyer details not found for email: " + username)
+//        );
+//        String message = inquiryService.sellerDeclineSampleOrder(soId, sellerDetails.getUserId());
+//        return ResponseEntity.ok(message);
+//    }
 
     @PostMapping("/sellerPackagingSample/{soId}")
     public ResponseEntity<String> packagingSample(@PathVariable String soId){

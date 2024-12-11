@@ -23,7 +23,7 @@ public interface InquiryService {
 
     String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO); //Admin send inquiry to seller
 
-    List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId); //Admin gets particular product's sellers.
+    List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames); //Admin gets particular product's sellers.
 
     List<SellerReceiveInquiryDTO> sellerAllInquiries(String sellerUId); //Seller all inquiries
 
@@ -77,15 +77,17 @@ public interface InquiryService {
 
     SampleOrderDTO adminGetsSampleOrderById(String soId);
 
+    SampleOrderDTO adminGetsSampleOrderByQId(String qId);
+
     String adminSendsSampleOrderToSeller(String soId, SampleOrderDTO sampleOrderDTO) throws Exception;
 
     List<SampleOrderDTO> sellerGetsAllSampleOrders(String sellerUId);
 
     SampleOrderDTO sellerGetsSampleOrderById(String soId, String sellerUId);
-
-    String sellerApproveSampleOrder(String soId, String sellerUId);
-
-    String sellerDeclineSampleOrder(String soId, String sellerUId);
+//
+//    String sellerApproveSampleOrder(String soId, String sellerUId);
+//
+//    String sellerDeclineSampleOrder(String soId, String sellerUId);
 
     String sellerPackagingSample(String soId, String sellerUId);
 
