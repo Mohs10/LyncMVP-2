@@ -1456,11 +1456,19 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception {
 
+        // Check if a SampleOrder already exists for the given qId and buyerUId
+        boolean exists = sampleOrderRepository.existsByQIdAndBuyerUId(qId, buyerUId);
+        if (exists) {
+            throw new RuntimeException("Buyer already Requested for sample for this Inquiry.");
+        }
+
         SampleOrder sampleOrder = new SampleOrder();
         OrderStatus orderStatus = new OrderStatus();
 
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+
+
 
         LocalDate currentDate = LocalDate.now();
 
@@ -1843,6 +1851,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setSellerUId(inquiry.getSellerUId());
         sampleOrder.setAdminSendQtyToSeller(sampleOrderDTO.getAdminSendQtyToSeller());
+        sampleOrder.setAdminUnit(sampleOrderDTO.getAdminUnit());
         sampleOrder.setAdminAddressId(sampleOrderDTO.getAdminAddressId());
         sampleOrder.setAdminEDDToSeller(sampleOrderDTO.getAdminEDDToSeller());
         sampleOrder.setAdminSendToSellerDate(LocalDate.now());
