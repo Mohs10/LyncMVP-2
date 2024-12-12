@@ -145,9 +145,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getAllProducts() {
 
-        Product product =productRepository.findById(20241128617901L).get();
 
-        System.out.println(product);
 
         return productRepository.findByActiveProductTrue().stream().map(this::toDTO) // Using helper method
                 .collect(Collectors.toList());
@@ -416,9 +414,6 @@ public class ProductServiceImpl implements ProductService {
 
     private  ProductDTO toDTO(Product product) {
 
-        if (Long.valueOf(20241128617901L).equals(product.getProductId())) {
-            System.out.println(product);
-        }
 
         ProductDTO dto = new ProductDTO();
 
