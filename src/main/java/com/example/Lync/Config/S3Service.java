@@ -579,9 +579,9 @@ public class S3Service {
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
 
-    public String uploadPurchaseOrder( MultipartFile file) throws IOException {
+    public String uploadPurchaseOrder(String orderId, MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        String s3Key = "SOPs/Buyer/"+ fileName;
+        String s3Key = "Orders/" + orderId +"/PurchaseOrder/" + fileName;
 
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(bucketName)
@@ -609,9 +609,9 @@ public class S3Service {
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
 
-    public String uploadInvoice(MultipartFile file) throws IOException {
+    public String uploadInvoice(String orderId, MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        String s3Key = "Invoices/Buyer/" + fileName;
+        String s3Key = "Orders/" + orderId +"/Invoices/" + fileName;
 
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(bucketName)
@@ -637,6 +637,9 @@ public class S3Service {
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
+
+
+
 
 
 
