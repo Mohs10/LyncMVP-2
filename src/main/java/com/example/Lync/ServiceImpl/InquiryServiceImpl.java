@@ -1467,9 +1467,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-
-
-
+        
         LocalDate currentDate = LocalDate.now();
 
         Long count = sampleOrderRepository.countSampleOrderByCurrentDate(currentDate);
@@ -1849,6 +1847,10 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
 
+        if(sampleOrder.getSellerUId() != null){ //validation added for, not to send the so to seller 2nd time
+            throw new RuntimeException("Already the Sample Order has been sent to the Seller");
+        }
+
         sampleOrder.setSellerUId(inquiry.getSellerUId());
         sampleOrder.setAdminSendQtyToSeller(sampleOrderDTO.getAdminSendQtyToSeller());
         sampleOrder.setAdminUnit(sampleOrderDTO.getAdminUnit());
@@ -2035,6 +2037,12 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
+        if(sampleOrder.getSellerPackagingDate() != null){
+            throw new RuntimeException("Already you had started packaging the sample");
+        } else if (sampleOrder.getSellerUId() == null) {
+            throw new RuntimeException("Seller is not assigned for the Sample Order");
+        }
+
         sampleOrder.setSellerPackagingDate(LocalDate.now());
         sampleOrder.setSellerPackagingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Seller Packaging the sample Order");
@@ -2059,7 +2067,13 @@ public class InquiryServiceImpl implements InquiryService {
             SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                     .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
-            sampleOrder.setSellerDispatchDate(LocalDate.now());
+            if(sampleOrder.getSellerDispatchDate() != null){
+                throw new RuntimeException("Already you had dispatched the sample");
+            } else if (sampleOrder.getSellerPackagingDate() == null) {
+                throw new RuntimeException("Packaging is pending");
+            }
+
+        sampleOrder.setSellerDispatchDate(LocalDate.now());
             sampleOrder.setSellerDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
             sampleOrder.setCurrentStatus("Seller Dispatched the sample Order");
             sampleOrderRepository.save(sampleOrder);
@@ -2081,6 +2095,12 @@ public class InquiryServiceImpl implements InquiryService {
     public String adminReceivedSample(String soId) {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
+
+        if(sampleOrder.getAdminReceiveDate() != null){
+            throw new RuntimeException("Already you had received the sample");
+        } else if (sampleOrder.getSellerDispatchDate() == null) {
+            throw new RuntimeException("Seller has not sent the sample yet");
+        }
 
         sampleOrder.setAdminReceiveDate(LocalDate.now());
         sampleOrder.setAdminReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -2106,6 +2126,12 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
+        if(sampleOrder.getAdminProcessingDate() != null){
+            throw new RuntimeException("Already you had processed the sample");
+        } else if (sampleOrder.getAdminReceiveDate() == null) {
+            throw new RuntimeException("You did not received the sample yet");
+        }
+
         sampleOrder.setAdminProcessingDate(LocalDate.now());
         sampleOrder.setAdminProcessingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Admin Processed the sample");
@@ -2128,6 +2154,12 @@ public class InquiryServiceImpl implements InquiryService {
     public String adminDispatchToBuyer(String soId) {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
+
+        if(sampleOrder.getAdminDispatchDate() != null){
+            throw new RuntimeException("Already you had dispatched the sample");
+        } else if (sampleOrder.getAdminProcessingDate() == null) {
+            throw new RuntimeException("You did not process the sample yet");
+        }
 
         sampleOrder.setAdminDispatchDate(LocalDate.now());
         sampleOrder.setAdminDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -2152,6 +2184,12 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
+        if(sampleOrder.getBuyerReceiveDate() != null){
+            throw new RuntimeException("Already you had received the sample");
+        } else if (sampleOrder.getAdminDispatchDate() == null) {
+            throw new RuntimeException("Admin did not dispatch the sample yet");
+        }
+
         sampleOrder.setBuyerReceiveDate(LocalDate.now());
         sampleOrder.setBuyerReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer received the sample");
@@ -2175,6 +2213,14 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
+        if(sampleOrder.getBuyerReceiveDate() == null){
+            throw new RuntimeException("You did not receive the sample");
+        } else if(sampleOrder.getBuyerApproveDate() != null){
+            throw new RuntimeException("Already you had approved the sample");
+        } else if (sampleOrder.getBuyerRejectDate() != null) {
+            throw new RuntimeException("Already you had rejected the sample");
+        }
+
         sampleOrder.setBuyerApproveDate(LocalDate.now());
         sampleOrder.setBuyerApproveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer approved the sample");
@@ -2197,6 +2243,14 @@ public class InquiryServiceImpl implements InquiryService {
     public String buyerRejectedSample(String soId, String buyerUId) {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
+
+        if(sampleOrder.getBuyerReceiveDate() == null){
+            throw new RuntimeException("You did not receive the sample");
+        } else if(sampleOrder.getBuyerApproveDate() != null){
+            throw new RuntimeException("Already you had approved the sample");
+        } else if (sampleOrder.getBuyerRejectDate() != null) {
+            throw new RuntimeException("Already you had rejected the sample");
+        }
 
         sampleOrder.setBuyerRejectDate(LocalDate.now());
         sampleOrder.setBuyerRejectTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));

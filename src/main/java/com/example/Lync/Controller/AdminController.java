@@ -5,6 +5,7 @@ import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.AdminAddress;
 import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Entity.SellerBuyerAddress;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
@@ -289,7 +290,10 @@ public class AdminController {
         return ResponseEntity.ok(inquiryService.buyersHavingCheque());
     }
 
-
+    @GetMapping("/adminGetsSellerBuyerAddress/{uaId}")
+    public ResponseEntity<SellerBuyerAddress> sellerBuyerAddress(@PathVariable Long uaId){
+        return ResponseEntity.ok(adminAddressService.adminGetsSellerBuyerAddress(uaId));
+    }
 
 
 
