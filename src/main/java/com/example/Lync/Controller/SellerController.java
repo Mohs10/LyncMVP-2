@@ -423,14 +423,4 @@ public class SellerController {
 
 
 
-
-
-
-
-
-
-
-
-
-
 }
