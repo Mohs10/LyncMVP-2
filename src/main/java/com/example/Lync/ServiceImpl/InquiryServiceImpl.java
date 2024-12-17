@@ -9,7 +9,9 @@ import com.example.Lync.Service.SellerBuyerService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -2275,6 +2277,17 @@ public class InquiryServiceImpl implements InquiryService {
         return sellerBuyerRepository.findAll().stream()
                 .filter(sellerBuyer ->  sellerBuyer.getCancelledChequeUrl() != null)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String uploadInvoice(String qId, MultipartFile file) throws IOException {
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+
+        String key =s3Service.uploadSampleInvoice(qId,file);
+        inquiry.setInvoiceUrl(key);
+        inquiryRepository.save(inquiry);
+        return key;
     }
 
 }

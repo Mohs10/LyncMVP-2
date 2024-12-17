@@ -102,6 +102,8 @@ public class InquiryDTO {
     private LocalTime afpTime;
     private String status;
 
+    //Invoice Url
+    private String invoiceUrl;
 
     //List of dynamic Specifications
     private List<SpecificationDTO> specifications;

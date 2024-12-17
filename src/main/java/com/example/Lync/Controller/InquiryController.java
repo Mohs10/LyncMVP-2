@@ -1,23 +1,29 @@
 package com.example.Lync.Controller;
 
+import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.InquiryDTO;
 import com.example.Lync.DTO.SampleOrderDTO;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Service.InquiryService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/inquiry")
+@RequestMapping("/api/inquiry")
 public class InquiryController {
+    private final S3Service s3Service;
 
     private InquiryService inquiryService;
     private SellerBuyerRepository sellerBuyerRepository;
@@ -87,4 +93,31 @@ public class InquiryController {
 //        inquiryService.sellerOrderSample(qId, sampleOrderDTO);
 //        return ResponseEntity.ok("Sample Ordered for ID" + qId);
 //    }
+
+
+    @PostMapping("/upload/SampleInvoice/{qId}")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+
+    public ResponseEntity<String> uploadSampleInvoice(@PathVariable String qId,@RequestParam("file") MultipartFile file) {
+        try {
+            String fileUrl = inquiryService.uploadInvoice(qId,file);
+            return new ResponseEntity<>("File uploaded successfully. File URL: " + fileUrl, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getSampleInvoice")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> getSampleInvoiceUrls(@RequestParam String key) {
+        try {
+            String fileUrl = s3Service.getSampleInvoice(key);
+            return ResponseEntity.ok(fileUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+        }
+    }
+
+
+
 }

@@ -74,6 +74,9 @@ public class Inquiry {
     private String unit;
     // Getters and Setters
 
+    //Invoice Url
+    private String invoiceUrl;
+
     @ManyToMany
     @JoinTable(
             name = "inquiry_specifications",

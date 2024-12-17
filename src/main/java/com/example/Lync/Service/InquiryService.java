@@ -2,7 +2,9 @@ package com.example.Lync.Service;
 
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.SellerBuyer;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface InquiryService {
@@ -107,6 +109,8 @@ public interface InquiryService {
 
     List<SellerBuyer> buyersHavingCheque();
 
+
+    String uploadInvoice(String qId, MultipartFile file) throws IOException;
 
 
 }
