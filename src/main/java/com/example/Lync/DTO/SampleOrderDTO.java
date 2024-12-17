@@ -70,4 +70,7 @@ public class SampleOrderDTO {
     private LocalDate buyerRejectDate;
     private LocalTime buyerRejectTime;
     private String status;
+
+    private String invoiceUrl;
+
 }

@@ -1764,6 +1764,9 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public SampleOrderDTO adminGetsSampleOrderByQId(String qId) {
 
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+
         SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Sample Order not found with given qId:" + qId));
 
@@ -1837,6 +1840,12 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
         sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
+
+        String key = null;
+        if (inquiry.getInvoiceUrl() != null) {
+            key = s3Service.getSampleInvoice(inquiry.getInvoiceUrl());
+        }
+        sampleOrderDTO.setInvoiceUrl(key);
 
         sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
         return sampleOrderDTO;
