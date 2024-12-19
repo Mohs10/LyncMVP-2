@@ -93,13 +93,13 @@ public interface InquiryService {
 
     String sellerPackagingSample(String soId, String sellerUId);
 
-    String sellerDispatchSampleToAdmin(String soId, String sellerUId);
+    String sellerDispatchSampleToAdmin(String soId, String sellerUId, String sellerDispatchSampleToAdmin);
 
     String adminReceivedSample(String soId);
 
     String adminProcessingSample(String soId);
 
-    String adminDispatchToBuyer(String soId);
+    String adminDispatchToBuyer(String soId, String transportationByAdmin);
 
     String buyerReceivedSample(String soId, String buyerUId);
 

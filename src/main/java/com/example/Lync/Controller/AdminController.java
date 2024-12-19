@@ -280,8 +280,8 @@ public class AdminController {
     }
 
     @PostMapping("/adminDispatchToBuyer/{soId}")
-    public ResponseEntity<String> dispatchToBuyer(@PathVariable String soId){
-        String message = inquiryService.adminDispatchToBuyer(soId);
+    public ResponseEntity<String> dispatchToBuyer(@PathVariable String soId, @RequestBody String transportationByAdmin){
+        String message = inquiryService.adminDispatchToBuyer(soId, transportationByAdmin);
         return ResponseEntity.ok(message);
     }
 

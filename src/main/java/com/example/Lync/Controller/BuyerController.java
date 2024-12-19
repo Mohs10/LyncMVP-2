@@ -13,6 +13,7 @@ import com.example.Lync.Service.OTPStorageService;
 import com.example.Lync.Service.OtpService;
 import com.example.Lync.Service.SellerBuyerService;
 import com.example.Lync.ServiceImpl.UserInfoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -209,7 +210,7 @@ public class BuyerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         String message =  inquiryService.buyerAddInquiry(inquiryDTO, sellerDetails.getUserId());
-        return ResponseEntity.ok(message);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/buyerGetsAllInquiry")
@@ -223,7 +224,7 @@ public class BuyerController {
         System.out.println("Controller sellerDetails : " + sellerDetails);
 //        List<InquiryDTO> DTOs = inquiryService.buyerGetsAllInquiry(sellerDetails.getUserId());
 
-        return ResponseEntity.ok(inquiryService.buyerGetsInquiries(sellerDetails.getUserId()));
+        return new ResponseEntity<>(inquiryService.buyerGetsInquiries(sellerDetails.getUserId()), HttpStatus.OK);
     }
 
     @GetMapping("/buyerGetsInquiryById/{qId}")

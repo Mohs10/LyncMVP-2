@@ -411,13 +411,13 @@ public class SellerController {
     }
 
     @PostMapping("/sellerDispatchSample/{soId}")
-    public ResponseEntity<String> sellerDispatchSample(@PathVariable String soId){
+    public ResponseEntity<String> sellerDispatchSample(@PathVariable String soId, @RequestBody String transportationBySeller){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        String message = inquiryService.sellerDispatchSampleToAdmin(soId, sellerDetails.getUserId());
+        String message = inquiryService.sellerDispatchSampleToAdmin(soId, sellerDetails.getUserId(), transportationBySeller);
         return ResponseEntity.ok(message);
     }
 

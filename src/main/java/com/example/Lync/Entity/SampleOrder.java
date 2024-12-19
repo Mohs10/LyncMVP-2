@@ -47,6 +47,7 @@ public class SampleOrder {
 
     private LocalDate sellerDispatchDate;
     private LocalTime sellerDispatchTime;
+    private String transportationBySeller;
 
     private LocalDate adminReceiveDate;
     private LocalTime adminReceiveTime;
@@ -56,6 +57,7 @@ public class SampleOrder {
 
     private LocalDate adminDispatchDate;
     private LocalTime adminDispatchTime;
+    private String transportationByAdmin;
 
     private LocalDate buyerReceiveDate;
     private LocalTime buyerReceiveTime;
