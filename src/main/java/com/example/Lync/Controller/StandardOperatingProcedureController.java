@@ -5,6 +5,7 @@ import com.example.Lync.Service.StandardOperatingProcedureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,8 @@ public class StandardOperatingProcedureController {
 
     // Create Proof of Concept
     @PostMapping("/add/buyer")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<StandardOperatingProcedureDTO> createStandardOperatingProcedureForBuyer(@RequestBody StandardOperatingProcedureDTO dto) {
         dto.setForRole("BUYER");
         StandardOperatingProcedureDTO createdDTO = standardOperatingProcedureService.createStandardOperatingProcedure(dto);
@@ -26,6 +29,8 @@ public class StandardOperatingProcedureController {
     }
 
     @PostMapping("/add/seller")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<StandardOperatingProcedureDTO> createStandardOperatingProcedureForSeller(@RequestBody StandardOperatingProcedureDTO dto) {
         dto.setForRole("SELLER");
         StandardOperatingProcedureDTO createdDTO = standardOperatingProcedureService.createStandardOperatingProcedure(dto);
@@ -33,7 +38,8 @@ public class StandardOperatingProcedureController {
     }
 
     // Update Proof of Concept
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<StandardOperatingProcedureDTO> updateStandardOperatingProcedure(@PathVariable Long id, @RequestBody StandardOperatingProcedureDTO dto) {
         StandardOperatingProcedureDTO updatedDTO = standardOperatingProcedureService.updateStandardOperatingProcedure(id, dto);
         return ResponseEntity.ok(updatedDTO);
@@ -55,6 +61,8 @@ public class StandardOperatingProcedureController {
 
 
     @PostMapping("/upload/buyer")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<String> uploadDocumentOfSOPForBuyer(@RequestParam("file") MultipartFile file) {
         try {
             String fileUrl = standardOperatingProcedureService.UploadDocumentOfSOPForBuyer(file);
@@ -65,6 +73,8 @@ public class StandardOperatingProcedureController {
     }
 
     @PostMapping("/upload/seller")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<String> uploadDocumentOfSOPForSeller(@RequestParam("file") MultipartFile file) {
         try {
             String fileUrl = standardOperatingProcedureService.UploadDocumentOfSOPForSeller(file);

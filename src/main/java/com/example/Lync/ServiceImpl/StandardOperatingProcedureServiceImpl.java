@@ -70,12 +70,7 @@ public class StandardOperatingProcedureServiceImpl implements StandardOperatingP
     public StandardOperatingProcedureDTO updateStandardOperatingProcedure(Long id, StandardOperatingProcedureDTO dto) {
         StandardOperatingProcedure existingPoc = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Proof of Concept not found with ID: " + id));
-
-        existingPoc.setDate(dto.getDate());
         existingPoc.setContent(dto.getContent());
-        existingPoc.setDocumentPath(dto.getDocumentPath());
-
-
         StandardOperatingProcedure updatedPoc = repository.save(existingPoc);
         return mapToDTO(updatedPoc);
     }

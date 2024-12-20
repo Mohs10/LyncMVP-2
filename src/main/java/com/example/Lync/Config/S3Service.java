@@ -671,6 +671,159 @@ public class S3Service {
 
 
 
+    public String uploadTestReport(String queryId,String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/test-report/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded invoice
+        return s3Key;
+    }
+    public String uploadTestInvoice(String queryId,String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/test-invoice/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded invoice
+        return s3Key;
+    }
+
+
+    public String uploadTestSamplingImage(String queryId,String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/test-sampling-image/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded invoice
+        return s3Key;
+    }
+
+    public String uploadTestSealedLotImage1(String queryId,String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/test-sealedLot-image1/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded invoice
+        return s3Key;
+    }
+
+
+    public String uploadTestSealedLotImage2(String queryId,String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/test-sealedLot-image2/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded invoice
+        return s3Key;
+    }
+
+
+
+    public String uploadDispatchImage1(String queryId, String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/dispatch-image1/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded dispatch image
+        return s3Key;
+    }
+
+    public String uploadDispatchImage2(String queryId, String testId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String s3Key = String.format("%s/%s/dispatch-image2/%s_%s", queryId, testId, timestamp, fileName);
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded dispatch image
+        return s3Key;
+    }
+
+
+    public String uploadEwayBill(String queryId, String testId, MultipartFile file) throws IOException {
+        // Extract the original file name
+        String fileName = file.getOriginalFilename();
+
+        // Generate a timestamp for uniqueness
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        // Construct the S3 key
+        String s3Key = String.format("%s/%s/eway-bill/%s_%s", queryId, testId, timestamp, fileName);
+
+        // Upload the file to S3
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded e-way bill
+        return s3Key;
+    }
+
+
+
+
+    public String getFiles(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(1440))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+
+
+
+
 
 }
 
