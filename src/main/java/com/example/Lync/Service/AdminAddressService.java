@@ -12,4 +12,6 @@ public interface AdminAddressService {
     List<AdminAddress> getAllAdminAddresses();
 
     SellerBuyerAddress adminGetsSellerBuyerAddress(Long uaId);
+
+    AdminAddress getAdminAddressById(Long adminAddressId);
 }

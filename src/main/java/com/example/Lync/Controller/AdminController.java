@@ -295,6 +295,11 @@ public class AdminController {
         return ResponseEntity.ok(adminAddressService.adminGetsSellerBuyerAddress(uaId));
     }
 
+    @GetMapping("/adminGetAdminAddressById/{adminAddressId}")
+    public ResponseEntity<AdminAddress> getAdminAddress(@PathVariable Long adminAddressId){
+        return new ResponseEntity<>(adminAddressService.getAdminAddressById(adminAddressId), HttpStatus.OK);
+    }
+
 
 
 
