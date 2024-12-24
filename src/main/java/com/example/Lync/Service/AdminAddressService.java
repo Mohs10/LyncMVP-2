@@ -14,4 +14,6 @@ public interface AdminAddressService {
     SellerBuyerAddress adminGetsSellerBuyerAddress(Long uaId);
 
     AdminAddress getAdminAddressById(Long adminAddressId);
+
+    AdminAddress sellerGetAdminAddressById(Long adminAddressId, String userId);
 }

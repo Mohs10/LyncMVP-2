@@ -40,4 +40,10 @@ public class AdminAddressServiceImpl implements AdminAddressService {
         return adminAddressRepository.findById(adminAddressId)
                 .orElseThrow(() -> new RuntimeException("Address not found with given Id: " + adminAddressId));
     }
+
+    @Override
+    public AdminAddress sellerGetAdminAddressById(Long adminAddressId, String userId) {
+        return adminAddressRepository.findById(adminAddressId)
+                .orElseThrow(() -> new RuntimeException("Address not found with given Id: " + adminAddressId));
+    }
 }

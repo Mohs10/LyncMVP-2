@@ -75,6 +75,8 @@ public interface SellerBuyerService {
 
     List<SellerBuyerAddressDTO> userGetsAddresses(String userId);
 
+    SellerBuyerAddressDTO userGetAddressById(String userId, Long uaId);
+
     public SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer);
 
     }

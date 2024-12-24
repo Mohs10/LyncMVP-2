@@ -99,7 +99,7 @@ public interface InquiryService {
 
     String adminProcessingSample(String soId);
 
-    String adminDispatchToBuyer(String soId, String transportationByAdmin);
+    String adminDispatchToBuyer(String soId, SampleOrderDTO sampleOrderDTO);
 
     String buyerReceivedSample(String soId, String buyerUId);
 

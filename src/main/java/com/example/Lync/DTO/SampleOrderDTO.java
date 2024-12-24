@@ -62,6 +62,7 @@ public class SampleOrderDTO {
     private LocalDate adminDispatchDate;
     private LocalTime adminDispatchTime;
     private String transportationByAdmin;
+    private LocalDate adminDDToBuyer;
 
     private LocalDate buyerReceiveDate;
     private LocalTime buyerReceiveTime;

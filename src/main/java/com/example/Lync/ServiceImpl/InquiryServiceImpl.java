@@ -1608,6 +1608,7 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
         sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
         sampleOrderDTO.setTransportationByAdmin(sampleOrder.getTransportationByAdmin());
+        sampleOrderDTO.setAdminDDToBuyer(sampleOrder.getAdminDDToBuyer());
 
         sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
         sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
@@ -1749,6 +1750,7 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
         sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
         sampleOrderDTO.setTransportationByAdmin(sampleOrder.getTransportationByAdmin());
+        sampleOrderDTO.setAdminDDToBuyer(sampleOrder.getAdminDDToBuyer());
 
         sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
         sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
@@ -1836,6 +1838,7 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
         sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
         sampleOrderDTO.setTransportationByAdmin(sampleOrder.getTransportationByAdmin());
+        sampleOrderDTO.setAdminDDToBuyer(sampleOrder.getAdminDDToBuyer());
 
         sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
         sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
@@ -1987,6 +1990,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrderDTO.setAdminDispatchDate(sampleOrder.getAdminDispatchDate());
         sampleOrderDTO.setAdminDispatchTime(sampleOrder.getAdminDispatchTime());
+        sampleOrderDTO.setAdminDDToBuyer(sampleOrder.getAdminDDToBuyer());
 
         sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
         sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
@@ -2169,7 +2173,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public String adminDispatchToBuyer(String soId, String transportationByAdmin) {
+    public String adminDispatchToBuyer(String soId, SampleOrderDTO sampleOrderDTO) {
         SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
                 .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
 
@@ -2181,7 +2185,8 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrder.setAdminDispatchDate(LocalDate.now());
         sampleOrder.setAdminDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        sampleOrder.setTransportationByAdmin(transportationByAdmin);
+        sampleOrder.setTransportationByAdmin(sampleOrderDTO.getTransportationByAdmin());
+        sampleOrder.setAdminDDToBuyer(sampleOrderDTO.getAdminDDToBuyer());
         sampleOrder.setCurrentStatus("Admin dispatched the sample");
         sampleOrderRepository.save(sampleOrder);
 

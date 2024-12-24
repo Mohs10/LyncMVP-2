@@ -200,6 +200,17 @@ public class BuyerController {
         return ResponseEntity.ok(addressDTOS);
     }
 
+    @GetMapping("/userGetAddressById/{uaId}")
+    public ResponseEntity<SellerBuyerAddressDTO> getAddressById(@PathVariable Long uaId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username =  authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("User details not found for Email : " + username));
+        SellerBuyerAddressDTO dto = sellerBuyerService.userGetAddressById(buyerDetails.getUserId(), uaId);
+
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
 
     @PostMapping("/addInquiry")
     public ResponseEntity<String> addInquiry(@RequestBody InquiryDTO inquiryDTO) throws Exception {

@@ -3,15 +3,14 @@ package com.example.Lync.Controller;
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
+import com.example.Lync.Entity.AdminAddress;
 import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Entity.SellerBuyerAddress;
 import com.example.Lync.Entity.SellerProduct;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.SellerProductRepository;
 import com.example.Lync.Repository.UserInfoRepository;
-import com.example.Lync.Service.InquiryService;
-import com.example.Lync.Service.OTPStorageService;
-import com.example.Lync.Service.OtpService;
-import com.example.Lync.Service.SellerBuyerService;
+import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +41,12 @@ public class SellerController {
     private final OtpService otpService;
     private final OTPStorageService otpStorageService;
     private final UserInfoService userInfoService;
+    private final AdminAddressService adminAddressService;
 
     private final SellerProductRepository sellerProductRepository;
     private final InquiryService inquiryService;
 
-    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, SellerProductRepository sellerProductRepository, InquiryService inquiryService) {
+    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, AdminAddressService adminAddressService, SellerProductRepository sellerProductRepository, InquiryService inquiryService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -57,6 +57,7 @@ public class SellerController {
         this.otpService = otpService;
         this.otpStorageService = otpStorageService;
         this.userInfoService = userInfoService;
+        this.adminAddressService = adminAddressService;
         this.sellerProductRepository = sellerProductRepository;
         this.inquiryService = inquiryService;
     }
@@ -255,7 +256,28 @@ public class SellerController {
         return ResponseEntity.ok(addressDTOS);
     }
 
+    @GetMapping("/userGetAddressById/{uaId}")
+    public ResponseEntity<SellerBuyerAddressDTO> getAddressById(@PathVariable Long uaId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Seller details not found for Email : " + username));
+        SellerBuyerAddressDTO dto = sellerBuyerService.userGetAddressById(sellerDetails.getUserId(), uaId);
 
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAdminAddressById/{adminAddressId}")
+    public ResponseEntity<AdminAddress> getAdminAddressById(@PathVariable Long adminAddressId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Seller details not found for Email : " + username));
+        AdminAddress adminAddress = adminAddressService.sellerGetAdminAddressById(adminAddressId, sellerDetails.getUserId());
+
+        return new ResponseEntity<>(adminAddress, HttpStatus.OK);
+
+    }
 
 
 
@@ -420,6 +442,11 @@ public class SellerController {
         );
         String message = inquiryService.sellerDispatchSampleToAdmin(soId, sellerDetails.getUserId(), transportationBySeller);
         return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/adminGetAdminAddressById/{adminAddressId}")
+    public ResponseEntity<AdminAddress> getAdminAddress(@PathVariable Long adminAddressId){
+        return new ResponseEntity<>(adminAddressService.getAdminAddressById(adminAddressId), HttpStatus.OK);
     }
 
 

@@ -1028,5 +1028,20 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         return sellerBuyerAddressDTOS;
     }
 
+    @Override
+    public SellerBuyerAddressDTO userGetAddressById(String userId, Long uaId) {
+        SellerBuyerAddress sellerBuyerAddress = sellerBuyerAddressRepository.findById(uaId)
+                .orElseThrow(() -> new RuntimeException("Address not found with Id : " + uaId));
+        SellerBuyerAddressDTO dto = new SellerBuyerAddressDTO();
+        dto.setUaId(sellerBuyerAddress.getUaId());
+        dto.setUId(sellerBuyerAddress.getUId());
+        dto.setAddress(sellerBuyerAddress.getAddress());
+        dto.setCity(sellerBuyerAddress.getCity());
+        dto.setState(sellerBuyerAddress.getState());
+        dto.setCountry(sellerBuyerAddress.getCountry());
+        dto.setPincode(sellerBuyerAddress.getPincode());
+        return dto;
+    }
+
 
 }

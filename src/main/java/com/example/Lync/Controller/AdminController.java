@@ -264,7 +264,7 @@ public class AdminController {
     @PostMapping("/adminSendSampleOrderToSeller/{soId}")
     public ResponseEntity<String> sampleOrderToSeller(@PathVariable String soId, @RequestBody SampleOrderDTO sampleOrderDTO) throws Exception {
         String message = inquiryService.adminSendsSampleOrderToSeller(soId, sampleOrderDTO);
-        return ResponseEntity.ok(message);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     @PostMapping("/adminReceivedSample/{soId}")
@@ -280,8 +280,8 @@ public class AdminController {
     }
 
     @PostMapping("/adminDispatchToBuyer/{soId}")
-    public ResponseEntity<String> dispatchToBuyer(@PathVariable String soId, @RequestBody String transportationByAdmin){
-        String message = inquiryService.adminDispatchToBuyer(soId, transportationByAdmin);
+    public ResponseEntity<String> dispatchToBuyer(@PathVariable String soId, @RequestBody SampleOrderDTO sampleOrderDTO){
+        String message = inquiryService.adminDispatchToBuyer(soId, sampleOrderDTO);
         return ResponseEntity.ok(message);
     }
 
