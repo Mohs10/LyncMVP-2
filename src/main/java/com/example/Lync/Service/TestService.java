@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface TestService {
     List<Test> getAllTests();
     public TestDTO getTestById(String testId) ;
-    List<Test> getTestsByQueryId(String queryId);
+    List<TestDTO> getTestsByQueryId(String queryId);
     Test saveTest(Test test);
     String approveSamplingByAdmin(String testId, Boolean isApproved);
     public String approveSamplingByBuyer(String testId, Boolean isApproved) ;

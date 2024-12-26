@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TestServiceImpl implements TestService {
@@ -44,8 +45,11 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<Test> getTestsByQueryId(String queryId) {
-        return testRepository.findByQueryId(queryId);
+    public List<TestDTO> getTestsByQueryId(String queryId) {
+        return testRepository.findByQueryId(queryId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -55,7 +59,7 @@ public class TestServiceImpl implements TestService {
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id: " + test.getQueryId()));
 
         // Populate Test entity details
-        test.setTestId("TEST-" + test.getQueryId());
+        test.setTestId("TEST-" + test.getQueryId() + "-" + System.currentTimeMillis());
         test.setBuyerId(inquiry.getBuyerId());
         test.setSamplingFixationDate(LocalDate.now());
         test.setSellerId(inquiry.getSellerUId());

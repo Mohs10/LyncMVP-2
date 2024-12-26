@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,10 +20,16 @@ public class TestController {
     @Autowired
     private TestService testService;
 
-    // Create or update a test
+    @GetMapping("/testsByQId/{queryId}")
+    public ResponseEntity<List<TestDTO>> getTestsByQueryId(@PathVariable String queryId) {
+        List<TestDTO> testDTOs = testService.getTestsByQueryId(queryId);
+        if (testDTOs.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Return 204 if no tests found
+        }
+        return ResponseEntity.ok(testDTOs);
+    }
 
-
-@GetMapping("/findByTestId/{testId}")
+    @GetMapping("/findByTestId/{testId}")
     public TestDTO getTestById(@PathVariable String testId) {
         return testService.getTestById(testId);
     }
