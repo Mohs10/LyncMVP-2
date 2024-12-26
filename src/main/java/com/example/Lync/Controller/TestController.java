@@ -20,7 +20,7 @@ public class TestController {
     @Autowired
     private TestService testService;
 
-    @GetMapping("/testsByQId/{queryId}")
+    @GetMapping("/testsByQId/{queryId}")//
     public ResponseEntity<List<TestDTO>> getTestsByQueryId(@PathVariable String queryId) {
         List<TestDTO> testDTOs = testService.getTestsByQueryId(queryId);
         if (testDTOs.isEmpty()) {
