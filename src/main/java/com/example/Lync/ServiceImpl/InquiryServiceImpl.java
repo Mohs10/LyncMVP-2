@@ -977,11 +977,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         // Get all sellers selling the specified product
         List<SellerProduct> validSellerProducts = sellerProductRepository
-                .findByProductIdAndProductFormIdAndProductVarietyId(
-                        inquiry.getProductId(),
-                        inquiry.getProductFormId(),
-                        inquiry.getProductVarietyId()
-                );
+                .findByPId(inquiry.getProductId());
 
         // Extract the seller IDs from the validSellerProducts list
         Set<String> validSellerIds = validSellerProducts.stream()
@@ -1059,44 +1055,40 @@ public class InquiryServiceImpl implements InquiryService {
 
     //Admin checks all sellers selling a particular product
     @Override
-    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
-        List<SellerProduct> sellerProducts = new ArrayList<>();
-        sellerProducts = sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
+    public SellerProductResponse sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
+        List<SellerProduct> sellerProducts;
+        String message;
 
-        if(sellerProducts.isEmpty()) {
+        sellerProducts = sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
+        if(!sellerProducts.isEmpty()){
+            message = "Matching based on productId, productFormId, productVarietyId, specifications";
+        } else {
             sellerProducts = sellerProductRepository
                     .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
-        }
-        if(sellerProducts.isEmpty()){
-            sellerProducts = sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId);
+            if (!sellerProducts.isEmpty()) {
+                message = "Matching based on productId, productFormId, productVarietyId";
+            } else {
+                sellerProducts = sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId);
+                if (!sellerProducts.isEmpty()) {
+                    message = "Matching based on productId, productVarietyId";
+                } else {
+                    sellerProducts = sellerProductRepository.findByPId(productId);
+                    if (!sellerProducts.isEmpty()) {
+                        message = "Matching based on productId";
+                    } else {
+                        return new SellerProductResponse(Collections.emptyList(), "No match found");
+                    }
+                }
+            }
         }
 
-        if(sellerProducts.isEmpty()){
-            sellerProducts = sellerProductRepository.findByPId(productId);
-        }
-
-        return sellerProducts.stream()
+        List<SellerProductDTO> sellerProductDTOS = sellerProducts.stream()
                 .map(sellerBuyerService::toDTO) // Method reference
-                .collect(Collectors.toList());
+                .toList();
 
+        return new SellerProductResponse(sellerProductDTOS, message);
     }
-    //        for(SellerProduct sellerProduct : sellerProducts){
-//            SellerProductDTO dto = new SellerProductDTO();
-//            Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found with ID :" + productId));
-//            SellerBuyer sellerBuyer = sellerBuyerRepository.findById(sellerProduct.getSellerId()).orElseThrow(() -> new RuntimeException("Seller not found with ID: " + sellerProduct.getSellerId()));
-////            dto.setProductName(product.getProductName());
-//////            dto.setProductCategory(categoryRepository.findById(product.getCategory()));
-////            dto.setSpId(sellerProduct.getSpId());
-////            dto.setSellerId(sellerProduct.getSellerId());
-////            dto.setSellerName(sellerBuyer.getFullName());
-////            dto.setSellerName(sellerBuyer.getEmail());
-////            dto.setSellerNumber(sellerBuyer.getPhoneNumber());
-////            dto.setMaxPricePerTon(sellerProduct.getMaxPricePerTon());
-////            dto.setMinPricePerTon(sellerProduct.getMinPricePerTon());
-//            dto.setDeliveryCharges(sellerProduct.getDeliveryCharges());
-//
-//            productDTOS.add(dto);
-//        }
+
 
 
     @Override

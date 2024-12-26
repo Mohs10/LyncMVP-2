@@ -63,5 +63,6 @@ public class SellerProductDTO {
 //    private MultipartFile certificationFile;
 
     private List<SpecificationDTO> specifications;
+
 }
 
