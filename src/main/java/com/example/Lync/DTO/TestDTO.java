@@ -59,6 +59,11 @@ public class TestDTO {
     private Boolean sellerAcceptsTestRequest = false; // Seller has accepted Test Request
     private Boolean buyerAcceptsTestRequest = false; // Buyer accepts Test Report
     private Boolean testResultRejected = false; // Buyer rejects Test Report
+
+    private String sopForSellerUrl;
+    private String sopForBuyerUrl;
+
     private List<TestStatus> statusList;
+
 }
 

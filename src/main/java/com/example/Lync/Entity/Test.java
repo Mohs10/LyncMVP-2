@@ -100,6 +100,12 @@ public class Test {
     private LocalDateTime paymentCompletedAt; // Timestamp when payment was completed
 
     // Agreement and Approval Flags
+
+
+    private String sopForSellerUrl;
+    private String sopForBuyerUrl;
+
+
     private Boolean buyerAgreedToTerms = false; // Buyer has accepted Terms and Conditions (T&C)
     private Boolean sellerAgreedToTerms = false; // Seller has accepted Terms and Conditions (T&C)
     private Boolean adminApprovesTestRequest = false; // Approval status by admin

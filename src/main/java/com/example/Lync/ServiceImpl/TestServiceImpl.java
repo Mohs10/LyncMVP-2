@@ -561,6 +561,86 @@ public class TestServiceImpl implements TestService {
     }
 
 
+
+    public String uploadBuyerSOP(String testId, MultipartFile multipartFile) throws IOException {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
+        String queryId = test.getQueryId();
+
+        // Upload the SOP file for the buyer
+        String path = s3Service.uploadBuyerSOP(queryId, testId, multipartFile);
+
+        // Update the test with the SOP URL
+        test.setSopForBuyerUrl(path);
+        testRepository.save(test);
+
+        // Create a TestStatus entry for the buyer SOP upload
+        TestStatus status = new TestStatus();
+        status.setStatusId("STATUS-" + testId + "-02-01");
+        status.setTestId(testId);
+        status.setStatusPhase("Phase 5: Payment");
+        status.setStatusMessage("Buyer SOP uploaded successfully");
+        status.setStatusTimestamp(LocalDateTime.now());
+        status.setAdditionalDetails("Buyer SOP uploaded. SOP URL: " + path);
+
+        // Save the TestStatus entry
+        testStatusRepository.save(status);
+
+        return path;
+    }
+
+
+
+
+    public String uploadSellerSOP(String testId, MultipartFile multipartFile) throws IOException {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
+        String queryId = test.getQueryId();
+
+        // Upload the SOP file for the seller
+        String path = s3Service.uploadSellerSOP(queryId, testId, multipartFile);
+
+        // Update the test with the SOP URL
+        test.setSopForSellerUrl(path);
+        testRepository.save(test);
+
+        // Create a TestStatus entry for the seller SOP upload
+        TestStatus status = new TestStatus();
+        status.setStatusId("STATUS-" + testId + "-03-01");
+        status.setTestId(testId);
+        status.setStatusPhase("Phase 5: Payment");
+        status.setStatusMessage("Seller SOP uploaded successfully");
+        status.setStatusTimestamp(LocalDateTime.now());
+        status.setAdditionalDetails("Seller SOP uploaded. SOP URL: " + path);
+
+        // Save the TestStatus entry
+        testStatusRepository.save(status);
+
+        return path;
+    }
+
+   public String getBuyerTestSOP(String testId)
+    {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
+
+        return s3Service.getFiles(test.getSopForBuyerUrl());
+
+    }
+
+
+
+   public String getSellerTestSOP(String testId)
+    {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
+
+        return s3Service.getFiles(test.getSopForSellerUrl());
+
+    }
+
+
+
     @Override
     public String processPayment(String testId, TestPhase5DTO dto) {
         Test test = testRepository.findById(testId)
@@ -612,57 +692,71 @@ public class TestServiceImpl implements TestService {
         // Transform URLs
         String testInvoiceUrl = null;
         if (test.getTestInvoiceUrl() != null) {
-            testInvoiceUrl = s3Service.getProductImagePresignedUrl(test.getTestInvoiceUrl());
+            testInvoiceUrl = s3Service.getFiles(test.getTestInvoiceUrl());
         }
         testDTO.setTestInvoiceUrl(testInvoiceUrl);
 
         String samplingImagesUrl = null;
         if (test.getSamplingImagesUrl() != null) {
-            samplingImagesUrl = s3Service.getProductImagePresignedUrl(test.getSamplingImagesUrl());
+            samplingImagesUrl = s3Service.getFiles(test.getSamplingImagesUrl());
         }
         testDTO.setSamplingImagesUrl(samplingImagesUrl);
 
         String sealedLotImage1Url = null;
         if (test.getSealedLotImage1Url() != null) {
-            sealedLotImage1Url = s3Service.getProductImagePresignedUrl(test.getSealedLotImage1Url());
+            sealedLotImage1Url = s3Service.getFiles(test.getSealedLotImage1Url());
         }
         testDTO.setSealedLotImage1Url(sealedLotImage1Url);
 
         String sealedLotImage2Url = null;
         if (test.getSealedLotImage2Url() != null) {
-            sealedLotImage2Url = s3Service.getProductImagePresignedUrl(test.getSealedLotImage2Url());
+            sealedLotImage2Url = s3Service.getFiles(test.getSealedLotImage2Url());
         }
         testDTO.setSealedLotImage2Url(sealedLotImage2Url);
 
         String testReportUrl = null;
         if (test.getTestReportUrl() != null) {
-            testReportUrl = s3Service.getProductImagePresignedUrl(test.getTestReportUrl());
+            testReportUrl = s3Service.getFiles(test.getTestReportUrl());
         }
         testDTO.setTestReportUrl(testReportUrl);
 
         String dispatchImage1Url = null;
         if (test.getDispatchImage1Url() != null) {
-            dispatchImage1Url = s3Service.getProductImagePresignedUrl(test.getDispatchImage1Url());
+            dispatchImage1Url = s3Service.getFiles(test.getDispatchImage1Url());
         }
         testDTO.setDispatchImage1Url(dispatchImage1Url);
 
         String dispatchImage2Url = null;
         if (test.getDispatchImage2Url() != null) {
-            dispatchImage2Url = s3Service.getProductImagePresignedUrl(test.getDispatchImage2Url());
+            dispatchImage2Url = s3Service.getFiles(test.getDispatchImage2Url());
         }
         testDTO.setDispatchImage2Url(dispatchImage2Url);
 
         String invoiceUrl = null;
         if (test.getInvoiceUrl() != null) {
-            invoiceUrl = s3Service.getProductImagePresignedUrl(test.getInvoiceUrl());
+            invoiceUrl = s3Service.getFiles(test.getInvoiceUrl());
         }
         testDTO.setInvoiceUrl(invoiceUrl);
 
         String ewayBillUrl = null;
         if (test.getEwayBillUrl() != null) {
-            ewayBillUrl = s3Service.getProductImagePresignedUrl(test.getEwayBillUrl());
+            ewayBillUrl = s3Service.getFiles(test.getEwayBillUrl());
         }
         testDTO.setEwayBillUrl(ewayBillUrl);
+
+
+        String buyerSopUrl = null;
+        if (test.getSopForBuyerUrl() != null) {
+            buyerSopUrl = s3Service.getFiles(test.getSopForBuyerUrl());
+        }
+        testDTO.setSopForBuyerUrl(buyerSopUrl);
+
+
+        String sellerSopUrl = null;
+        if (test.getSopForSellerUrl() != null) {
+            sellerSopUrl = s3Service.getFiles(test.getSopForSellerUrl());
+        }
+        testDTO.setSopForSellerUrl(sellerSopUrl);
 
         testDTO.setIsDefaultAgency(test.getIsDefaultAgency());
         testDTO.setTestingAgencyName(test.getTestingAgencyName());

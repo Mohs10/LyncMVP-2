@@ -30,8 +30,8 @@ public class TestController {
     }
 
     @GetMapping("/findByTestId/{testId}")
-    public TestDTO getTestById(@PathVariable String testId) {
-        return testService.getTestById(testId);
+    public ResponseEntity<TestDTO>  getTestById(@PathVariable String testId) {
+        return ResponseEntity.ok(testService.getTestById(testId));
     }
     @PostMapping("/initiateTestRequest")
     public ResponseEntity<Test> saveTest(@RequestBody Test test) {
@@ -241,7 +241,45 @@ public class TestController {
         }
     }
 
+    @PostMapping("/{testId}/uploadBuyerSOP")
+    public ResponseEntity<String> uploadBuyerSOP(@PathVariable String testId,
+                                                 @RequestParam("file") MultipartFile file) {
+        try {
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = testService.uploadBuyerSOP(testId, file);
+                return ResponseEntity.ok("Buyer SOP uploaded successfully at : " + fileUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Buyer SOP file is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Buyer SOP.");
+        }
+    }
+    @PostMapping("/{testId}/uploadSellerSOP")
+    public ResponseEntity<String> uploadSellerSOP(@PathVariable String testId,
+                                                  @RequestParam("file") MultipartFile file) {
+        try {
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = testService.uploadSellerSOP(testId, file);
+                return ResponseEntity.ok("Seller SOP uploaded successfully at : " + fileUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Seller SOP file is required.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading Seller SOP.");
+        }
+    }
 
+
+    @GetMapping("/getBuyerTestSOP/{testId}")
+    public ResponseEntity<String>  getBuyerTestSOP(@PathVariable String testId) {
+        return ResponseEntity.ok(testService.getBuyerTestSOP(testId));
+    }
+
+    @GetMapping("/getSellerTestSOP/{testId}")
+    public ResponseEntity<String>  getSellerTestSOP(@PathVariable String testId) {
+        return ResponseEntity.ok(testService.getSellerTestSOP(testId));
+    }
 
 
 

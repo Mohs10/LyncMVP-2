@@ -802,6 +802,56 @@ public class S3Service {
     }
 
 
+    public String uploadSellerSOP(String queryId, String testId, MultipartFile file) throws IOException {
+        // Extract the original file name
+        String fileName = file.getOriginalFilename();
+
+        // Generate a timestamp for uniqueness
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        // Construct the S3 key
+        String s3Key = String.format("%s/%s/seller-sop/%s_%s", queryId, testId, timestamp, fileName);
+
+        // Upload the file to S3
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded Seller SOP
+        return s3Key;
+    }
+    public String uploadBuyerSOP(String queryId, String testId, MultipartFile file) throws IOException {
+        // Extract the original file name
+        String fileName = file.getOriginalFilename();
+
+        // Generate a timestamp for uniqueness
+        String timestamp = String.valueOf(System.currentTimeMillis());
+
+        // Construct the S3 key
+        String s3Key = String.format("%s/%s/buyer-sop/%s_%s", queryId, testId, timestamp, fileName);
+
+        // Upload the file to S3
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+
+        // Return the S3 key of the uploaded Buyer SOP
+        return s3Key;
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     public String getFiles(String url) {

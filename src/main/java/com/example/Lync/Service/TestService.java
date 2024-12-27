@@ -34,6 +34,10 @@ public interface TestService {
     String logDispatchDetails(String testId, TestPhase4DTO dto);
     String uploadDispatchImage1(String testId, MultipartFile multipartFile) throws IOException;
     String uploadDispatchImage2(String testId, MultipartFile multipartFile) throws IOException;
+    public String uploadSellerSOP(String testId, MultipartFile multipartFile) throws IOException ;
+    public String uploadBuyerSOP(String testId, MultipartFile multipartFile) throws IOException ;
+    String getBuyerTestSOP(String testId);
+    String getSellerTestSOP(String testId);
 
 
     String processPayment(String testId, TestPhase5DTO dto);
