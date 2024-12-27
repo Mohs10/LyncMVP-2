@@ -203,13 +203,13 @@ public class AdminController {
     }
 
     @GetMapping("/sellerSellingProduct/{productId}/{productFormId}/{productVarietyId}")
-    public ResponseEntity<SellerProductResponse> sellersSellingProducts(@PathVariable Long productId,
+    public ResponseEntity<List<SellerProductDTO>> sellersSellingProducts(@PathVariable Long productId,
                                                                          @PathVariable Long productFormId,
                                                                          @PathVariable Long productVarietyId,
                                             @RequestParam(required = false) List<String> specificationNames){
-        SellerProductResponse sellerProductDTOList = inquiryService
+        List<SellerProductDTO> sellerProductDTOList = inquiryService
                 .sellersSellingProduct(productId, productFormId, productVarietyId, specificationNames != null ? specificationNames : List.of());
-        return ResponseEntity.ok(sellerProductDTOList);
+        return new ResponseEntity<>(sellerProductDTOList, HttpStatus.OK);
     }
 
     @PostMapping("/sendFinalPrice/{snId}")

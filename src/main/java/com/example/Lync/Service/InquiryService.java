@@ -25,7 +25,7 @@ public interface InquiryService {
 
     String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO); //Admin send inquiry to seller
 
-    SellerProductResponse sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames); //Admin gets particular product's sellers.
+    List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames); //Admin gets particular product's sellers.
 
     List<SellerReceiveInquiryDTO> sellerAllInquiries(String sellerUId); //Seller all inquiries
 

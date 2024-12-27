@@ -1055,38 +1055,60 @@ public class InquiryServiceImpl implements InquiryService {
 
     //Admin checks all sellers selling a particular product
     @Override
-    public SellerProductResponse sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
-        List<SellerProduct> sellerProducts;
-        String message;
+    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
 
-        sellerProducts = sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
-        if(!sellerProducts.isEmpty()){
-            message = "Matching based on productId, productFormId, productVarietyId, specifications";
-        } else {
-            sellerProducts = sellerProductRepository
-                    .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
-            if (!sellerProducts.isEmpty()) {
-                message = "Matching based on productId, productFormId, productVarietyId";
-            } else {
-                sellerProducts = sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId);
-                if (!sellerProducts.isEmpty()) {
-                    message = "Matching based on productId, productVarietyId";
-                } else {
-                    sellerProducts = sellerProductRepository.findByPId(productId);
-                    if (!sellerProducts.isEmpty()) {
-                        message = "Matching based on productId";
-                    } else {
-                        return new SellerProductResponse(Collections.emptyList(), "No match found");
-                    }
-                }
-            }
+        List<SellerProductDTO> sellerProductDTOS = new ArrayList<>();
+
+        List<SellerProduct> tempProductsFour = sellerProductRepository
+                .findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
+        if (!tempProductsFour.isEmpty()) {
+
+            List<SellerProductDTO> tempSellerProductDTOS = tempProductsFour.stream()
+                    .map( sellerProduct -> {
+                                SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
+                                dto.setMessage("Matching based on Product, Form, Variety, Specifications");
+                                return dto;
+                            }).toList();
+            sellerProductDTOS.addAll(tempSellerProductDTOS);
         }
 
-        List<SellerProductDTO> sellerProductDTOS = sellerProducts.stream()
-                .map(sellerBuyerService::toDTO) // Method reference
-                .toList();
+        List<SellerProduct> tempProductsThree = sellerProductRepository
+                .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
+        if(!tempProductsThree.isEmpty()){
+            List<SellerProductDTO> tempSellerProductDTOS = tempProductsThree.stream()
+                    .map(sellerProduct -> {
+                        SellerProductDTO dto =sellerBuyerService.toDTO(sellerProduct);
+                        dto.setMessage("Matching based on Product, Form, Variety");
+                        return dto;
+                    }).toList();
+            sellerProductDTOS.addAll(tempSellerProductDTOS);
+        }
 
-        return new SellerProductResponse(sellerProductDTOS, message);
+        List<SellerProduct> tempProductsTwo = sellerProductRepository
+                .findByProductIdAndProductVarietyId(productId, productVarietyId);
+
+        if (!tempProductsTwo.isEmpty()) {
+            List<SellerProductDTO> tempSellerProductsDTOS = tempProductsTwo.stream()
+                    .map(sellerProduct -> {
+                        SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
+                        dto.setMessage("Matching based on Product, Variety");
+                        return dto;
+                    }).toList();
+            sellerProductDTOS.addAll(tempSellerProductsDTOS);
+        }
+
+        List<SellerProduct> tempProductOne = sellerProductRepository.findByPId(productId);
+        if (!tempProductOne.isEmpty()) {
+            List<SellerProductDTO> tempSellerProductsDTOS = tempProductOne.stream()
+                    .map(sellerProduct -> {
+                        SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
+                        dto.setMessage("Matching based on Product");
+                        return dto;
+                    }).toList();
+            sellerProductDTOS.addAll(tempSellerProductsDTOS);
+        }
+
+        return sellerProductDTOS;
     }
 
 
