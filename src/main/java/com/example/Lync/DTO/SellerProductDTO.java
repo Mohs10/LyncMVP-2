@@ -65,6 +65,7 @@ public class SellerProductDTO {
     private List<SpecificationDTO> specifications;
 
     private String message; //for criteria matching propose in Inquiry part
+    private int priority;
 
 }
 

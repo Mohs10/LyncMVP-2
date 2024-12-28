@@ -3,6 +3,7 @@ package com.example.Lync.ServiceImpl;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
+import com.example.Lync.Exception.ResourceNotFoundException;
 import com.example.Lync.Repository.*;
 import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.SellerBuyerService;
@@ -1058,55 +1059,53 @@ public class InquiryServiceImpl implements InquiryService {
     public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
 
         List<SellerProductDTO> sellerProductDTOS = new ArrayList<>();
+        Set<String> uniqueSpIds = new HashSet<>();
+        Map<String, String> spIdToMessageMap = new HashMap<>();
+        Map<String, Integer> spIdToPriorityMap = new HashMap<>();
 
-        List<SellerProduct> tempProductsFour = sellerProductRepository
-                .findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId);
-        if (!tempProductsFour.isEmpty()) {
-
-            List<SellerProductDTO> tempSellerProductDTOS = tempProductsFour.stream()
-                    .map( sellerProduct -> {
-                                SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
-                                dto.setMessage("Matching based on Product, Form, Variety, Specifications");
-                                return dto;
-                            }).toList();
-            sellerProductDTOS.addAll(tempSellerProductDTOS);
+        int priority = 4;
+        for(SellerProduct sellerProduct : sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId)) {
+            if(uniqueSpIds.add(sellerProduct.getSpId())) {
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form, Variety and Specifications");
+                spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
+            }
         }
 
-        List<SellerProduct> tempProductsThree = sellerProductRepository
-                .findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId);
-        if(!tempProductsThree.isEmpty()){
-            List<SellerProductDTO> tempSellerProductDTOS = tempProductsThree.stream()
-                    .map(sellerProduct -> {
-                        SellerProductDTO dto =sellerBuyerService.toDTO(sellerProduct);
-                        dto.setMessage("Matching based on Product, Form, Variety");
-                        return dto;
-                    }).toList();
-            sellerProductDTOS.addAll(tempSellerProductDTOS);
+        priority = 3;
+        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId)) {
+            if(uniqueSpIds.add(sellerProduct.getSpId())) {
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form and Variety");
+                spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
+            }
         }
 
-        List<SellerProduct> tempProductsTwo = sellerProductRepository
-                .findByProductIdAndProductVarietyId(productId, productVarietyId);
-
-        if (!tempProductsTwo.isEmpty()) {
-            List<SellerProductDTO> tempSellerProductsDTOS = tempProductsTwo.stream()
-                    .map(sellerProduct -> {
-                        SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
-                        dto.setMessage("Matching based on Product, Variety");
-                        return dto;
-                    }).toList();
-            sellerProductDTOS.addAll(tempSellerProductsDTOS);
+        priority = 2;
+        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId)) {
+            if(uniqueSpIds.add(sellerProduct.getSpId())) {
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product and Variety");
+                spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
+            }
         }
 
-        List<SellerProduct> tempProductOne = sellerProductRepository.findByPId(productId);
-        if (!tempProductOne.isEmpty()) {
-            List<SellerProductDTO> tempSellerProductsDTOS = tempProductOne.stream()
-                    .map(sellerProduct -> {
-                        SellerProductDTO dto = sellerBuyerService.toDTO(sellerProduct);
-                        dto.setMessage("Matching based on Product");
-                        return dto;
-                    }).toList();
-            sellerProductDTOS.addAll(tempSellerProductsDTOS);
+        priority = 1;
+        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductVarietyId(productId, productVarietyId)) {
+            if(uniqueSpIds.add(sellerProduct.getSpId())) {
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product");
+                spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
+            }
         }
+
+        for (String spId : uniqueSpIds) {
+            SellerProduct product = sellerProductRepository.findById(spId)
+                    .orElseThrow(() -> new ResourceNotFoundException("SellerProduct not found with spId: " + spId));
+
+            SellerProductDTO dto = sellerBuyerService.toDTO(product); // Implement this method to map fields
+            dto.setMessage(spIdToMessageMap.get(spId));
+            dto.setPriority(spIdToPriorityMap.get(spId));
+            sellerProductDTOS.add(dto);
+        }
+
+        sellerProductDTOS.sort(Comparator.comparingInt(SellerProductDTO::getPriority).reversed());
 
         return sellerProductDTOS;
     }
