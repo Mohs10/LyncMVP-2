@@ -102,13 +102,18 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
         sellerReceiveInquiryDTO.setAdminInitialPrice(sellerNegotiate.getAdminInitialPrice());
         sellerReceiveInquiryDTO.setAdminAddressId(sellerNegotiate.getAdminAddressId());
-        sellerReceiveInquiryDTO.setSellerName(sellerBuyerRepository.findById(sellerNegotiate.getSellerUId()).orElseThrow(null).getFullName());
+
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(sellerNegotiate.getSellerUId())
+                .orElseThrow(() -> new RuntimeException("Seller name not found with given Id : " + sellerNegotiate.getSellerUId()));
+
+        sellerReceiveInquiryDTO.setSellerName(sellerBuyer.getFullName());
         sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
         sellerReceiveInquiryDTO.setSellerNegotiatePrice(sellerNegotiate.getSellerNegotiatePrice());
         sellerReceiveInquiryDTO.setAdminFinalPrice(sellerNegotiate.getAdminFinalPrice());
 
 
-        Product product = productRepository.findById(inquiry.getProductId()).orElseThrow(null);
+        Product product = productRepository.findById(inquiry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found with given product Id: " + inquiry.getProductId()));
         sellerReceiveInquiryDTO.setProductName(product.getProductName());
         sellerReceiveInquiryDTO.setVarietyName(product.getVarieties().stream().map(Variety::getVarietyName).toList().toString());
         sellerReceiveInquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
@@ -974,6 +979,10 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
 
+        if (!"Query Raised".equals(inquiry.getOrderStatus())) {
+            throw new RuntimeException("Query already sent to sellers already.");
+        }
+
         List<String> successfulSellers = new ArrayList<>();
 
         // Get all sellers selling the specified product
@@ -1107,6 +1116,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sellerProductDTOS.sort(Comparator.comparingInt(SellerProductDTO::getPriority).reversed());
 
+
         return sellerProductDTOS;
     }
 
@@ -1115,9 +1125,9 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public List<SellerReceiveInquiryDTO> sellerAllInquiries(String sellerUId) {
         return sellerNegotiateRepository.findAll().stream()
-                .map(this::mapToSellerViewList)
                 .filter(sellerReceiveInquiryDTO ->
                 sellerReceiveInquiryDTO.getSellerUId().equals(sellerUId))
+                .map(this::mapToSellerViewList)
                 .collect(Collectors.toList());
     }
 
@@ -1231,7 +1241,7 @@ public class InquiryServiceImpl implements InquiryService {
     public String sellerRejectQuery(Long snId, String sellerUId) throws Exception {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
-
+//        if (sellerNegotiate )
         sellerNegotiate.setStatus("Seller Rejected the Inquiry");
         sellerNegotiateRepository.save(sellerNegotiate);
         return "You Rejected the Inquiry";
@@ -1249,7 +1259,15 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String sellerNegotiatePrice(Long snId, String sellerUId, Double amount) {
-        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        if (sellerNegotiate.getSellerNegotiatePrice() != null) {
+            throw new RuntimeException("You have already negotiated of amount" + amount);
+        } else if (sellerNegotiate.getAdminInitialPrice() == null) {
+            throw new RuntimeException("Admin has not given price to you yet");
+        }
+
         sellerNegotiate.setSellerNegotiatePrice(amount);
         sellerNegotiate.setSnpDate(LocalDate.now());
         sellerNegotiate.setSnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -1260,7 +1278,15 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String adminFinalPriceToSeller(Long snId, Double amount) {
-        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId).orElseThrow(null);
+        SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
+                .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        if (sellerNegotiate.getSellerNegotiatePrice() == null){
+            throw new RuntimeException("Seller did not negotiate yet");
+        } else if (sellerNegotiate.getAdminFinalPrice() != null) {
+            throw new RuntimeException("You have already given final price to seller");
+        }
+
         sellerNegotiate.setAdminFinalPrice(amount);
         sellerNegotiate.setAfpDate(LocalDate.now());
         sellerNegotiate.setAfpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -1274,6 +1300,18 @@ public class InquiryServiceImpl implements InquiryService {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
 
+        if (sellerNegotiate.getAdminInitialPrice() == null && sellerNegotiate.getAdminFinalPrice() == null){
+            throw new RuntimeException("Admin price is not found");
+        } else if ("Seller Accepted Admin Price".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("You have already accepted the Admin price");
+        } else if ("Seller Rejected Admin Price".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("You have already rejected the Admin price");
+        } else if ("Selected Seller".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already selected seller");
+        } else if ("Admin Rejected for Query".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already rejected");
+        }
+
         sellerNegotiate.setStatus("Seller Accepted Admin Price");
         sellerNegotiateRepository.save(sellerNegotiate);
         return "You Accepted the Admin Price";
@@ -1283,6 +1321,18 @@ public class InquiryServiceImpl implements InquiryService {
     public String sellerRejectAdminPrice(Long snId, String sellerUId) {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
+
+        if (sellerNegotiate.getAdminInitialPrice() == null && sellerNegotiate.getAdminFinalPrice() == null){
+            throw new RuntimeException("Admin price is not found");
+        } else if ("Seller Accepted Admin Price".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("You have already accepted the Admin price");
+        } else if ("Seller Rejected Admin Price".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("You have already rejected the Admin price");
+        } else if ("Selected Seller".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already selected seller");
+        } else if ("Admin Rejected for Query".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already rejected");
+        }
 
         sellerNegotiate.setStatus("Seller Rejected Admin Price");
         sellerNegotiateRepository.save(sellerNegotiate);
@@ -1294,6 +1344,16 @@ public class InquiryServiceImpl implements InquiryService {
         // Fetch the SellerNegotiate entity by snId or throw an exception if not found
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(() -> new RuntimeException("SellerNegotiate not found with ID: " + snId));
+
+        if (sellerNegotiate.getSellerNegotiatePrice() == null){
+            throw new RuntimeException("Seller has not negotiated yet");
+        } else if ("Seller Rejected Admin Price".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Seller have already rejected the Admin price");
+        } else if ("Selected Seller".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already selected seller");
+        } else if ("Admin Rejected for Query".equals(sellerNegotiate.getStatus())) {
+            throw new RuntimeException("Admin has already rejected");
+        }
 
         // Fetch the Inquiry entity associated with the QId
         Inquiry inquiry = inquiryRepository.findByQId(sellerNegotiate.getQId())
@@ -1477,12 +1537,16 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Buyer already Requested for sample for this Inquiry.");
         }
 
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+
+        if (inquiry.getSellerUId() == null) {
+            throw new RuntimeException("Seller is not decided yet to proceed further.");
+        }
+
         SampleOrder sampleOrder = new SampleOrder();
         OrderStatus orderStatus = new OrderStatus();
 
-        Inquiry inquiry = inquiryRepository.findByQId(qId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        
         LocalDate currentDate = LocalDate.now();
 
         Long count = sampleOrderRepository.countSampleOrderByCurrentDate(currentDate);
