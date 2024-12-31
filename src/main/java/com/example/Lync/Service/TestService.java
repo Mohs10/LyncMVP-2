@@ -7,15 +7,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface TestService {
     List<Test> getAllTests();
     public TestDTO getTestById(String testId) ;
     List<TestDTO> getTestsByQueryId(String queryId);
     Test saveTest(Test test);
+    Test adminAddAgency(Test test, String testId);
     String approveSamplingByAdmin(String testId, Boolean isApproved);
     public String approveSamplingByBuyer(String testId, Boolean isApproved) ;
     public String buyerAgreedToTerms(String testId, Boolean isApproved) ;
@@ -38,6 +37,8 @@ public interface TestService {
     public String uploadBuyerSOP(String testId, MultipartFile multipartFile) throws IOException ;
     String getBuyerTestSOP(String testId);
     String getSellerTestSOP(String testId);
+
+
 
 
     String processPayment(String testId, TestPhase5DTO dto);

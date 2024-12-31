@@ -112,5 +112,8 @@ public interface InquiryService {
 
     String uploadInvoice(String qId, MultipartFile file) throws IOException;
 
+    //Purchase Order- Kishan
+    String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException;
 
+    String getPurchaseOrder(String qId);
 }

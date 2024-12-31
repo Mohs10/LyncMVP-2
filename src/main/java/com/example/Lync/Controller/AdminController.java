@@ -300,6 +300,11 @@ public class AdminController {
         return new ResponseEntity<>(adminAddressService.getAdminAddressById(adminAddressId), HttpStatus.OK);
     }
 
+    @GetMapping("/adminGetPurchaseOrder/{qId}")
+    public ResponseEntity<String> getPurchaseOrder(@PathVariable String qId){
+        return ResponseEntity.ok(inquiryService.getPurchaseOrder(qId));
+    }
+
 
 
 

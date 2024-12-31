@@ -2389,6 +2389,24 @@ public class InquiryServiceImpl implements InquiryService {
         return key;
     }
 
+    @Override
+    public String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException {
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+        String key = s3Service.uploadPurchaseOrder(qId, file);
+        inquiry.setPurchaseOrderUrl(key);
+        return key;
+    }
+
+    @Override
+    public String getPurchaseOrder(String qId) {
+
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+
+        return s3Service.getFiles(inquiry.getPurchaseOrderUrl());
+    }
+
 }
 
 

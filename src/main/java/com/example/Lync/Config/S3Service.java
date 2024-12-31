@@ -578,36 +578,36 @@ public class S3Service {
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
-
-    public String uploadPurchaseOrder(String orderId, MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename();
-        String s3Key = "Orders/" + orderId +"/PurchaseOrder/" + fileName;
-
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3Key)
-                        .build(),
-                RequestBody.fromBytes(file.getBytes()));
-
-        // Return the S3 key of the uploaded image
-        return s3Key;
-    }
-
-    public String getPurchaseOrder(String url) {
-        String s3Key = url;
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(s3Key)
-                .build();
-
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(1440))
-                .getObjectRequest(getObjectRequest)
-                .build();
-
-        return s3Presigner.presignGetObject(presignRequest).url().toString();
-    }
+//
+//    public String uploadPurchaseOrder(String orderId, MultipartFile file) throws IOException {
+//        String fileName = file.getOriginalFilename();
+//        String s3Key = "Orders/" + orderId +"/PurchaseOrder/" + fileName;
+//
+//        s3Client.putObject(PutObjectRequest.builder()
+//                        .bucket(bucketName)
+//                        .key(s3Key)
+//                        .build(),
+//                RequestBody.fromBytes(file.getBytes()));
+//
+//        // Return the S3 key of the uploaded image
+//        return s3Key;
+//    }
+//
+//    public String getPurchaseOrder(String url) {
+//        String s3Key = url;
+//
+//        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(s3Key)
+//                .build();
+//
+//        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(1440))
+//                .getObjectRequest(getObjectRequest)
+//                .build();
+//
+//        return s3Presigner.presignGetObject(presignRequest).url().toString();
+//    }
 
     public String uploadOrderInvoice(String orderId, MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
@@ -653,6 +653,7 @@ public class S3Service {
         // Return the S3 key of the uploaded invoice
         return s3Key;
     }
+
     public String getSampleInvoice(String url) {
         String s3Key = url;
 
@@ -668,6 +669,35 @@ public class S3Service {
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
+
+    public String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Query/PurchaseOrder/" + qId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    public String getPurchaseOrder(String url) {
+        String s3Key = url;
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(1440))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
 
 
 

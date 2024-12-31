@@ -20,7 +20,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -370,6 +372,15 @@ public class BuyerController {
         return ResponseEntity.ok(message);
     }
 
+    @PostMapping("/upload/PurchaseOrder/{qId}")
+    public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String qId, @RequestParam("file")MultipartFile file) {
+        try{
+            String fileUrl = inquiryService.uploadPurchaseOrder(qId, file);
+            return ResponseEntity.ok(fileUrl);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+        }
+    }
 
 
 

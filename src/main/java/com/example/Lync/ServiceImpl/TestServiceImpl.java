@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,6 +86,19 @@ public class TestServiceImpl implements TestService {
         testStatusRepository.save(initialStatus);
 
         return savedTest;
+    }
+
+    @Override
+    public Test adminAddAgency(Test test, String testId) {
+        Test existingTest = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
+        existingTest.setTestingAgencyName(test.getTestingAgencyName());
+        existingTest.setTestingParameters(test.getTestingParameters());
+        existingTest.setContactPersonEmail(test.getContactPersonEmail());
+        existingTest.setContactPersonPhoneNumber(test.getContactPersonPhoneNumber());
+        existingTest.setTestingLocation(test.getTestingLocation());
+
+        return testRepository.save(existingTest);
     }
 
 

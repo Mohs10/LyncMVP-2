@@ -39,6 +39,12 @@ public class TestController {
         return ResponseEntity.ok(testService.saveTest(test));
     }
 
+    @PutMapping("/adminAddAgency/{testId}")
+    public ResponseEntity<Test> adminAddAgency(@PathVariable String testId, @RequestBody Test test) {
+        Test updatedTest = testService.adminAddAgency(test, testId);
+        return ResponseEntity.ok(updatedTest);
+    }
+
     @PutMapping("/{testId}/sampling/buyer-sop-acceptance")
     public ResponseEntity<String> approveSopByBuyer(@PathVariable String testId, @RequestBody Map<String, Object> approval) {
         Boolean isApproved = (Boolean) approval.get("approved");

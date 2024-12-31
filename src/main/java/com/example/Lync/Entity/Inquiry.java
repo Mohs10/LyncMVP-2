@@ -84,5 +84,7 @@ public class Inquiry {
             inverseJoinColumns = @JoinColumn(name = "inquiry_specification_id")
     )
     private List<InquirySpecification> specifications;
+
+    private String purchaseOrderUrl; // Admin will upload the purchase order
 }
 
