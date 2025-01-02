@@ -2071,7 +2071,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         sampleOrderDTO.setBuyerReceiveDate(sampleOrder.getBuyerReceiveDate());
         sampleOrderDTO.setBuyerReceiveTime(sampleOrder.getBuyerReceiveTime());
-
+        sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
         sampleOrderDTO.setBuyerApproveDate(sampleOrder.getBuyerApproveDate());
         sampleOrderDTO.setBuyerApproveTime(sampleOrder.getBuyerApproveTime());
 
