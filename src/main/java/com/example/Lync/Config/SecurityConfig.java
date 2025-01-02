@@ -48,6 +48,8 @@ public class SecurityConfig {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of(
                             "http://localhost:5173",
+
+                            "http://localhost:*",
                             "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
                             "https://another-domain.com",
                             "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com"
