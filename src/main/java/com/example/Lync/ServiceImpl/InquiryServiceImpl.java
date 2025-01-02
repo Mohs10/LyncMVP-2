@@ -2395,6 +2395,7 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         String key = s3Service.uploadPurchaseOrder(qId, file);
         inquiry.setPurchaseOrderUrl(key);
+        inquiryRepository.save(inquiry);
         return key;
     }
 
