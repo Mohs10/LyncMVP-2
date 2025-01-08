@@ -3,11 +3,11 @@ package com.example.Lync.ServiceImpl;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.Inquiry;
+import com.example.Lync.Entity.Product;
 import com.example.Lync.Entity.Test;
 import com.example.Lync.Entity.TestStatus;
-import com.example.Lync.Repository.InquiryRepository;
-import com.example.Lync.Repository.TestRepository;
-import com.example.Lync.Repository.TestStatusRepository;
+import com.example.Lync.Repository.*;
+import com.example.Lync.Service.ProductService;
 import com.example.Lync.Service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,10 @@ public class TestServiceImpl implements TestService {
     private TestStatusRepository testStatusRepository;
     @Autowired
     private InquiryRepository inquiryRepository;
-
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private VarietyRepository varietyRepository;
     @Autowired
     private S3Service s3Service;
 
@@ -48,6 +51,13 @@ public class TestServiceImpl implements TestService {
         return testRepository.findByQueryId(queryId)
                 .stream()
                 .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<OrderInTestingDTO> findBySellerId(String sellerId) {
+        return testRepository.findBySellerId(sellerId)
+                .stream()
+                .map(this::toOrderInTestingDTO)
                 .collect(Collectors.toList());
     }
 
@@ -807,6 +817,39 @@ public class TestServiceImpl implements TestService {
 
 
 
+    private OrderInTestingDTO toOrderInTestingDTO(Test test) {
+        if (test == null) {
+            return null;
+        }
+
+        OrderInTestingDTO testDTO = new OrderInTestingDTO();
+        Inquiry inquiry = inquiryRepository.findByQId(test.getQueryId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id: " + test.getQueryId()));
+        Product product = productRepository.findById(inquiry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        System.out.println(inquiry);
+        // Handle variety name or assign "NA" if not found
+        String productVariety = varietyRepository.findVarietyNameByVarietyId(inquiry.getProductVarietyId())
+                .orElse("NA");
+
+        testDTO.setTestId(test.getTestId());
+        testDTO.setBuyerId(test.getBuyerId());
+        testDTO.setSellerId(test.getSellerId());
+        testDTO.setQueryId(test.getQueryId());
+        testDTO.setProductName(product.getProductName());
+        testDTO.setPrice(inquiry.getBuyerFinalPrice());
+        testDTO.setVariety(productVariety);
+        testDTO.setQuantity(inquiry.getQuantity());
+
+        String productImageUrl = null;
+        if (product.getProductImageUrl() != null) {
+            productImageUrl = s3Service.getFiles(product.getProductImageUrl());
+        }
+        testDTO.setProductImageUrl(productImageUrl);
+
+        return testDTO;
+    }
 
 
 

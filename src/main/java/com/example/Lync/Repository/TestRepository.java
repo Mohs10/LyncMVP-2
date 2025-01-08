@@ -10,6 +10,10 @@ import java.util.List;
 @Repository
 public interface TestRepository extends JpaRepository<Test, String> {
     List<Test> findByQueryId(String queryId); // Find all tests by queryId
+
+    List<Test> findBySellerId(String sellerId);
+    List<Test> findBySellerIdAndResultUploadDateIsNull(String sellerId);
+
 }
 
 

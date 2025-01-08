@@ -34,6 +34,11 @@ public class TestController {
         return ResponseEntity.ok(testService.getTestById(testId));
     }
 
+    @GetMapping("/findTestBySellerID/{sellerId}")
+    public ResponseEntity<List<OrderInTestingDTO>> findTestBySellerID(@PathVariable String sellerId) {
+        return ResponseEntity.ok(testService.findBySellerId(sellerId));
+    }
+
     @PostMapping("/initiateTestRequest")
     public ResponseEntity<Test> saveTest(@RequestBody Test test) {
         return ResponseEntity.ok(testService.saveTest(test));

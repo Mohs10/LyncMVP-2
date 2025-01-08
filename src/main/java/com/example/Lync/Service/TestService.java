@@ -13,6 +13,8 @@ public interface TestService {
     List<Test> getAllTests();
     public TestDTO getTestById(String testId) ;
     List<TestDTO> getTestsByQueryId(String queryId);
+    public List<OrderInTestingDTO> findBySellerId(String sellerId) ;
+
     Test saveTest(Test test);
     Test adminAddAgency(Test test, String testId);
     String approveSamplingByAdmin(String testId, Boolean isApproved);
