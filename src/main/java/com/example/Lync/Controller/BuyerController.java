@@ -223,7 +223,7 @@ public class BuyerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         String message =  inquiryService.buyerAddInquiry(inquiryDTO, sellerDetails.getUserId());
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     @GetMapping("/buyerGetsAllInquiry")

@@ -1,5 +1,6 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.MessageConfig;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
@@ -9,6 +10,8 @@ import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.SellerBuyerService;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +41,9 @@ public class InquiryServiceImpl implements InquiryService {
     private VarietyRepository varietyRepository;
     private InquirySpecificationRepository inquirySpecificationRepository;
     private  S3Service s3Service;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     private final Map<String, Inquiry> inquiryQIdCache = new HashMap<>();
 
@@ -255,6 +261,19 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setSpecifications(inquirySpecifications);
         inquiryRepository.save(inquiry);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("New inquiry added by buyer: " + buyerUId);
+        notification.setBuyerId(buyerUId);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ROUTING_KEY, notification);
+        // Publish the notification
+
 
         return "You raised an inquiry.";
     }
