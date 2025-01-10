@@ -280,7 +280,6 @@ public class InquiryServiceImpl implements InquiryService {
         messagingTemplate.convertAndSend("/topic/notifications", notification);
         notificationRepository.save(notification);
 
-
         return "You raised an inquiry.";
     }
 
