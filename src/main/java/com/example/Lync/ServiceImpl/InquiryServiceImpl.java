@@ -12,6 +12,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +42,10 @@ public class InquiryServiceImpl implements InquiryService {
     private VarietyRepository varietyRepository;
     private InquirySpecificationRepository inquirySpecificationRepository;
     private  S3Service s3Service;
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -272,7 +277,8 @@ public class InquiryServiceImpl implements InquiryService {
 
 // Send the notification to the 'notification.queue' with the correct routing key
         rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ROUTING_KEY, notification);
-        // Publish the notification
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
 
 
         return "You raised an inquiry.";
