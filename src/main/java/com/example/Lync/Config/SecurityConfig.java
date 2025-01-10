@@ -54,8 +54,10 @@ public class SecurityConfig {
                             "https://another-domain.com",
                             "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com"
                     )); // Add multiple origins
+                    config.setAllowedOriginPatterns(List.of("http://localhost:*"));
                      config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH")); // Allowed methods
                     config.setAllowedHeaders(List.of("*")); // Allowed headers
+                    config.setAllowCredentials(true); // Allow credentials
                     return config;
                 }))
                 .authorizeHttpRequests(auth -> auth
