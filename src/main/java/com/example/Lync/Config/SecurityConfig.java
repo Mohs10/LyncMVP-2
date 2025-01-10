@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/sellerbuyer_login/**").permitAll()
                         .requestMatchers("/auth/otp-authenticate/**").permitAll()
                         .requestMatchers("/logic/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
 
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
