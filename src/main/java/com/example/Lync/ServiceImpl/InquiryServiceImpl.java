@@ -269,14 +269,15 @@ public class InquiryServiceImpl implements InquiryService {
 
         Notification notification = new Notification();
         notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("New inquiry added by buyer: " + buyerUId);
-        notification.setBuyerId(buyerUId);
+        notification.setMessage("You have received a new query request");
+
         notification.setIsRead(false);
         notification.setDate(LocalDate.now());
         notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setInquiryId(inquiryId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ROUTING_KEY, notification);
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
         messagingTemplate.convertAndSend("/topic/notifications", notification);
         notificationRepository.save(notification);
 
@@ -1039,6 +1040,20 @@ public class InquiryServiceImpl implements InquiryService {
                     sellerNegotiate.setStatus("Inquiry send to Seller");
                     sellerNegotiateRepository.save(sellerNegotiate);
 
+                    Notification notification = new Notification();
+                    notification.setNotificationId(UUID.randomUUID().toString());
+                    notification.setMessage("You have received a new query request");
+                    notification.setSellerId(sellerUId);
+                    notification.setIsRead(false);
+                    notification.setDate(LocalDate.now());
+                    notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+                    notification.setInquiryId(qId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+                    rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
+                    messagingTemplate.convertAndSend("/topic/notifications/seller/" + sellerUId, notification);
+                    notificationRepository.save(notification);
+
                     OrderStatus orderStatus = new OrderStatus();
                     orderStatus.setOId(qId);
                     orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
@@ -1268,6 +1283,21 @@ public class InquiryServiceImpl implements InquiryService {
 //        if (sellerNegotiate )
         sellerNegotiate.setStatus("Seller Rejected the Inquiry");
         sellerNegotiateRepository.save(sellerNegotiate);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller has rejected the query ID" + sellerNegotiate.getQId());
+
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setInquiryId(sellerNegotiate.getQId());
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
+
         return "You Rejected the Inquiry";
     }
 
@@ -1278,6 +1308,20 @@ public class InquiryServiceImpl implements InquiryService {
 
         sellerNegotiate.setStatus("Seller Accepted the Inquiry");
         sellerNegotiateRepository.save(sellerNegotiate);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller has accepted the query ID" + sellerNegotiate.getQId());
+
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setInquiryId(sellerNegotiate.getQId());
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
         return "You Accepted the Inquiry";
     }
 
@@ -1297,6 +1341,21 @@ public class InquiryServiceImpl implements InquiryService {
         sellerNegotiate.setSnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         sellerNegotiate.setStatus("Seller Negotiated");
         sellerNegotiateRepository.save(sellerNegotiate);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller has accepted the query ID" + sellerNegotiate.getQId());
+
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setInquiryId(sellerNegotiate.getQId());
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
+
         return "You negotiated with amount :" + amount;
     }
 

@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,7 @@ public class AdminController {
     private final OTPStorageService otpStorageService;
     private final InquiryService inquiryService;
     private final AdminAddressService adminAddressService;
+    private NotificationService notificationService;
 
     // Removed the duplicate UserInfoService field
     public AdminController(S3Service s3Service,
@@ -49,7 +53,8 @@ public class AdminController {
                            SellerBuyerService sellerBuyerService,
                            AuthenticationManager authenticationManager,
                            OtpService otpService,
-                           OTPStorageService otpStorageService, InquiryService inquiryService, AdminAddressService adminAddressService) {
+                           OTPStorageService otpStorageService, InquiryService inquiryService, AdminAddressService adminAddressService,
+                           NotificationService notificationServices) {
         this.s3Service = s3Service;
         this.service = service;
         this.jwtService = jwtService;
@@ -59,6 +64,7 @@ public class AdminController {
         this.otpStorageService = otpStorageService;
         this.inquiryService = inquiryService;
         this.adminAddressService = adminAddressService;
+        this.notificationService = notificationServices;
     }
 
 
@@ -305,6 +311,22 @@ public class AdminController {
         return ResponseEntity.ok(inquiryService.getPurchaseOrder(qId));
     }
 
+    @GetMapping("/adminGetsAllNotification")
+    public ResponseEntity<List<NotificationDTO>> getNotifications(){
+        return new ResponseEntity<>(notificationService.getAllNotifications(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteNotificationById/{notificationId}")
+    public ResponseEntity<String> deleteNotificationById(@PathVariable String notificationId){
+        return new ResponseEntity<>(notificationService.deleteNotificationById(notificationId),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/getNotificationDetails/{notificationId}")
+    public ResponseEntity<Object> getNotificationDetails(@PathVariable String notificationId){
+        return new ResponseEntity<>(notificationService.notificationDetails(notificationId),
+                HttpStatus.OK);
+    }
 
 
 
