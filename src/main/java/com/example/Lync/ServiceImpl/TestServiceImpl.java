@@ -1,22 +1,25 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.MessageConfig;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
-import com.example.Lync.Entity.Inquiry;
-import com.example.Lync.Entity.Product;
-import com.example.Lync.Entity.Test;
-import com.example.Lync.Entity.TestStatus;
+import com.example.Lync.Entity.*;
 import com.example.Lync.Repository.*;
 import com.example.Lync.Service.ProductService;
 import com.example.Lync.Service.TestService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +37,14 @@ public class TestServiceImpl implements TestService {
     private VarietyRepository varietyRepository;
     @Autowired
     private S3Service s3Service;
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public List<Test> getAllTests() {
@@ -95,6 +106,21 @@ public class TestServiceImpl implements TestService {
         // Save the initial TestStatus entry
         testStatusRepository.save(initialStatus);
 
+
+
+        String adminMessage = String.format(
+                "Testing request has been raised from the Buyer: %s for Query with id: %s",
+                savedTest.getBuyerId(),
+                savedTest.getQueryId()
+        );
+
+        // Send notifications
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
+
+
+
+
+
         return savedTest;
     }
 
@@ -108,7 +134,18 @@ public class TestServiceImpl implements TestService {
         existingTest.setContactPersonPhoneNumber(test.getContactPersonPhoneNumber());
         existingTest.setTestingLocation(test.getTestingLocation());
 
-        return testRepository.save(existingTest);
+        Test savedTest =  testRepository.save(existingTest);
+        // Construct a notification message for the admin
+        String buyerMessage = String.format(
+                "A testing agency has been assigned for Query ID: %s by Lyncc. " +
+                        "Please review the updated testing details.",
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
+
+        return savedTest;
     }
 
 
@@ -119,7 +156,17 @@ public class TestServiceImpl implements TestService {
 
         // Update the admin approval status
         test.setAdminApprovesTestRequest(isApproved);
-        testRepository.save(test);
+       Test savedTest= testRepository.save(test);
+
+
+        // Construct a notification message for the admin
+        String buyerMessage = String.format(
+                "Lyncc has " + (isApproved ? "approved" : "rejected") + " the sampling request for Query ID: %s",
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
 
         // Create a TestStatus entry for the approval/rejection
         TestStatus status = new TestStatus();
@@ -143,7 +190,17 @@ public class TestServiceImpl implements TestService {
 
         // Update the buyer approval status
         test.setBuyerAcceptsTestRequest(isApproved);
-        testRepository.save(test);
+        Test savedTest = testRepository.save(test);
+
+
+        // Construct a notification message for the admin
+        String adminMessage = String.format(
+                "Buyer has " + (isApproved ? "approved" : "rejected") + " the sampling request for Query ID: %s",
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
 
         // Create a TestStatus entry for the approval/rejection
         TestStatus status = new TestStatus();
@@ -167,7 +224,22 @@ public class TestServiceImpl implements TestService {
 
         // Update the buyer's agreement to terms
         test.setBuyerAgreedToTerms(isApproved);
-        testRepository.save(test);
+        Test savedTest = testRepository.save(test);
+        // Construct a notification message for the admin
+        String adminMessage = String.format(
+                "Buyer has " + (isApproved ? "approved" : "rejected") + " the sampling request for Query ID: %s",
+                savedTest.getQueryId()
+        );
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
+
+        if (isApproved) {
+            String sellerMessage = String.format(
+                    "You have received a new testing request for Query ID: %s.",
+                    savedTest.getQueryId()
+            );
+            sendNotificationBasedOnRoleOrUser(savedTest, "SELLER", sellerMessage);
+        }
 
         // Create a TestStatus entry for the agreement/rejection
         TestStatus status = new TestStatus();
@@ -193,7 +265,22 @@ public class TestServiceImpl implements TestService {
         // Update the seller's approval and agreement to terms
         test.setSellerAcceptsTestRequest(isApproved);
         test.setSellerAgreedToTerms(isApproved);
-        testRepository.save(test);
+        Test savedTest = testRepository.save(test);
+        // Construct a notification message for the admin
+        String adminMessage = String.format(
+                "Seller has " + (isApproved ? "approved" : "rejected") + " the sampling request for Query ID: %s",
+                savedTest.getQueryId()
+        );
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
+
+        if (isApproved) {
+            String buyerMessage = String.format(
+                    "Testing has been initiated for Query ID: %s. Please await further updates.",
+                    savedTest.getQueryId()
+            );
+            sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
+        }
 
         // Create a TestStatus entry for the approval/rejection
         TestStatus status = new TestStatus();
@@ -221,7 +308,20 @@ public class TestServiceImpl implements TestService {
         test.setSamplingLocation(dto.getSamplingLocation());
         test.setEstimatedResultDate(dto.getEstimatedResultDate());
 
-        testRepository.save(test);
+        Test savedTest = testRepository.save(test);
+        // Construct a notification message for the admin
+        String adminMessage = String.format(
+                "Query ID: %s, Sampling date: %s, Location: %s, Estimated result date: %s",
+                savedTest.getQueryId(),
+                savedTest.getSamplingDate(),
+                savedTest.getSamplingLocation(),
+                savedTest.getEstimatedResultDate()
+        );
+
+
+        // Send notifications asynchronously
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
+
 
         // Create a TestStatus entry for the update
         TestStatus status = new TestStatus();
@@ -373,7 +473,26 @@ public class TestServiceImpl implements TestService {
 
         // Update the test with the new test report URL
         test.setTestReportUrl(path);
-        testRepository.save(test);
+        Test savedTest =  testRepository.save(test);
+        // Construct a notification message for the admin
+// Construct a notification message for the admin
+        String adminMessage = String.format(
+                "Test results are uploaded for Query ID: %s. Please review the uploaded file.",
+                savedTest.getQueryId()
+        );
+
+// Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
+
+// Construct a notification message for the buyer
+        String buyerMessage = String.format(
+                "Test results for Query ID: %s have been uploaded. Please log in to review the results.",
+                savedTest.getQueryId()
+        );
+
+// Send notification to the buyer
+        sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
+
 
         // Create a TestStatus entry for the test results file upload
         TestStatus status = new TestStatus();
@@ -398,7 +517,15 @@ public class TestServiceImpl implements TestService {
 
         // Update the buyer's decision on the test result
         test.setBuyerAcceptsTestRequest(isApproved);
-        testRepository.save(test);
+        Test savedTest =  testRepository.save(test);
+        // Construct a notification message for the admin
+        String adminMessage = String.format(
+                " Buyer has " + (isApproved ? "accepted" : "rejected") + " the test result. Query ID: %s" ,
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "ADMIN", adminMessage);
 
         // Create a TestStatus entry for the buyer's decision
         TestStatus status = new TestStatus();
@@ -594,7 +721,16 @@ public class TestServiceImpl implements TestService {
 
         // Update the test with the SOP URL
         test.setSopForBuyerUrl(path);
-        testRepository.save(test);
+        Test savedTest =  testRepository.save(test);
+        // Construct a notification message for the admin
+        String buyerMessage = String.format(
+                "Buyer SOP uploaded for Query ID: %s" +
+                        "Please review the uploaded file.",
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
 
         // Create a TestStatus entry for the buyer SOP upload
         TestStatus status = new TestStatus();
@@ -624,7 +760,16 @@ public class TestServiceImpl implements TestService {
 
         // Update the test with the SOP URL
         test.setSopForSellerUrl(path);
-        testRepository.save(test);
+        Test savedTest =  testRepository.save(test);
+        // Construct a notification message for the admin
+        String sellerMessage = String.format(
+                "Seller SOP uploaded for Query ID: %s" +
+                        "Please review the uploaded file.",
+                savedTest.getQueryId()
+        );
+
+        // Send notification to the admin
+        sendNotificationBasedOnRoleOrUser(savedTest, "SELLER", sellerMessage);
 
         // Create a TestStatus entry for the seller SOP upload
         TestStatus status = new TestStatus();
@@ -853,6 +998,55 @@ public class TestServiceImpl implements TestService {
 
 
 
+
+
+    public void sendNotificationBasedOnRoleOrUser(Test test, String role, String message) {
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage(message);
+        notification.setBuyerId(test.getBuyerId()); // Assuming BuyerId represents the recipient
+        notification.setSellerId(test.getSellerId());
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+        // Determine the routing key and topic based on role or userId
+        String routingKey;
+        String topic;
+
+        if (role != null) {
+            switch (role.toUpperCase()) {
+                case "ADMIN":
+                    routingKey = MessageConfig.ADMIN_ROUTING_KEY;
+                    topic = "/topic/notifications";
+                    break;
+                case "SELLER":
+                    routingKey = MessageConfig.SELLER_ROUTING_KEY;
+                    topic = "/topic/notifications/seller"+test.getSellerId();
+                    break;
+                case "BUYER":
+                    routingKey = MessageConfig.BUYER_ROUTING_KEY;
+                    topic = "/topic/notifications/buyer"+test.getBuyerId();
+                    break;
+                default:
+                    routingKey = MessageConfig.DEFAULT_ROUTING_KEY;
+                    topic = "/topic/notifications/general";
+            }
+        } else {
+            // Default case if no role is provided
+            routingKey = MessageConfig.DEFAULT_ROUTING_KEY;
+            topic = "/topic/notifications/general";
+        }
+
+        // Send notification to RabbitMQ
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, routingKey, notification);
+
+        // Send notification to WebSocket subscribers
+        messagingTemplate.convertAndSend(topic, notification);
+
+        // Save the notification in the repository
+        notificationRepository.save(notification);
+    }
 
 
 
