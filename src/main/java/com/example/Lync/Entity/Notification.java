@@ -23,6 +23,7 @@ public class Notification {
     private String message;
     private String buyerId;
     private String sellerId;
+    private Boolean isAdmin;
     private Boolean isRead;
     private LocalDate date;
     private LocalTime time;
