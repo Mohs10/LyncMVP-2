@@ -2,7 +2,9 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.Test;
+import com.example.Lync.Repository.TestRepository;
 import com.example.Lync.Service.TestService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class TestController {
 
     @Autowired
     private TestService testService;
+
+    @Autowired
+    private TestRepository testRepository;
 
     @GetMapping("/testsByQId/{queryId}")//
     public ResponseEntity<List<TestDTO>> getTestsByQueryId(@PathVariable String queryId) {
@@ -85,6 +90,9 @@ public class TestController {
     public ResponseEntity<String> updateSamplingDetails(@PathVariable String testId, @RequestBody TestPhase2DTO dto) {
         return ResponseEntity.ok(testService.updateSamplingDetails(testId, dto));
     }
+
+
+
 
 //    @PutMapping("/{testId}/sampling/results-estimate")
 //    public ResponseEntity<String> setResultsEstimate(@PathVariable String testId, @RequestBody Map<String, Object> details) {
@@ -292,6 +300,197 @@ public class TestController {
     public ResponseEntity<String>  getSellerTestSOP(@PathVariable String testId) {
         return ResponseEntity.ok(testService.getSellerTestSOP(testId));
     }
+
+
+
+
+
+
+//  Notifications
+
+    @PostMapping("/{testId}/notifyBuyer/testingDetails")
+    public ResponseEntity<String> notifyBuyerTestingDetails(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = String.format("Testing details are available now for Query ID: %s", test.getQueryId());
+
+            // Send notification to the BUYER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "BUYER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{testId}/notifyBuyer/sopAvailable")
+    public ResponseEntity<String> notifyBuyerSOPAvailable(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = "SOP now available";
+
+            // Send notification to the BUYER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "BUYER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/{testId}/notifyBuyer/testingInitiated")
+    public ResponseEntity<String> notifyBuyerTestingInitiated(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = String.format("Testing has been initiated for the Query ID: %s", test.getQueryId());
+
+            // Send notification to the BUYER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "BUYER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/{testId}/notifyBuyer/resultAvailable")
+    public ResponseEntity<String> notifyBuyerResultAvailable(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = String.format("Result is available now for the testing for Query ID: %s", test.getQueryId());
+
+            // Send notification to the BUYER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "BUYER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+
+    @PostMapping("/{testId}/notifySeller/newTestingRequest")
+    public ResponseEntity<String> notifySellerNewTestingRequest(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = "You have received a new testing request.";
+
+            // Send notification to the SELLER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "SELLER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/{testId}/notifySeller/testingInitiated")
+    public ResponseEntity<String> notifySellerTestingInitiated(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = String.format("Testing has been initiated for the Query ID: %s", test.getQueryId());
+
+            // Send notification to the SELLER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "SELLER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/{testId}/notifySeller/resultAvailable")
+    public ResponseEntity<String> notifySellerResultAvailable(@PathVariable String testId) {
+        try {
+            // Fetch test details
+            Test test = testRepository.findById(testId)
+                    .orElseThrow(() -> new EntityNotFoundException("Test not found with given test Id: " + testId));
+
+            // Prepare notification message
+            String message = String.format("Result is available now for the testing for Query ID: %s", test.getQueryId());
+
+            // Send notification to the SELLER role
+            testService.sendNotificationBasedOnRoleOrUser(test, "SELLER", message);
+
+            // Return success response
+            return ResponseEntity.ok("Notification sent successfully");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending notification: " + e.getMessage());
+        }
+    }
+
+
+
 
 
 

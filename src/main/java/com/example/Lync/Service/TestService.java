@@ -44,5 +44,8 @@ public interface TestService {
 
 
     String processPayment(String testId, TestPhase5DTO dto);
-}
+
+    public void sendNotificationBasedOnRoleOrUser(Test test, String role, String message) ;
+
+    }
 
