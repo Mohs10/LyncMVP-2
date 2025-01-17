@@ -1006,6 +1006,10 @@ public class TestServiceImpl implements TestService {
         notification.setMessage(message);
         notification.setBuyerId(test.getBuyerId()); // Assuming BuyerId represents the recipient
         notification.setSellerId(test.getSellerId());
+
+        notification.setIsAdmin("ADMIN".equalsIgnoreCase(role));
+
+
         notification.setIsRead(false);
         notification.setDate(LocalDate.now());
         notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
