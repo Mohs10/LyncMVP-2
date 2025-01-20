@@ -7,6 +7,7 @@ import com.razorpay.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class RazorpayController {
 
     // API to create an order
     @PostMapping("/create-order")
+//    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+
     public ResponseEntity<String> createOrder(
             @RequestParam double amount,
             @RequestParam String currency,
@@ -35,6 +38,8 @@ public class RazorpayController {
     // API to verify payment signature
 // API to verify payment signature
     @PostMapping("/verify-signature")
+//    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+
     public ResponseEntity<String> verifySignature(
             @RequestParam String orderId,
             @RequestParam String paymentId,
@@ -48,6 +53,8 @@ public class RazorpayController {
     }
 
     @GetMapping("/allOrders")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<?> fetchAllOrders() {
         try {
             List<RazorpayOrderDTO> allOrders = razorpayService.fetchAllOrders();
@@ -60,6 +67,8 @@ public class RazorpayController {
     }
 
     @GetMapping("/allPayments")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
     public ResponseEntity<?> fetchAllPayments() {
         try {
             List<RazorpayPaymentDTO> allPayment =  razorpayService.fetchAllPayments();
