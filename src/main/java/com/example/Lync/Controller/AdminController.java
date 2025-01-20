@@ -10,6 +10,7 @@ import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,7 +43,8 @@ public class AdminController {
     private final OTPStorageService otpStorageService;
     private final InquiryService inquiryService;
     private final AdminAddressService adminAddressService;
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final OrderService orderService;
 
     // Removed the duplicate UserInfoService field
     public AdminController(S3Service s3Service,
@@ -54,7 +56,7 @@ public class AdminController {
                            AuthenticationManager authenticationManager,
                            OtpService otpService,
                            OTPStorageService otpStorageService, InquiryService inquiryService, AdminAddressService adminAddressService,
-                           NotificationService notificationServices) {
+                           NotificationService notificationServices, OrderService orderService) {
         this.s3Service = s3Service;
         this.service = service;
         this.jwtService = jwtService;
@@ -65,6 +67,7 @@ public class AdminController {
         this.inquiryService = inquiryService;
         this.adminAddressService = adminAddressService;
         this.notificationService = notificationServices;
+        this.orderService = orderService;
     }
 
 
@@ -328,6 +331,65 @@ public class AdminController {
                 HttpStatus.OK);
     }
 
+    @PostMapping("/adminUploadPurchaseInvoice/{oId}")
+    public ResponseEntity<String> uploadPurchaseInvoice(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+       String message = orderService.adminUploadPurchaseInvoice(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
 
+    @PostMapping("/adminUploadPurchaseOrder/{oId}")
+    public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadPurchaseOrder(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminNotifyBuyerToPay/{oId}")
+    public ResponseEntity<String> adminNotifyBuyerToPay(@PathVariable String oId, @RequestBody Map<String, Double> requestBody){
+        Double amount = requestBody.get("amount");
+        String message = orderService.adminNotifyBuyerToPay(oId, amount);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminConfirmBuyerPayment/{oId}")
+    public ResponseEntity<String> adminConfirmBuyerPayment(@PathVariable String oId){
+        String message = orderService.adminConfirmBuyerPayment(oId);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminNotifySellerToDispatch/{oId}")
+    public ResponseEntity<String> adminNotifySellerToDispatch(@PathVariable String oId){
+        String message = orderService.adminNotifySellerToDispatch(oId);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminUploadEWayBill/{oId}")
+    public ResponseEntity<String> adminUploadEWayBill(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadEWayBill(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminUploadPaymentInvoice/{oId}")
+    public ResponseEntity<String> adminUploadPaymentInvoice(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadPaymentInvoice(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminUploadLRCopy/{oId}")
+    public ResponseEntity<String> adminUploadLRCopy(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadLRCopy(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminUploadWeightSlipPreLoad/{oId}")
+    public ResponseEntity<String> adminUploadWeightSlipPreLoad(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadWeightSlipPreLoad(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminUploadWeightSlipPostLoad/{oId}")
+    public ResponseEntity<String> adminUploadWeightSlipPostLoad(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadWeightSlipPostLoad(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
 
 }

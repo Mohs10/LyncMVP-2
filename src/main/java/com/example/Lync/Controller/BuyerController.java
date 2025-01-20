@@ -8,10 +8,7 @@ import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
-import com.example.Lync.Service.InquiryService;
-import com.example.Lync.Service.OTPStorageService;
-import com.example.Lync.Service.OtpService;
-import com.example.Lync.Service.SellerBuyerService;
+import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +41,9 @@ public class BuyerController {
     private final OTPStorageService otpStorageService;
     private final UserInfoService userInfoService;
     private final InquiryService inquiryService;
+    private final OrderService orderService;
 
-    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService) {
+    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService, OrderService orderService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -57,6 +55,7 @@ public class BuyerController {
         this.otpStorageService = otpStorageService;
         this.userInfoService = userInfoService;
         this.inquiryService = inquiryService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/buyerProfile")
@@ -374,8 +373,14 @@ public class BuyerController {
 
     @PostMapping("/upload/PurchaseOrder/{qId}")
     public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String qId, @RequestParam("file")MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
         try{
-            String fileUrl = inquiryService.uploadPurchaseOrder(qId, file);
+//            String fileUrl = inquiryService.uploadPurchaseOrder(qId, file);
+            String fileUrl = orderService.buyerUploadPurchaseOrder(qId,file, buyerDetails.getUserId());
             return ResponseEntity.ok(fileUrl);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");

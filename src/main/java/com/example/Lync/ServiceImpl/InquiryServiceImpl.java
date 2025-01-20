@@ -2651,7 +2651,7 @@ public class InquiryServiceImpl implements InquiryService {
         Notification noti = new Notification();
         noti.setNotificationId(UUID.randomUUID().toString());
         noti.setMessage("Lyncc dispatched sample for query ID : " + sampleOrder.getQId());
-        noti.setSellerId(sampleOrder.getBuyerUId());
+        noti.setBuyerId(sampleOrder.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
         noti.setDate(LocalDate.now());
@@ -2854,7 +2854,7 @@ public class InquiryServiceImpl implements InquiryService {
     public String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException {
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        String key = s3Service.uploadPurchaseOrder(qId, file);
+        String key = s3Service.buyerUploadPurchaseOrder(qId, file);
         inquiry.setPurchaseOrderUrl(key);
         inquiryRepository.save(inquiry);
         return key;

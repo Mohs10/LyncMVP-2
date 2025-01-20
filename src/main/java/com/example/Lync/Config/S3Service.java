@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -609,6 +608,7 @@ public class S3Service {
 //        return s3Presigner.presignGetObject(presignRequest).url().toString();
 //    }
 
+    //Seller Upload Invoice
     public String uploadOrderInvoice(String orderId, MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
         String s3Key = "Orders/" + orderId +"/Invoices/" + fileName;
@@ -670,9 +670,33 @@ public class S3Service {
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
 
-    public String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException {
+    public String buyerUploadPurchaseOrder(String qId, MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
         String s3Key = "Query/PurchaseOrder/" + qId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    public String adminUploadPurchaseInvoice(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/AdminPurchaseInvoice/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    public String adminUploadPurchaseOrder(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/AdminPurchaseOrder/" + oId + "/" + fileName;
 
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(bucketName)
@@ -870,6 +894,169 @@ public class S3Service {
                 RequestBody.fromBytes(file.getBytes()));
 
         // Return the S3 key of the uploaded Buyer SOP
+        return s3Key;
+    }
+
+
+
+
+
+
+
+
+    //Seller Uploads in Order Section
+    public String sellerOrderLoadingVehicleImg(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/OrderLoadingVehicle/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(s3Key)
+                .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerLoadedSealedVehicleImg(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/LoadedSealedVehicle/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerEWayBill(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/EWayBill/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerPaymentInvoice(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/PaymentInvoice/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerLRCopy(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/LRCopy/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerWeightSlipPreLoad(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/WeightSlipPreLoad/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Seller Uploads in Order Section
+    public String sellerWeightSlipPostLoad(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/WeightSlipPostLoad/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Admin Uploads in Order Section
+    public String adminEWayBill(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/EWayBill/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Admin Uploads in Order Section
+    public String adminPaymentInvoice(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/PaymentInvoice/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Admin Uploads in Order Section
+    public String adminLRCopy(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/LRCopy/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Admin Uploads in Order Section
+    public String adminWeightSlipPreLoaded(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/WeightSlipPreLoaded/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    //Admin Uploads in Order Section
+    public String adminWeightSlipPostLoaded(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/WeightSlipPostLoaded/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
         return s3Key;
     }
 
