@@ -1,5 +1,6 @@
 package com.example.Lync.ServiceImpl;
 
+import com.example.Lync.Config.MessageConfig;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
@@ -9,8 +10,10 @@ import com.example.Lync.Service.SellerBuyerService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -43,15 +47,22 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final SellerProductSpecificationRepository sellerProductSpecificationRepository;
     private final S3Service s3Service;
     private final SellerBuyerAddressRepository sellerBuyerAddressRepository;
+    private NotificationRepository notificationRepository;
 
     private static final AtomicInteger serialNumber = new AtomicInteger(1); // Initialize starting value
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     @Lazy
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository, NotificationRepository notificationRepository) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -64,6 +75,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.sellerProductSpecificationRepository = sellerProductSpecificationRepository;
         this.s3Service = s3Service;
         this.sellerBuyerAddressRepository = sellerBuyerAddressRepository;
+        this.notificationRepository = notificationRepository;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
     private final Map<String, SellerBuyer> sellerBuyerEmailCache = new HashMap<>();
@@ -146,7 +158,19 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         userInfo.setMobileNumber(sellerBuyer.getPhoneNumber());
         userInfo.setPassword(encoder.encode(sellerBuyerDTO.getPassword()));
         userInfoRepository.save(userInfo);
-//        Kishan
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("New Seller with ID : " + sellerBuyer.getUserId() + " registration on Lyncc");
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
 
     }
 
@@ -189,6 +213,19 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         userInfo.setMobileNumber(sellerBuyer.getPhoneNumber());
         userInfo.setPassword(encoder.encode(sellerBuyerDTO.getPassword()));
         userInfoRepository.save(userInfo);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("New Buyer with ID : " + sellerBuyer.getUserId() + " registration on Lyncc");
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
 
     }
 

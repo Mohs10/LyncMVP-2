@@ -7,27 +7,119 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity
-@Table(name = "orders") // Renaming table to "orders"
 @Data
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String oId;
-    private String status;
+    private String qId;
     private String buyerUId; // Reference to buyer (User)
     private String sellerUId; // Reference to seller (User)
     private Long pId; // Reference to Product
-    private Double quantity;
-    private Double price;
-    private String stockLocation;
-    private String deliveryLocation;
-    private Double buyingPrice;
-    private Double sellingPrice;
-    private Double marginPrice;
+    private Double productQuantity;
+    private Double buyerFinalPrice;
+    private Double buyerPaid;
+    private Double sellerFinalPrice;
+    private Long adminAddressId;
+    private Long buyerAddressId;
+
+    private String buyerPurchaseOrderURL;
+    private LocalDate buyerPurchaseOrderURLDate;
+    private LocalTime buyerPurchaseOrderURLTime;
+
+    private String adminPurchaseInvoiceURL;
+    private LocalDate adminPurchaseInvoiceURLDate;
+    private LocalTime adminPurchaseInvoiceURLTime;
+
+    private String adminPurchaseOrderURL;
+    private LocalDate adminPurchaseOrderURLDate;
+    private LocalTime adminPurchaseOrderURLTime;
+
+    private Boolean sellerAcceptTnC;
+    private LocalDate sellerAcceptTnCDate;
+    private LocalTime sellerAcceptTnCTime;
+
+    private Boolean sellerAcceptSOP;
+    private LocalDate sellerAcceptSOPDate;
+    private LocalTime sellerAcceptSOPTime;
+
+    private Double adminNotifyBuyerToPay;
+    private LocalDate adminNotifyBuyerToPayDate;
+    private LocalTime adminNotifyBuyerToPayTime;
+
+    private Boolean buyer1stPayment;
+    private LocalDate buyer1stPaymentDate;
+    private LocalTime buyer1stPaymentTime;
+
+    private Boolean buyerClearedPayment;
+
+    private Boolean adminConfirmBuyerPayment;
+    private LocalDate adminConfirmBuyerPaymentDate;
+    private LocalTime adminConfirmBuyerPaymentTime;
+
+    private Boolean adminNotifySellerToDispatch;
+    private LocalDate adminNotifySellerToDispatchDate;
+    private LocalTime adminNotifySellerToDispatchTime;
+
+    private LocalDate sellerDispatchPeriod;
+
+    private String sellerOrderLoadingVehicleImg;
+    private LocalDate sellerOrderLoadingVehicleImgDate;
+    private LocalTime sellerOrderLoadingVehicleImgTime;
+
+    private String sellerLoadedSealedVehicleImg;
+    private LocalDate sellerLoadedSealedVehicleImgDate;
+    private LocalTime sellerLoadedSealedVehicleImgTime;
+
+    private String sellerEWayBill;
+    private LocalDate sellerEWayBillDate;
+    private LocalTime sellerEWayBillTime;
+
+    private String sellerPaymentInvoice;
+    private LocalDate sellerPaymentInvoiceDate;
+    private LocalTime sellerPaymentInvoiceTime;
+
+    private String sellerLRCopy;
+    private LocalDate sellerLRCopyDate;
+    private LocalTime sellerLRCopyTime;
+
+    private String sellerWeightSlipPreLoad;
+    private LocalDate sellerWeightSlipPreLoadDate;
+    private LocalTime sellerWeightSlipPreLoadTime;
+
+    private String sellerWeightSlipPostLoad;
+    private LocalDate sellerWeightSlipPostLoadDate;
+    private LocalTime sellerWeightSlipPostLoadTime;
+
+    private String adminEWayBill;
+    private LocalDate adminEWayBillDate;
+    private LocalTime adminEWayBillTime;
+
+    private String adminPaymentInvoice;
+    private LocalDate adminPaymentInvoiceDate;
+    private LocalTime adminPaymentInvoiceTime;
+
+    private String adminLRCopy;
+    private LocalDate adminLRCopyDate;
+    private LocalTime adminLRCopyTime;
+
+    private String adminWeightSlipPreLoad;
+    private LocalDate adminWeightSlipPreLoadDate;
+    private LocalTime adminWeightSlipPreLoadTime;
+
+    private String adminWeightSlipPostLoad;
+    private LocalDate adminWeightSlipPostLoadDate;
+    private LocalTime adminWeightSlipPostLoadTime;
+
+
+
+
 
     // Getters and Setters
 }
-
