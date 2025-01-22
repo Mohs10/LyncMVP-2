@@ -1004,10 +1004,16 @@ public class TestServiceImpl implements TestService {
         Notification notification = new Notification();
         notification.setNotificationId(UUID.randomUUID().toString());
         notification.setMessage(message);
-        notification.setBuyerId(test.getBuyerId()); // Assuming BuyerId represents the recipient
-        notification.setSellerId(test.getSellerId());
-
+        // Assuming BuyerId represents the recipient
+        if ("BUYER".equalsIgnoreCase(role)) {
+            notification.setBuyerId(test.getBuyerId());
+        }
+        if ("SELLER".equalsIgnoreCase(role)) {
+            notification.setSellerId(test.getSellerId());
+        }
+// Admin logic remains unchanged
         notification.setIsAdmin("ADMIN".equalsIgnoreCase(role));
+
 
 
         notification.setIsRead(false);
@@ -1026,11 +1032,11 @@ public class TestServiceImpl implements TestService {
                     break;
                 case "SELLER":
                     routingKey = MessageConfig.SELLER_ROUTING_KEY;
-                    topic = "/topic/notifications/seller"+test.getSellerId();
+                    topic = "/topic/notifications/seller/"+test.getSellerId();
                     break;
                 case "BUYER":
                     routingKey = MessageConfig.BUYER_ROUTING_KEY;
-                    topic = "/topic/notifications/buyer"+test.getBuyerId();
+                    topic = "/topic/notifications/buyer/"+test.getBuyerId();
                     break;
                 default:
                     routingKey = MessageConfig.DEFAULT_ROUTING_KEY;
