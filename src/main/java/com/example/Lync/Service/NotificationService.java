@@ -8,11 +8,21 @@ public interface NotificationService {
 
     List<NotificationDTO> getAllNotifications();
 
-    String deleteNotificationById(String notificationId);
+    String adminDeleteNotificationById(String notificationId);
+
+    String buyerDeleteNotificationById(String notificationId, String buyerId);
+
+    String sellerDeleteNotificationById(String notificationId, String sellerId);
 
     void deleteNotificationOlderThan30Days();
 
     Object notificationDetails(String notificationId);
+
+    List<NotificationDTO> buyerGetAllNotification(String buyerId);
+
+    List<NotificationDTO> sellerGetAllNotification(String sellerId);
+
+    List<NotificationDTO> adminGetAllNotification();
 
 
 }

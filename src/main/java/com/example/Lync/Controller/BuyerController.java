@@ -42,8 +42,9 @@ public class BuyerController {
     private final UserInfoService userInfoService;
     private final InquiryService inquiryService;
     private final OrderService orderService;
+    private final NotificationService notificationService;
 
-    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService, OrderService orderService) {
+    public BuyerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, InquiryService inquiryService, OrderService orderService, NotificationService notificationService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -56,6 +57,7 @@ public class BuyerController {
         this.userInfoService = userInfoService;
         this.inquiryService = inquiryService;
         this.orderService = orderService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/buyerProfile")
@@ -371,6 +373,28 @@ public class BuyerController {
         return ResponseEntity.ok(message);
     }
 
+    @GetMapping("/buyerGetAllNotification")
+    public ResponseEntity<List<NotificationDTO>> buyerGetAllNotification(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<NotificationDTO> respond = notificationService.buyerGetAllNotification(buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/buyerDeleteNotificationById/{notificationId}")
+    public ResponseEntity<String> deleteNotificationById(@PathVariable String notificationId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        return new ResponseEntity<>(notificationService.buyerDeleteNotificationById(notificationId, buyerDetails.getUserId()),
+                HttpStatus.OK);
+    }
+
     @PostMapping("/upload/PurchaseOrder/{qId}")
     public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String qId, @RequestParam("file")MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -386,6 +410,8 @@ public class BuyerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
         }
     }
+
+
 
 
 

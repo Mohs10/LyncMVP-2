@@ -52,6 +52,7 @@ public class Inquiry {
     private int pincode;
     private LocalDate specifyDeliveryDate;
 
+
     //Product Specification
 //    private Double chalkyGrains;
 //    private String grainSize;

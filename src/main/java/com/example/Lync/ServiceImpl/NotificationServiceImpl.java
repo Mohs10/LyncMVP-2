@@ -2,6 +2,7 @@ package com.example.Lync.ServiceImpl;
 
 import com.example.Lync.DTO.NotificationDTO;
 import com.example.Lync.Entity.Notification;
+import com.example.Lync.Exception.UnauthorizedException;
 import com.example.Lync.Repository.InquiryRepository;
 import com.example.Lync.Repository.NotificationRepository;
 import com.example.Lync.Repository.SampleOrderRepository;
@@ -45,9 +46,31 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public String deleteNotificationById(String notificationId) {
+    public String adminDeleteNotificationById(String notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found with given Id: " + notificationId));
+        notificationRepository.delete(notification);
+        return "Notification deleted successfully.";
+    }
+
+    @Override
+    public String buyerDeleteNotificationById(String notificationId, String buyerId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("Notification not found with given Id: " + notificationId));
+        if (notification.getBuyerId().equals(buyerId)) {
+            throw new UnauthorizedException("Unauthorized: The buyer Id does not match with the respective notification's buyer Id.");
+        }
+        notificationRepository.delete(notification);
+        return "Notification deleted successfully.";
+    }
+
+    @Override
+    public String sellerDeleteNotificationById(String notificationId, String sellerId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("Notification not found with given Id: " + notificationId));
+        if (notification.getSellerId().equals(sellerId)) {
+            throw new UnauthorizedException("Unauthorized: The seller Id does not match with the respective notification's seller Id.");
+        }
         notificationRepository.delete(notification);
         return "Notification deleted successfully.";
     }
@@ -87,6 +110,55 @@ public class NotificationServiceImpl implements NotificationService {
 
 //Order to be added
         throw new RuntimeException("No valid ID found in the notification.");
+    }
+
+    @Override
+    public List<NotificationDTO> buyerGetAllNotification(String buyerId) {
+        List<Notification> notifications = notificationRepository.findAllWhereBuyerIdIsNotNull();
+        List<Notification> notificationList = notifications.stream().filter(notification -> notification.getBuyerId().equals(buyerId)).toList();
+        return notificationList.stream().map(
+                notification -> {
+                    NotificationDTO notificationDTO = new NotificationDTO();
+                    notificationDTO.setNotificationId(notification.getNotificationId());
+                    notificationDTO.setMessage(notification.getMessage());
+                    notificationDTO.setBuyerId(notification.getBuyerId());
+                    notificationDTO.setDate(notification.getDate());
+                    notificationDTO.setTime(notification.getTime());
+                    return notificationDTO;
+                }
+        ).toList();
+    }
+
+    @Override
+    public List<NotificationDTO> sellerGetAllNotification(String sellerId) {
+        List<Notification> notifications = notificationRepository.findAllWhereSellerIdIsNotNull();
+        List<Notification> notificationList = notifications.stream().filter(notification -> notification.getSellerId().equals(sellerId)).toList();
+        return notificationList.stream().map(
+                notification -> {
+                    NotificationDTO notificationDTO = new NotificationDTO();
+                    notificationDTO.setNotificationId(notification.getNotificationId());
+                    notificationDTO.setMessage(notification.getMessage());
+                    notificationDTO.setBuyerId(notification.getSellerId());
+                    notificationDTO.setDate(notification.getDate());
+                    notificationDTO.setTime(notification.getTime());
+                    return notificationDTO;
+                }
+        ).toList();
+    }
+
+    @Override
+    public List<NotificationDTO> adminGetAllNotification() {
+        List<Notification> notifications = notificationRepository.findAllByIsAdminTrue();
+        return notifications.stream().map(
+                notification -> {
+                    NotificationDTO notificationDTO = new NotificationDTO();
+                    notificationDTO.setNotificationId(notification.getNotificationId());
+                    notificationDTO.setMessage(notification.getMessage());
+                    notificationDTO.setDate(notification.getDate());
+                    notificationDTO.setTime(notification.getTime());
+                    return notificationDTO;
+                }
+        ).toList();
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.Lync.Repository;
 
 import com.example.Lync.Entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,4 +12,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
     void deleteByDateBefore(LocalDate date);
 
     List<Notification> findByCreatedAtBefore(LocalDateTime date);
+
+    @Query("SELECT n FROM Notification n WHERE n.isAdmin = true")
+    List<Notification> findAllByIsAdminTrue();
+
+    @Query("SELECT n FROM Notification n WHERE n.sellerId IS NOT NULL")
+    List<Notification> findAllWhereSellerIdIsNotNull();
+
+    @Query("SELECT n FROM Notification n WHERE n.buyerId IS NOT NULL")
+    List<Notification> findAllWhereBuyerIdIsNotNull();
+
 }

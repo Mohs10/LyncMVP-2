@@ -1060,6 +1060,30 @@ public class S3Service {
         return s3Key;
     }
 
+    public String sellerUploadTransactionCertificate(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/TransactionCertificate/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
+    public String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Admin/TransactionCertificate/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
+
 
 
 

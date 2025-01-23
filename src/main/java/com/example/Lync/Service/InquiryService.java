@@ -2,6 +2,8 @@ package com.example.Lync.Service;
 
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.SellerBuyer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,7 +21,7 @@ public interface InquiryService {
 
     InquiryDTO buyerGetsInquiryById(String buyerUId, String qId);
 
-    List<InquiryDTO> adminGetAllInquiry(); //Admin get all inquiry
+    Page<InquiryDTO> adminGetAllInquiry(Pageable pageable); //Admin get all inquiry
 
     InquiryDTO adminGetInquiryByQId(String qId) throws Exception; //Admin get inquiry
 

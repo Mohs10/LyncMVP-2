@@ -45,8 +45,9 @@ public class SellerController {
     private final OrderService orderService;
     private final SellerProductRepository sellerProductRepository;
     private final InquiryService inquiryService;
+    private final NotificationService notificationService;
 
-    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, AdminAddressService adminAddressService, OrderService orderService, SellerProductRepository sellerProductRepository, InquiryService inquiryService) {
+    public SellerController(S3Service s3Service, UserInfoRepository repository, SellerBuyerRepository sellerBuyerRepository, UserInfoService service, JwtService jwtService, SellerBuyerService sellerBuyerService, AuthenticationManager authenticationManager, OtpService otpService, OTPStorageService otpStorageService, UserInfoService userInfoService, AdminAddressService adminAddressService, OrderService orderService, SellerProductRepository sellerProductRepository, InquiryService inquiryService, NotificationService notificationService) {
         this.s3Service = s3Service;
         this.repository = repository;
         this.sellerBuyerRepository = sellerBuyerRepository;
@@ -61,6 +62,7 @@ public class SellerController {
         this.orderService = orderService;
         this.sellerProductRepository = sellerProductRepository;
         this.inquiryService = inquiryService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/sellerProfile")
@@ -450,26 +452,26 @@ public class SellerController {
         return new ResponseEntity<>(adminAddressService.getAdminAddressById(adminAddressId), HttpStatus.OK);
     }
 
-    @PostMapping("/sellerAcceptTnC/{oId}")
-    public ResponseEntity<String> sellerAcceptTnC(@PathVariable String oId){
+    @GetMapping("/sellerGetAllNotification")
+    public ResponseEntity<List<NotificationDTO>> sellerGetAllNotification(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        String message = orderService.sellerAcceptTnC(oId, sellerDetails.getUserId());
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        List<NotificationDTO> respond = notificationService.sellerGetAllNotification(sellerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
-    @PostMapping("/sellerAcceptSOP/{oId}")
-    public ResponseEntity<String> sellerAcceptSOP(@PathVariable String oId){
+    @DeleteMapping("/sellerDeleteNotificationById/{notificationId}")
+    public ResponseEntity<String> deleteNotificationById(@PathVariable String notificationId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
-        String message = orderService.sellerAcceptSOP(oId, sellerDetails.getUserId());
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
+        return new ResponseEntity<>(notificationService.sellerDeleteNotificationById(notificationId, sellerDetails.getUserId()),
+                HttpStatus.OK);
     }
 
     @PostMapping("/sellerUploadOrderLoadedVehicleImg/{oId}")
@@ -549,6 +551,18 @@ public class SellerController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
+
+
+    @PostMapping("/sellerUploadTransactionCertificate/{oId}")
+    public ResponseEntity<String> sellerUploadTransactionCertificate(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = orderService.sellerUploadTransactionCertificate(oId, sellerDetails.getUserId(), file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
 
 
 }

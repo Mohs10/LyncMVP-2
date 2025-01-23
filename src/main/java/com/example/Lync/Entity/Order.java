@@ -41,14 +41,6 @@ public class Order {
     private LocalDate adminPurchaseOrderURLDate;
     private LocalTime adminPurchaseOrderURLTime;
 
-    private Boolean sellerAcceptTnC;
-    private LocalDate sellerAcceptTnCDate;
-    private LocalTime sellerAcceptTnCTime;
-
-    private Boolean sellerAcceptSOP;
-    private LocalDate sellerAcceptSOPDate;
-    private LocalTime sellerAcceptSOPTime;
-
     private Double adminNotifyBuyerToPay;
     private LocalDate adminNotifyBuyerToPayDate;
     private LocalTime adminNotifyBuyerToPayTime;
@@ -58,16 +50,19 @@ public class Order {
     private LocalTime buyer1stPaymentTime;
 
     private Boolean buyerClearedPayment;
-
-    private Boolean adminConfirmBuyerPayment;
-    private LocalDate adminConfirmBuyerPaymentDate;
-    private LocalTime adminConfirmBuyerPaymentTime;
+//
+//    private Boolean adminConfirmBuyerPayment;
+//    private LocalDate adminConfirmBuyerPaymentDate;
+//    private LocalTime adminConfirmBuyerPaymentTime;
 
     private Boolean adminNotifySellerToDispatch;
     private LocalDate adminNotifySellerToDispatchDate;
     private LocalTime adminNotifySellerToDispatchTime;
 
     private LocalDate sellerDispatchPeriod;
+
+    private String sellerCourierCompany;
+    private String sellerOrderTrackerId;
 
     private String sellerOrderLoadingVehicleImg;
     private LocalDate sellerOrderLoadingVehicleImgDate;
@@ -97,6 +92,9 @@ public class Order {
     private LocalDate sellerWeightSlipPostLoadDate;
     private LocalTime sellerWeightSlipPostLoadTime;
 
+    private String adminCourierCompany;
+    private String adminOrderTrackerId;
+
     private String adminEWayBill;
     private LocalDate adminEWayBillDate;
     private LocalTime adminEWayBillTime;
@@ -117,6 +115,13 @@ public class Order {
     private LocalDate adminWeightSlipPostLoadDate;
     private LocalTime adminWeightSlipPostLoadTime;
 
+    private String sellerTransactionCertificate;
+    private LocalDate sellerTransactionCertificateDate;
+    private LocalTime sellerTransactionCertificateTime;
+
+    private String adminTransactionCertificate;
+    private LocalDate adminTransactionCertificateDate;
+    private LocalTime adminTransactionCertificateTime;
 
 
 

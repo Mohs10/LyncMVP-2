@@ -149,61 +149,6 @@ public class OrderServiceImpl implements OrderService {
         return "You uploaded the purchase order successfully";
     }
 
-    @Override
-    public String sellerAcceptTnC(String oId, String sellerId) {
-        Order order = orderRepository.findById(oId)
-                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        if (!sellerId.equals(order.getSellerUId())) {
-            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
-        }
-        order.setSellerAcceptTnC(true);
-        order.setSellerAcceptTnCDate(LocalDate.now());
-        order.setSellerAcceptTnCTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        orderRepository.save(order);
-
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Seller with ID : " + sellerId + " has accepted the Terms & Condition for Order ID: " + oId);
-        notification.setIsAdmin(true);
-        notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(oId);
-
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-        notificationRepository.save(notification);
-        return "You accepted the Terms & Condition";
-    }
-
-    @Override
-    public String sellerAcceptSOP(String oId, String sellerId) {
-        Order order = orderRepository.findById(oId)
-                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        if (!sellerId.equals(order.getSellerUId())) {
-            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
-        }
-        order.setSellerAcceptSOP(true);
-        order.setSellerAcceptSOPDate(LocalDate.now());
-        order.setSellerAcceptSOPTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        orderRepository.save(order);
-
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Seller with ID : " + sellerId + " has accepted the SOP for Order ID: " + oId);
-        notification.setIsAdmin(true);
-        notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(oId);
-
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-        notificationRepository.save(notification);
-        return "You accepted the SOP";
-    }
 
     @Override
     public String adminNotifyBuyerToPay(String oId, Double amount) {
@@ -236,31 +181,6 @@ public class OrderServiceImpl implements OrderService {
 //        return "";
 //    }
 
-    @Override
-    public String adminConfirmBuyerPayment(String oId) {
-        Order order = orderRepository.findById(oId)
-                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        order.setAdminConfirmBuyerPayment(true);
-        order.setAdminConfirmBuyerPaymentDate(LocalDate.now());
-        order.setAdminConfirmBuyerPaymentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        orderRepository.save(order);
-
-        Notification noti = new Notification();
-        noti.setNotificationId(UUID.randomUUID().toString());
-        noti.setMessage("Lyncc confirmed your payment of amount : " + order.getBuyer1stPayment() + "for Order Id : " + oId);
-        noti.setBuyerId(order.getBuyerUId());
-        noti.setIsRead(false);
-        noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        noti.setOId(oId);
-
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, noti);
-        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + order.getBuyerUId(), noti);
-        notificationRepository.save(noti);
-        return "You confirmed buyer about the received payment";
-    }
 
     @Override
     public String adminNotifySellerToDispatch(String oId) {
@@ -626,5 +546,31 @@ public class OrderServiceImpl implements OrderService {
         return "You uploaded the weight slip of the post-loaded vehicle for the Order ID : " + oId;
     }
 
+    @Override
+    public String sellerUploadTransactionCertificate(String oId, String sellerId, MultipartFile file) throws IOException {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        if (!sellerId.equals(order.getSellerUId())) {
+            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
+        }
+        String s3Key = s3Service.sellerUploadTransactionCertificate(oId, file);
+        order.setSellerTransactionCertificate(s3Key);
+        order.setSellerTransactionCertificateDate(LocalDate.now());
+        order.setSellerTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+        return "You uploaded the Transaction Certificate";
+    }
+
+    @Override
+    public String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        String key = s3Service.adminUploadTransactionCertificate(oId, file);
+        order.setAdminTransactionCertificate(key);
+        order.setAdminTransactionCertificateDate(LocalDate.now());
+        order.setAdminTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+        return "You uploaded the Transaction Certificate";
+    }
 
 }

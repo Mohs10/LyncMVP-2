@@ -10,7 +10,9 @@ import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
 import com.example.Lync.ServiceImpl.UserInfoService;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -196,8 +195,10 @@ public class AdminController {
 
 
     @GetMapping("/allInquiries")
-    public ResponseEntity<?> getInquiries(){
-        return ResponseEntity.ok(inquiryService.adminGetAllInquiry());
+    public ResponseEntity<?> getInquiries(Pageable pageable){
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10, pageable.getSort());
+        Page<InquiryDTO> inquiryDTOS = inquiryService.adminGetAllInquiry(pageRequest);
+        return ResponseEntity.ok(inquiryDTOS);
     }
 
     @GetMapping("/getInquiryById/{qId}")
@@ -316,12 +317,12 @@ public class AdminController {
 
     @GetMapping("/adminGetsAllNotification")
     public ResponseEntity<List<NotificationDTO>> getNotifications(){
-        return new ResponseEntity<>(notificationService.getAllNotifications(), HttpStatus.OK);
+        return new ResponseEntity<>(notificationService.adminGetAllNotification(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteNotificationById/{notificationId}")
+    @DeleteMapping("/adminDeleteNotificationById/{notificationId}")
     public ResponseEntity<String> deleteNotificationById(@PathVariable String notificationId){
-        return new ResponseEntity<>(notificationService.deleteNotificationById(notificationId),
+        return new ResponseEntity<>(notificationService.adminDeleteNotificationById(notificationId),
                 HttpStatus.OK);
     }
 
@@ -350,11 +351,6 @@ public class AdminController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
-    @PostMapping("/adminConfirmBuyerPayment/{oId}")
-    public ResponseEntity<String> adminConfirmBuyerPayment(@PathVariable String oId){
-        String message = orderService.adminConfirmBuyerPayment(oId);
-        return new ResponseEntity<>(message, HttpStatus.CREATED);
-    }
 
     @PostMapping("/adminNotifySellerToDispatch/{oId}")
     public ResponseEntity<String> adminNotifySellerToDispatch(@PathVariable String oId){
@@ -391,5 +387,12 @@ public class AdminController {
         String message = orderService.adminUploadWeightSlipPostLoad(oId, file);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
+
+    @PostMapping("/adminUploadTransactionCertificate/{oId}")
+    public ResponseEntity<String> adminUploadTransactionCertificate(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        String message = orderService.adminUploadTransactionCertificate(oId, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
 
 }

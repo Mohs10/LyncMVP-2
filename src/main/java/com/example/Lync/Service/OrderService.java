@@ -12,15 +12,9 @@ public interface OrderService {
 
     String adminUploadPurchaseOrder(String oId, MultipartFile file) throws IOException;
 
-    String sellerAcceptTnC(String oId, String sellerId);
-
-    String sellerAcceptSOP(String oId, String sellerId);
-
     String adminNotifyBuyerToPay(String oId, Double amount);
 
 //    String buyer1stPayment(String oId, String buyerId);
-
-    String adminConfirmBuyerPayment(String oId);
 
     String adminNotifySellerToDispatch(String oId);
 
@@ -47,4 +41,10 @@ public interface OrderService {
     String adminUploadWeightSlipPreLoad(String oId, MultipartFile file) throws IOException;
 
     String adminUploadWeightSlipPostLoad(String oId, MultipartFile file) throws IOException;
+
+    String sellerUploadTransactionCertificate(String oId, String sellerId, MultipartFile file) throws IOException;
+
+    String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException;
+
+
 }
