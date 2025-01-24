@@ -1561,7 +1561,7 @@ public class InquiryServiceImpl implements InquiryService {
 
 // Send the notification to the 'notification.queue' with the correct routing key
         rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
+//        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
         notificationRepository.save(notification);
         log.info("Sending WebSocket notification to destination: /topic/notifications/buyer/{}", inquiry.getBuyerId());
         log.info("Notification Payload: {}", notification);

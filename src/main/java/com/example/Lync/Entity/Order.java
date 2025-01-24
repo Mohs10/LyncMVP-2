@@ -28,6 +28,7 @@ public class Order {
     private Double sellerFinalPrice;
     private Long adminAddressId;
     private Long buyerAddressId;
+    private String paymentId;
 
     private String buyerPurchaseOrderURL;
     private LocalDate buyerPurchaseOrderURLDate;
