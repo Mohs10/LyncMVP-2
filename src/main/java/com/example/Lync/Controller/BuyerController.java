@@ -412,6 +412,16 @@ public class BuyerController {
     }
 
 
+    @GetMapping("/buyerReceivedOrder/{oId}")
+    public ResponseEntity<String> buyerReceivedOrder(@PathVariable String oId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String respond = orderService.buyerReceivedOrder(oId, buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
 
 
 

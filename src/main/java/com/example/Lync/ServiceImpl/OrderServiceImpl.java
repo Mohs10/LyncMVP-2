@@ -209,6 +209,60 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public String sellerProcessingOrder(String oId, String sellerId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        if (!sellerId.equals(order.getSellerUId())) {
+            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
+        }
+        order.setSellerProcessingOrderDate(LocalDate.now());
+        order.setSellerProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller with ID : " + sellerId + " is processing the product for Order ID: " + oId);
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setSoId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
+        return "You started processing the product with Order ID : " + oId;
+    }
+
+    @Override
+    public String sellerDispatchedOrder(String oId, String sellerId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        if (!sellerId.equals(order.getSellerUId())) {
+            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
+        }
+        order.setSellerDispatchOrderDate(LocalDate.now());
+        order.setSellerDispatchOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller with ID : " + sellerId + " has dispatched the product for Order ID: " + oId);
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setSoId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
+        return "You dispatched the product with Order ID : " + oId;
+    }
+
+    @Override
     public String sellerUploadOrderLoadedVehicleImg(String oId, String sellerId, MultipartFile file) throws IOException {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
@@ -412,6 +466,81 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public String adminReceivedOrder(String oId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        order.setAdminReceivedOrderDate(LocalDate.now());
+        order.setAdminReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Lyncc received the product with Order ID : " + oId);
+        notification.setSellerId(order.getSellerUId());
+        notification.setIsRead(false);
+        notification.setIsAdmin(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setOId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications/seller/" + order.getSellerUId(), notification);
+        notificationRepository.save(notification);
+        return "You received the product with Order Id : " + oId;
+    }
+
+    @Override
+    public String adminProcessingOrder(String oId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        order.setAdminProcessingOrderDate(LocalDate.now());
+        order.setAdminProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Lyncc processing the product with Order ID : " + oId);
+        notification.setSellerId(order.getBuyerUId());
+        notification.setIsRead(false);
+        notification.setIsAdmin(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setOId(oId);
+
+        // Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + order.getBuyerUId(), notification);
+        notificationRepository.save(notification);
+        return "You started processing the product with Order Id : " + oId;
+    }
+
+    @Override
+    public String adminDispatchedOrder(String oId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        order.setAdminDispatchedOrderDate(LocalDate.now());
+        order.setAdminDispatchedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Lyncc dispatched the product with Order ID : " + oId);
+        notification.setSellerId(order.getBuyerUId());
+        notification.setIsRead(false);
+        notification.setIsAdmin(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setOId(oId);
+
+        // Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + order.getBuyerUId(), notification);
+        notificationRepository.save(notification);
+        return "You dispatched the product with Order Id : " + oId;
+    }
+
+    @Override
     public String adminUploadEWayBill(String oId, MultipartFile file) throws IOException {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
@@ -558,6 +687,20 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerTransactionCertificateDate(LocalDate.now());
         order.setSellerTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Seller with ID : " + sellerId + " has uploaded the Transaction Certificate for Order ID: " + oId);
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setSoId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
         return "You uploaded the Transaction Certificate";
     }
 
@@ -570,7 +713,49 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminTransactionCertificateDate(LocalDate.now());
         order.setAdminTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderRepository.save(order);
+
+        Notification noti = new Notification();
+        noti.setNotificationId(UUID.randomUUID().toString());
+        noti.setMessage("Lyncc uploaded the Transaction Certificate for Order Id : " + oId);
+        noti.setBuyerId(order.getBuyerUId());
+        noti.setIsRead(false);
+        noti.setIsAdmin(false);
+        noti.setDate(LocalDate.now());
+        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setOId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, noti);
+        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + order.getBuyerUId(), noti);
+        notificationRepository.save(noti);
         return "You uploaded the Transaction Certificate";
+    }
+
+    @Override
+    public String buyerReceivedOrder(String oId, String buyerId) {
+        Order order = orderRepository.findById(oId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        if (!buyerId.equals(order.getBuyerUId())) {
+            throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
+        }
+        order.setBuyerReceivedOrderDate(LocalDate.now());
+        order.setBuyerReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderRepository.save(order);
+
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Buyer with ID : " + buyerId + " has received the product with Order ID: " + oId);
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setSoId(oId);
+
+// Send the notification to the 'notification.queue' with the correct routing key
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationRepository.save(notification);
+        return "You received the Product";
     }
 
 }

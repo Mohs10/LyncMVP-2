@@ -60,6 +60,12 @@ public class Order {
     private LocalDate adminNotifySellerToDispatchDate;
     private LocalTime adminNotifySellerToDispatchTime;
 
+    private LocalDate sellerProcessingOrderDate;
+    private LocalTime sellerProcessingOrderTime;
+
+    private LocalDate sellerDispatchOrderDate;
+    private LocalTime sellerDispatchOrderTime;
+
     private LocalDate sellerDispatchPeriod;
 
     private String sellerCourierCompany;
@@ -93,6 +99,15 @@ public class Order {
     private LocalDate sellerWeightSlipPostLoadDate;
     private LocalTime sellerWeightSlipPostLoadTime;
 
+    private LocalDate adminReceivedOrderDate;
+    private LocalTime adminReceivedOrderTime;
+
+    private LocalDate adminProcessingOrderDate;
+    private LocalTime adminProcessingOrderTime;
+
+    private LocalDate adminDispatchedOrderDate;
+    private LocalTime adminDispatchedOrderTime;
+
     private String adminCourierCompany;
     private String adminOrderTrackerId;
 
@@ -123,6 +138,9 @@ public class Order {
     private String adminTransactionCertificate;
     private LocalDate adminTransactionCertificateDate;
     private LocalTime adminTransactionCertificateTime;
+
+    private LocalDate buyerReceivedOrderDate;
+    private LocalTime buyerReceivedOrderTime;
 
 
 

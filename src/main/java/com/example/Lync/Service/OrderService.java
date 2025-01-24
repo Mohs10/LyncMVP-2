@@ -18,6 +18,10 @@ public interface OrderService {
 
     String adminNotifySellerToDispatch(String oId);
 
+    String sellerProcessingOrder(String oId, String sellerId);
+
+    String sellerDispatchedOrder(String oId, String sellerId);
+
     String sellerUploadOrderLoadedVehicleImg(String oId, String sellerId, MultipartFile file) throws IOException;
 
     String sellerUploadLoadedSealedVehicleImg(String oId, String sellerId, MultipartFile file) throws IOException;
@@ -32,6 +36,12 @@ public interface OrderService {
 
     String sellerUploadWeightSlipPostLoad(String oId, String sellerId, MultipartFile file) throws IOException;
 
+    String adminReceivedOrder(String oId);
+
+    String adminProcessingOrder(String oId);
+
+    String adminDispatchedOrder(String oId);
+
     String adminUploadEWayBill(String oId, MultipartFile file) throws IOException;
 
     String adminUploadPaymentInvoice(String oId, MultipartFile file) throws IOException;
@@ -45,6 +55,8 @@ public interface OrderService {
     String sellerUploadTransactionCertificate(String oId, String sellerId, MultipartFile file) throws IOException;
 
     String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException;
+
+    String buyerReceivedOrder(String oId, String buyerId);
 
 
 }

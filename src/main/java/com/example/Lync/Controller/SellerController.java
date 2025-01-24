@@ -459,6 +459,7 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        System.out.println(sellerDetails.getFullName() + ", " +sellerDetails.getUserId());
         List<NotificationDTO> respond = notificationService.sellerGetAllNotification(sellerDetails.getUserId());
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
@@ -561,6 +562,28 @@ public class SellerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         String message = orderService.sellerUploadTransactionCertificate(oId, sellerDetails.getUserId(), file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/sellerProcessingOrder/{oId}")
+    public ResponseEntity<String> sellerProcessingOrder(@PathVariable String oId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = orderService.sellerProcessingOrder(oId, sellerDetails.getUserId());
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/sellerDispatchedOrder/{oId}")
+    public ResponseEntity<String> sellerDispatchedOrder(@PathVariable String oId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = orderService.sellerDispatchedOrder(oId, sellerDetails.getUserId());
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 

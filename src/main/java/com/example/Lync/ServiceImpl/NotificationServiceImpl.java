@@ -138,7 +138,7 @@ public class NotificationServiceImpl implements NotificationService {
                     NotificationDTO notificationDTO = new NotificationDTO();
                     notificationDTO.setNotificationId(notification.getNotificationId());
                     notificationDTO.setMessage(notification.getMessage());
-                    notificationDTO.setBuyerId(notification.getSellerId());
+                    notificationDTO.setSellerId(notification.getSellerId());
                     notificationDTO.setDate(notification.getDate());
                     notificationDTO.setTime(notification.getTime());
                     return notificationDTO;

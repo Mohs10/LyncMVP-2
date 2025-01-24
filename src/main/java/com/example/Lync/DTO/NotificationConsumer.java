@@ -19,38 +19,38 @@ public class NotificationConsumer {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @RabbitListener(queues = "notification.queue")
-    public void consumeNotification(Notification notification) {
-        // Save notification to the database
-//        notificationRepository.save(notification);
-
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-//        System.out.println("Notification received and saved: " + notification);
-    }
-
-    // Listener for Buyer Notifications
-    @RabbitListener(queues = MessageConfig.BUYER_QUEUE)
-    public void handleBuyerNotification(Notification notification) {
-        String destination = "/topic/notifications/buyer/" + notification.getBuyerId();
-        messagingTemplate.convertAndSend(destination, notification);
-//        logNotification("Buyer", notification, destination);
-    }
-
-    // Listener for Seller Notifications
-    @RabbitListener(queues = MessageConfig.SELLER_QUEUE)
-    public void handleSellerNotification(Notification notification) {
-        String destination = "/topic/notifications/seller/" + notification.getSellerId();
-        messagingTemplate.convertAndSend(destination, notification);
-//        logNotification("Seller", notification, destination);
-    }
-
-    // Listener for Admin Notifications
-    @RabbitListener(queues = MessageConfig.ADMIN_QUEUE)
-    public void handleAdminNotification(Notification notification) {
-        String destination = "/topic/notifications";
-        messagingTemplate.convertAndSend(destination, notification);
-//        logNotification("Admin", notification, destination);
-    }
+//    @RabbitListener(queues = "notification.queue")
+//    public void consumeNotification(Notification notification) {
+//        // Save notification to the database
+////        notificationRepository.save(notification);
+//
+//        messagingTemplate.convertAndSend("/topic/notifications", notification);
+////        System.out.println("Notification received and saved: " + notification);
+//    }
+//
+//    // Listener for Buyer Notifications
+//    @RabbitListener(queues = MessageConfig.BUYER_QUEUE)
+//    public void handleBuyerNotification(Notification notification) {
+//        String destination = "/topic/notifications/buyer/" + notification.getBuyerId();
+//        messagingTemplate.convertAndSend(destination, notification);
+////        logNotification("Buyer", notification, destination);
+//    }
+//
+//    // Listener for Seller Notifications
+//    @RabbitListener(queues = MessageConfig.SELLER_QUEUE)
+//    public void handleSellerNotification(Notification notification) {
+//        String destination = "/topic/notifications/seller/" + notification.getSellerId();
+//        messagingTemplate.convertAndSend(destination, notification);
+////        logNotification("Seller", notification, destination);
+//    }
+//
+//    // Listener for Admin Notifications
+//    @RabbitListener(queues = MessageConfig.ADMIN_QUEUE)
+//    public void handleAdminNotification(Notification notification) {
+//        String destination = "/topic/notifications";
+//        messagingTemplate.convertAndSend(destination, notification);
+////        logNotification("Admin", notification, destination);
+//    }
 
     // Listener for Default Notifications
 //    @RabbitListener(queues = MessageConfig.DEFAULT_QUEUE)

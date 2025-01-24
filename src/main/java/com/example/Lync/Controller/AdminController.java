@@ -394,5 +394,25 @@ public class AdminController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
+    @PostMapping("/adminReceivedOrder/{oId}")
+    public ResponseEntity<String> adminReceivedOrder(@PathVariable String oId)  {
+        String message = orderService.adminReceivedOrder(oId);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminProcessingOrder/{oId}")
+    public ResponseEntity<String> adminProcessingOrder(@PathVariable String oId)  {
+        String message = orderService.adminProcessingOrder(oId);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/adminDispatchedOrder/{oId}")
+    public ResponseEntity<String> adminDispatchedOrder(@PathVariable String oId)  {
+        String message = orderService.adminDispatchedOrder(oId);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+
+
 
 }
