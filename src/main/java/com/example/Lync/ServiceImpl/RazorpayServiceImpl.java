@@ -111,6 +111,36 @@ public class RazorpayServiceImpl implements RazorpayService {
     }
 
 
+    public RazorpayOrderDTO fetchByReceipt(String receipt) throws Exception {
+        try {
+            JSONObject options = new JSONObject();
+            options.put("receipt", receipt); // Filter by receipt (if supported)
+
+            List<Order> orders = razorpayClient.orders.fetchAll(options);
+
+            return orders.stream()
+                    .map(this::toOrderDto)
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception e) {
+            throw new Exception("Failed to fetch order by receipt: " + e.getMessage(), e);
+        }
+    }
+
+    public RazorpayPaymentDTO fetchByPaymentId(String paymentId) throws Exception {
+        try {
+            // Fetch the payment using the provided payment ID
+            Payment payment = razorpayClient.payments.fetch(paymentId);
+            // Convert the Payment object to RazorpayPaymentDTO and return
+            return toPaymentDto(payment);
+        } catch (Exception e) {
+            // Throw a more specific exception message
+            throw new Exception("Failed to fetch payment with ID " + paymentId + ": " + e.getMessage(), e);
+        }
+    }
+
+
+
 
     public List<RazorpayOrderDTO> fetchAllOrders() throws Exception {
         try {
@@ -119,6 +149,8 @@ public class RazorpayServiceImpl implements RazorpayService {
             options.put("count", 100); // Limit the number of orders fetched
 
             List<Order> orders = razorpayClient.orders.fetchAll(options); // Pass options to fetchAll
+
+
 
             // Convert to DTO list
             return orders.stream()
@@ -151,8 +183,10 @@ public class RazorpayServiceImpl implements RazorpayService {
     private RazorpayOrderDTO toOrderDto(Order order) {
         RazorpayOrderDTO dto = new RazorpayOrderDTO();
 
+
+
         dto.setId(getStringOrDefault(order, "id"));
-        dto.setReceipt(getStringOrDefault(order, "receipt"));
+        dto.setOrderId(getStringOrDefault(order, "receipt"));//the order_id
         dto.setStatus(getStringOrDefault(order, "status"));
         dto.setAmount(order.get("amount"));
         dto.setCurrency(getStringOrDefault(order, "currency"));
@@ -197,7 +231,7 @@ public class RazorpayServiceImpl implements RazorpayService {
         RazorpayPaymentDTO paymentDTO = new RazorpayPaymentDTO();
 
         paymentDTO.setId(getStringOrDefault(payment, "id"));
-        paymentDTO.setOrderId(getStringOrDefault(payment, "order_id"));
+        paymentDTO.setRazorpayOrderId(getStringOrDefault(payment, "order_id"));//(Razorpay OrderId )
         paymentDTO.setContact(getStringOrDefault(payment, "contact"));
         paymentDTO.setEmail(getStringOrDefault(payment, "email"));
         paymentDTO.setCurrency(getStringOrDefault(payment, "currency"));

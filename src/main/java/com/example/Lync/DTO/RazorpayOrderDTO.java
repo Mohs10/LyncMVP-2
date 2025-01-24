@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class RazorpayOrderDTO {
 
     private String id;
-    private String receipt;
+    private String orderId;
     private String status;
     private int amount;
     private String currency;

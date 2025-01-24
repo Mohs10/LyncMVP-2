@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 public class RazorpayPaymentDTO {
 
     private String id;
-    private String orderId;
+    private String razorpayOrderId;
     private String contact;
     private String email;
     private String currency;

@@ -5,6 +5,7 @@ import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.*;
 
+
 import com.example.Lync.Repository.*;
 import com.example.Lync.Service.SellerBuyerService;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -182,25 +184,6 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         LocalDateTime indianLocalDateTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
         sellerBuyerDTO.setCreatedAt(indianLocalDateTime);
-
-        // Upload profile picture if provided
-//        if (sellerBuyerDTO.getProfilePicture() != null) {
-//            String profilePictureUrl =s3Service. uploadUserImage(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getProfilePicture());
-//            sellerBuyerDTO.setProfilePictureUrl(profilePictureUrl);
-//        }
-//
-//        // Upload certificate if provided
-//        if (sellerBuyerDTO.getCertificate() != null) {
-//            String certificateUrl = s3Service.uploadUserCertificate(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCertificate());
-//            sellerBuyerDTO.setCertificateUrl(certificateUrl);
-//        }
-//
-//        // Upload cancelled cheque if provided
-//        if (sellerBuyerDTO.getCancelledCheque() != null) {
-//            String cancelledChequeUrl = s3Service.uploadUserCancelledCheque(sellerBuyerDTO.getUserId(), sellerBuyerDTO.getCancelledCheque());
-//            sellerBuyerDTO.setCancelledChequeUrl(cancelledChequeUrl);
-//        }
-
 
         SellerBuyer sellerBuyer=  sellerBuyerRepository.save(convertToSellerBuyer(sellerBuyerDTO));
         addToPhoneNumberCache(sellerBuyer.getPhoneNumber(),sellerBuyer);
@@ -991,6 +974,37 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
         Double maxPrice = sellerProducts.stream()
                 .mapToDouble(SellerProduct::getMaxPrice)
+                .max()
+                .orElse(Double.MIN_VALUE);
+
+        priceRangeProjection.setMinPrice(minPrice);
+        priceRangeProjection.setMaxPrice(maxPrice);
+
+        return priceRangeProjection; // Return the computed PriceRangeProjection
+    }
+
+//Margin added
+    public PriceRangeProjection priceRangeByProductId(Long productId, double margin) {
+        List<SellerProduct> sellerProducts = sellerProductRepository.findByPId(productId);
+
+        if (sellerProducts.isEmpty()) {
+            System.out.println("No products found for the given productId.");
+            return null; // Return null if no products are found
+        }
+
+        PriceRangeProjection priceRangeProjection = new PriceRangeProjection();
+        priceRangeProjection.setProductId(productId);
+
+        // Compute min and max prices with the margin applied
+        Double minPrice = sellerProducts.stream()
+                .mapToDouble(SellerProduct::getMinPrice)
+                .map(price -> price + margin) // Add margin to the min price
+                .min()
+                .orElse(Double.MAX_VALUE);
+
+        Double maxPrice = sellerProducts.stream()
+                .mapToDouble(SellerProduct::getMaxPrice)
+                .map(price -> price + margin) // Add margin to the max price
                 .max()
                 .orElse(Double.MIN_VALUE);
 

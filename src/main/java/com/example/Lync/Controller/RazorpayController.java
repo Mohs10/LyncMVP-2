@@ -52,6 +52,17 @@ public class RazorpayController {
         }
     }
 
+
+    @PostMapping("/processRefund")
+    public String processRefund(@RequestParam String paymentId, @RequestParam double refundAmount) {
+        try {
+            System.out.println("Here we go ");
+            return razorpayService.processRefund(paymentId, refundAmount);
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
     @GetMapping("/allOrders")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 
