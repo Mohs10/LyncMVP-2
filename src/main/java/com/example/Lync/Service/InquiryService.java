@@ -22,6 +22,7 @@ public interface InquiryService {
     InquiryDTO buyerGetsInquiryById(String buyerUId, String qId);
 
     Page<InquiryDTO> adminGetAllInquiry(Pageable pageable); //Admin get all inquiry
+    public List<InquiryDTO> adminGetAllInquiryList() ;
 
     InquiryDTO adminGetInquiryByQId(String qId) throws Exception; //Admin get inquiry
 

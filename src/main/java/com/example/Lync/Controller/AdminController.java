@@ -201,6 +201,12 @@ public class AdminController {
         return ResponseEntity.ok(inquiryDTOS);
     }
 
+
+    @GetMapping("/allInquiriesList")
+    public ResponseEntity<?> getInquiries(){
+        return ResponseEntity.ok(inquiryService.adminGetAllInquiryList());
+    }
+
     @GetMapping("/getInquiryById/{qId}")
     public ResponseEntity<?> getInquiryById(@PathVariable String qId) throws Exception {
         return ResponseEntity.ok(inquiryService.adminGetInquiryByQId(qId));

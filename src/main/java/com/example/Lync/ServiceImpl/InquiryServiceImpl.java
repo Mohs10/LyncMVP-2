@@ -612,6 +612,118 @@ public class InquiryServiceImpl implements InquiryService {
         return new PageImpl<>(inquiryDTOS, pageable, inquiriesPage.getTotalElements());
     }
 
+    public List<InquiryDTO> adminGetAllInquiryList() {
+//        System.out.println("Fetching all inquiries for admin.");
+
+        List<Inquiry> inquiries = inquiryRepository.findAll();
+//        System.out.println("Fetched inquiries: " + inquiries);
+
+        List<InquiryDTO> inquiryDTOS = new ArrayList<>();
+
+        for (Inquiry inquiry : inquiries) {
+            try {
+                InquiryDTO inquiryDTO = new InquiryDTO();
+
+                // Set basic inquiry details
+                inquiryDTO.setQId(inquiry.getQId());
+                inquiryDTO.setBuyerUId(inquiry.getBuyerId());
+                inquiryDTO.setProductId(inquiry.getProductId());
+
+
+                // Debugging prints
+//                System.out.println("Processing Inquiry with QId: " + inquiry.getQId());
+
+                // Fetch product details
+                Product product = productRepository.findById(inquiry.getProductId())
+                        .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+
+                // Set product-related fields
+                inquiryDTO.setProductName(product.getProductName());
+                inquiryDTO.setVarietyName(
+                        product.getVarieties().stream().map(Variety::getVarietyName).collect(Collectors.joining(", "))
+                );
+                inquiryDTO.setFormName(
+                        product.getForms().stream().map(Form::getFormName).collect(Collectors.joining(", "))
+                );
+
+                // Set order specifications
+                inquiryDTO.setProductFormId(inquiry.getProductFormId());
+                inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+                inquiryDTO.setQuantity(inquiry.getQuantity());
+                inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
+                inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
+                inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
+                inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
+                inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
+                inquiryDTO.setNpop(inquiry.getNpop());
+                inquiryDTO.setNop(inquiry.getNop());
+                inquiryDTO.setEu(inquiry.getEu());
+                inquiryDTO.setGsdc(inquiry.getGsdc());
+                inquiryDTO.setIpm(inquiry.getIpm());
+                inquiryDTO.setOther(inquiry.getOther());
+                inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
+                inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+                inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
+                inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
+                inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
+                inquiryDTO.setCountry(inquiry.getCountry());
+                inquiryDTO.setState(inquiry.getState());
+                inquiryDTO.setCity(inquiry.getCity());
+                inquiryDTO.setPincode(inquiry.getPincode());
+                inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+
+                // Fetch specifications for the inquiry
+                List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
+
+                // Map specifications to SpecificationDTO
+                List<SpecificationDTO> specificationDTOs = specifications.stream()
+                        .map(spec -> {
+                            SpecificationDTO dto = new SpecificationDTO();
+                            dto.setSpecificationName(spec.getSpecificationName());
+                            dto.setSpecificationValue(spec.getSpecificationValue());
+                            dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
+                            return dto;
+                        })
+                        .toList();
+
+                inquiryDTO.setSpecifications(specificationDTOs);
+
+                // Set raise details
+                inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
+                inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
+                inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
+                inquiryDTO.setSellerUId(inquiry.getSellerUId());
+                inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+                inquiryDTO.setSentDate(inquiry.getSentDate());
+                inquiryDTO.setSentTime(inquiry.getSentTime());
+                inquiryDTO.setUnit(inquiry.getUnit());
+
+                // Fetch and set order status details
+                OrderStatus orderStatus = orderStatusRepository.findByOsId(inquiry.getOsId());
+                if (orderStatus != null) {
+                    inquiryDTO.setOsId(orderStatus.getOsId());
+                    inquiryDTO.setDate(orderStatus.getDate());
+                    inquiryDTO.setTime(orderStatus.getTime());
+                    inquiryDTO.setDescription(orderStatus.getDescription());
+                    inquiryDTO.setImageUrl(orderStatus.getImageUrl());
+                    inquiryDTO.setLocation(orderStatus.getLocation());
+                }
+
+                // Add to the list
+                inquiryDTOS.add(inquiryDTO);
+
+            } catch (Exception e) {
+                // Handle any exceptions and log the error
+//                System.err.println("Error processing inquiry with QId " + inquiry.getQId() + ": " + e.getMessage());
+            }
+        }
+
+        return inquiryDTOS;
+    }
+
+
+
+
 
     @Override
     public InquiryDTO adminGetInquiryByQId(String qId) throws Exception {
