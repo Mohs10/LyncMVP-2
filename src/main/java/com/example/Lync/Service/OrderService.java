@@ -58,5 +58,7 @@ public interface OrderService {
 
     String buyerReceivedOrder(String oId, String buyerId);
 
+    String paymentIdReceived (String orderId, String paymentId , String buyerId);
+
 
 }

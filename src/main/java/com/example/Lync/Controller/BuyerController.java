@@ -424,5 +424,27 @@ public class BuyerController {
     }
 
 
+    @PostMapping("/{orderId}/payment")
+    public ResponseEntity<String> updatePaymentId(
+            @PathVariable String orderId,
+            @RequestParam String paymentId) {
+        try {
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                    new RuntimeException("SellerBuyer details not found for email: " + username)
+            );
+            // Call the service to update payment ID and send notification
+            String response = orderService.paymentIdReceived(orderId, paymentId ,buyerDetails.getUserId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Return an error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred: " + e.getMessage());
+        }
+    }
+
+
 
 }

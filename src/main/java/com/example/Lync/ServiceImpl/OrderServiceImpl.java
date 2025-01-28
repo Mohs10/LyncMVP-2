@@ -758,4 +758,41 @@ public class OrderServiceImpl implements OrderService {
         return "You received the Product";
     }
 
+    @Override
+    public String paymentIdReceived(String orderId, String paymentId , String buyerId) {
+
+        // Fetch the order from the repository
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with given Order ID: " + orderId));
+
+        // Update the payment ID for the order
+        order.setPaymentId(paymentId);
+
+        // Save the updated order back to the repository
+        orderRepository.save(order);
+
+        // Create and configure a notification
+        Notification notification = new Notification();
+        notification.setNotificationId(UUID.randomUUID().toString());
+        notification.setMessage("Payment has been successfully received for Order ID: " + orderId +
+                ". Buyer ID: " + buyerId + " has acknowledged the receipt of the product.");
+        notification.setIsAdmin(true);
+        notification.setIsRead(false);
+        notification.setDate(LocalDate.now());
+        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setSoId(orderId);
+
+        // Send the notification to the message queue and WebSocket topic
+        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+
+        // Save the notification to the repository
+        notificationRepository.save(notification);
+
+        // Return a success message
+        return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
+    }
+
+
+
 }
