@@ -72,6 +72,8 @@ public interface OrderService {
 
     OrderDTO adminGetOrderDetails(String oId);
 
+    String getOIdByQId(String qId);
+
     List<OrderDTO> sellerGetAllOrders(String sellerId);
 
     OrderDTO sellerGetOrderDetails(String oId, String sellerId);

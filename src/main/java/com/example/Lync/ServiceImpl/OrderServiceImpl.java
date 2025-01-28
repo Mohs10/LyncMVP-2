@@ -49,7 +49,6 @@ public class OrderServiceImpl implements OrderService {
 //        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
 //                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
         String key = s3Service.buyerUploadPurchaseOrder(qId, file);
-        System.out.println("Key" + key);
         Order order = new Order();
         Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
         String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -1066,6 +1065,11 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setBuyerReceivedOrderTime(order.getBuyerReceivedOrderTime());
 
         return orderDTO;
+    }
+
+    @Override
+    public String getOIdByQId(String qId) {
+        return orderRepository.findOIdByQId(qId);
     }
 
     @Override

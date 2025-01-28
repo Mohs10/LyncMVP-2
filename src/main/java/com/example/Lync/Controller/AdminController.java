@@ -430,7 +430,10 @@ public class AdminController {
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
-
+    @GetMapping("/getOIdByQId/{qId}")
+    public ResponseEntity<String> getOIdByQId(@PathVariable String qId){
+        return new ResponseEntity<>(orderService.getOIdByQId(qId), HttpStatus.OK);
+    }
 
 
 
