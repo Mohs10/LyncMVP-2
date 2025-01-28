@@ -617,7 +617,7 @@ public class SellerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         List<OrderDTO> respond = orderService.sellerGetAllOrders(sellerDetails.getUserId());
-        return new ResponseEntity<>(respond, HttpStatus.CREATED);
+        return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
     @PostMapping("/sellerGetOrderDetails/{oId}")
@@ -628,7 +628,7 @@ public class SellerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         OrderDTO respond = orderService.sellerGetOrderDetails(oId, sellerDetails.getUserId());
-        return new ResponseEntity<>(respond, HttpStatus.CREATED);
+        return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
 

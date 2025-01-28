@@ -46,11 +46,10 @@ public class OrderServiceImpl implements OrderService {
         if (!buyerId.equals(inquiry.getBuyerId())) {
             throw new UnauthorizedException("Unauthorized: The buyer Id does not match with the respective query's buyer Id.");
         }
-        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
-                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
-
+//        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
+//                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
         String key = s3Service.buyerUploadPurchaseOrder(qId, file);
-
+        System.out.println("Key" + key);
         Order order = new Order();
         Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
         String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -65,8 +64,8 @@ public class OrderServiceImpl implements OrderService {
         order.setProductQuantity(inquiry.getQuantity());
         order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
         order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-        order.setAdminAddressId(sampleOrder.getAdminAddressId());
-        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
+//        order.setAdminAddressId(sampleOrder.getAdminAddressId());
+//        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
         order.setBuyerPurchaseOrderURL(key);
         order.setBuyerPurchaseOrderURLDate(LocalDate.now());
         order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -74,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
 
         Notification notification = new Notification();
         notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + sampleOrder.getQId());
+        notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + qId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
         notification.setDate(LocalDate.now());
