@@ -60,6 +60,11 @@ public class Order {
     private LocalDate adminNotifySellerToDispatchDate;
     private LocalTime adminNotifySellerToDispatchTime;
 
+    private String sellerPurchaseInvoiceURL;
+    private LocalDate sellerPurchaseInvoiceURLDate;
+    private LocalTime sellerPurchaseInvoiceURLTime;
+
+
     private LocalDate sellerProcessingOrderDate;
     private LocalTime sellerProcessingOrderTime;
 

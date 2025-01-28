@@ -412,7 +412,7 @@ public class BuyerController {
     }
 
 
-    @GetMapping("/buyerReceivedOrder/{oId}")
+    @PostMapping("/buyerReceivedOrder/{oId}")
     public ResponseEntity<String> buyerReceivedOrder(@PathVariable String oId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -420,6 +420,28 @@ public class BuyerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         String respond = orderService.buyerReceivedOrder(oId, buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/buyerGetAllOrders")
+    public ResponseEntity<List<OrderDTO>> buyerGetAllOrders(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<OrderDTO> respond = orderService.buyerGetAllOrders(buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/buyerGetOrderDetails/{oId}")
+    public ResponseEntity<OrderDTO> buyerGetOrderDetails(@PathVariable String oId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        OrderDTO respond = orderService.buyerGetOrderDetails(oId, buyerDetails.getUserId());
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
