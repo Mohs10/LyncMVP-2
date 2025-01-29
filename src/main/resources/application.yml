@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: Lync
+
+  datasource:
+    url: jdbc:mysql://lyncorganikness.cgio4ohrx24c.ap-south-1.rds.amazonaws.com:3306/lync
+    username: lyncorganikness2
+    password: Lync&Mvp-02
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # url: jdbc:mysql://localhost:3306/lync
+    # username: root
+    # password: Dzire7086
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    # ddl-auto: update
+    # properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  rabbitmq:
+    host: b-c067ddea-f077-4c90-b5d0-2ff072fd36ec.mq.ap-south-1.amazonaws.com
+    port: 5671
+    username: root
+    password: Organik_1989
+    virtual-host: /
+    ssl:
+      enabled: true
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 10
+
+  # logging:
+  #   level:
+  #     org.springframework: DEBUG
+  #     com.amazonaws: DEBUG
+  #     org.springframework.web.multipart: DEBUG
+
+server:
+  port: 5000
+  error:
+    whitelabel:
+      enabled: false
+    path: /error
+  # port: 8089
+  # port: 8080
+
+aws:
+  access-key: AKIAY4YC5IL62HWG7A26
+  secret-key: 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
+  s3:
+    region: ap-south-1
+    bucket-name: lync-bucket
+  # access-key: AKIAY4YC5IL63E6SKAWV
+  # secret-key: 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
+  # s3:
+  #   region: ap-south-1
+  #   bucket-name: lync-bucket
+
+razorpay:
+  key-id: rzp_test_V6Q3DmhiFmfzHZ
+  key-secret: pg8bXMKq1wxtOQDLqSnT45OY
+  # key-id: rzp_live_k1zkYf43GKwwjh
+  # key-secret: OImtEcXzp4narEy2Kx9BuIkC

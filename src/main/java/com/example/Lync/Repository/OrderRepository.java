@@ -10,4 +10,7 @@ import java.time.LocalDate;
 public interface OrderRepository extends JpaRepository<Order, String> {
     @Query("SELECT COUNT(o) FROM Order o WHERE o.buyerPurchaseOrderURLDate = :currentDate")
     Long countOrderByCurrentDate(@Param("currentDate")LocalDate currentDate);
+
+    @Query("SELECT o.oId FROM Order o WHERE o.qId = :qId")
+    String findOIdByQId(String qId);
 }

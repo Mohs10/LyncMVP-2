@@ -418,6 +418,23 @@ public class AdminController {
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
+    @GetMapping("/adminGetAllOrders")
+    public ResponseEntity<List<OrderDTO>> adminGetAllOrders()  {
+        List<OrderDTO> respond = orderService.adminGetAllOrders();
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/adminGetOrderDetails/{oId}")
+    public ResponseEntity<OrderDTO> adminGetOrderDetails(@PathVariable String oId)  {
+        OrderDTO respond = orderService.adminGetOrderDetails(oId);
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/getOIdByQId/{qId}")
+    public ResponseEntity<String> getOIdByQId(@PathVariable String qId){
+        return new ResponseEntity<>(orderService.getOIdByQId(qId), HttpStatus.OK);
+    }
+
 
 
 

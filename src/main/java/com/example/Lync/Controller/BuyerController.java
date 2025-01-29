@@ -6,6 +6,7 @@ import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Exception.UnauthorizedException;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
@@ -396,7 +397,7 @@ public class BuyerController {
     }
 
     @PostMapping("/upload/PurchaseOrder/{qId}")
-    public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String qId, @RequestParam("file")MultipartFile file) {
+    public ResponseEntity<String> uploadPurchaseOrder(@PathVariable String qId, @RequestParam("file") MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
@@ -406,13 +407,13 @@ public class BuyerController {
 //            String fileUrl = inquiryService.uploadPurchaseOrder(qId, file);
             String fileUrl = orderService.buyerUploadPurchaseOrder(qId,file, buyerDetails.getUserId());
             return ResponseEntity.ok(fileUrl);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+        } catch (RuntimeException | IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
 
-    @GetMapping("/buyerReceivedOrder/{oId}")
+    @PostMapping("/buyerReceivedOrder/{oId}")
     public ResponseEntity<String> buyerReceivedOrder(@PathVariable String oId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -420,6 +421,28 @@ public class BuyerController {
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
         String respond = orderService.buyerReceivedOrder(oId, buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/buyerGetAllOrders")
+    public ResponseEntity<List<OrderDTO>> buyerGetAllOrders(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<OrderDTO> respond = orderService.buyerGetAllOrders(buyerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @GetMapping("/buyerGetOrderDetails/{oId}")
+    public ResponseEntity<OrderDTO> buyerGetOrderDetails(@PathVariable String oId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        OrderDTO respond = orderService.buyerGetOrderDetails(oId, buyerDetails.getUserId());
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 

@@ -475,6 +475,28 @@ public class SellerController {
                 HttpStatus.OK);
     }
 
+    @PostMapping("/sellerUploadPurchaseInvoice/{oId}")
+    public ResponseEntity<String> sellerUploadPurchaseInvoice(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = orderService.sellerUploadPurchaseInvoice(oId, sellerDetails.getUserId(), file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/sellerAddTransportation/{oId}")
+    public ResponseEntity<String> sellerAddTransportation(@PathVariable String oId, @RequestBody OrderDTO orderDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        String message = orderService.sellerAddTransportation(oId, sellerDetails.getUserId(), orderDTO);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
     @PostMapping("/sellerUploadOrderLoadedVehicleImg/{oId}")
     public ResponseEntity<String> sellerAcceptSOP(@PathVariable String oId, @RequestParam("file")MultipartFile file) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -585,6 +607,28 @@ public class SellerController {
         );
         String message = orderService.sellerDispatchedOrder(oId, sellerDetails.getUserId());
         return new ResponseEntity<>(message, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/sellerGetAllOrders")
+    public ResponseEntity<List<OrderDTO>> sellerGetAllOrders() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        List<OrderDTO> respond = orderService.sellerGetAllOrders(sellerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
+    }
+
+    @PostMapping("/sellerGetOrderDetails/{oId}")
+    public ResponseEntity<OrderDTO> sellerGetOrderDetails(@PathVariable String oId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+        OrderDTO respond = orderService.sellerGetOrderDetails(oId, sellerDetails.getUserId());
+        return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
 

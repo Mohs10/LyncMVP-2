@@ -903,6 +903,18 @@ public class S3Service {
 
 
 
+    //Seller Uploads in Order Section
+    public String sellerPurchaseInvoice(String oId, MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String s3Key = "Order/Seller/PurchaseInvoice/" + oId + "/" + fileName;
+
+        s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(s3Key)
+                        .build(),
+                RequestBody.fromBytes(file.getBytes()));
+        return s3Key;
+    }
 
     //Seller Uploads in Order Section
     public String sellerOrderLoadingVehicleImg(String oId, MultipartFile file) throws IOException {

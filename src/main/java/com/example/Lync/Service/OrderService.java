@@ -1,8 +1,10 @@
 package com.example.Lync.Service;
 
+import com.example.Lync.DTO.OrderDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface OrderService {
 
@@ -18,9 +20,13 @@ public interface OrderService {
 
     String adminNotifySellerToDispatch(String oId);
 
+    String sellerUploadPurchaseInvoice(String oId, String sellerId, MultipartFile file) throws IOException;
+
     String sellerProcessingOrder(String oId, String sellerId);
 
     String sellerDispatchedOrder(String oId, String sellerId);
+
+    String sellerAddTransportation(String oId, String sellerId, OrderDTO orderDTO);
 
     String sellerUploadOrderLoadedVehicleImg(String oId, String sellerId, MultipartFile file) throws IOException;
 
@@ -57,6 +63,23 @@ public interface OrderService {
     String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException;
 
     String buyerReceivedOrder(String oId, String buyerId);
+
+    List<OrderDTO> buyerGetAllOrders(String buyerId);
+
+    OrderDTO buyerGetOrderDetails(String oId, String buyerId);
+
+    List<OrderDTO> adminGetAllOrders();
+
+    OrderDTO adminGetOrderDetails(String oId);
+
+    String getOIdByQId(String qId);
+
+    List<OrderDTO> sellerGetAllOrders(String sellerId);
+
+    OrderDTO sellerGetOrderDetails(String oId, String sellerId);
+
+
+
 
     String paymentIdReceived (String orderId, String paymentId , String buyerId);
 
