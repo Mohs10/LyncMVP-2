@@ -860,10 +860,10 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setBuyerPaid(order.getBuyerPaid());
         orderDTO.setBuyerAddressId(order.getBuyerAddressId());
 
-        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL());
+        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
         orderDTO.setBuyerPurchaseOrderURLTime(order.getBuyerPurchaseOrderURLTime());
-        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL());
+        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getAdminPurchaseInvoiceURL()) : null);
         orderDTO.setAdminPurchaseInvoiceURLDate(order.getAdminPurchaseInvoiceURLDate());
         orderDTO.setAdminPurchaseInvoiceURLTime(order.getAdminPurchaseInvoiceURLTime());
         orderDTO.setAdminNotifyBuyerToPay(order.getAdminNotifyBuyerToPay());
@@ -881,22 +881,22 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminDispatchedOrderTime(order.getAdminDispatchedOrderTime());
         orderDTO.setAdminCourierCompany(order.getAdminCourierCompany());
         orderDTO.setAdminOrderTrackerId(order.getAdminOrderTrackerId());
-        orderDTO.setAdminEWayBill(order.getAdminEWayBill());
+        orderDTO.setAdminEWayBill(order.getAdminEWayBill() != null ? s3Service.getFiles(order.getAdminEWayBill()) : null);
         orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
         orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
-        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice());
+        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice() != null ? s3Service.getFiles(order.getAdminPaymentInvoice()) : null);
         orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
         orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
-        orderDTO.setAdminLRCopy(order.getAdminLRCopy());
+        orderDTO.setAdminLRCopy(order.getAdminLRCopy() != null ? s3Service.getFiles(order.getAdminLRCopy()) : null);
         orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
         orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
-        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad());
+        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPreLoad()) : null);
         orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
         orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
         orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad());
-        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
+        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPostLoad()) : null);
         orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
-        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate());
+        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate() != null ? s3Service.getFiles(order.getAdminTransactionCertificate()) : null);
         orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
         orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
         orderDTO.setBuyerReceivedOrderDate(order.getBuyerReceivedOrderDate());
@@ -956,18 +956,86 @@ public class OrderServiceImpl implements OrderService {
                 .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
 
-        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL());
+        // Assuming s3Service is your service for handling file uploads to S3
+
+        orderDTO.setBuyerPurchaseOrderURL(s3Service.getFiles(order.getBuyerPurchaseOrderURL()));
+        orderDTO.setAdminPurchaseInvoiceURL(s3Service.getFiles(order.getAdminPurchaseInvoiceURL()));
+        orderDTO.setAdminPurchaseOrderURL(s3Service.getFiles(order.getAdminPurchaseOrderURL()));
+
+        orderDTO.setSellerPurchaseInvoiceURL(s3Service.getFiles(order.getSellerPurchaseInvoiceURL()));
+        orderDTO.setSellerOrderLoadingVehicleImg(s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()));
+        orderDTO.setSellerLoadedSealedVehicleImg(s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()));
+        orderDTO.setSellerEWayBill(s3Service.getFiles(order.getSellerEWayBill()));
+        orderDTO.setSellerPaymentInvoice(s3Service.getFiles(order.getSellerPaymentInvoice()));
+        orderDTO.setSellerLRCopy(s3Service.getFiles(order.getSellerLRCopy()));
+        orderDTO.setSellerWeightSlipPreLoad(s3Service.getFiles(order.getSellerWeightSlipPreLoad()));
+        orderDTO.setSellerWeightSlipPostLoad(s3Service.getFiles(order.getSellerWeightSlipPostLoad()));
+
+        orderDTO.setAdminEWayBill(s3Service.getFiles(order.getAdminEWayBill()));
+        orderDTO.setAdminPaymentInvoice(s3Service.getFiles(order.getAdminPaymentInvoice()));
+        orderDTO.setAdminLRCopy(s3Service.getFiles(order.getAdminLRCopy()));
+        orderDTO.setAdminWeightSlipPreLoad(s3Service.getFiles(order.getAdminWeightSlipPreLoad()));
+        orderDTO.setAdminWeightSlipPostLoad(s3Service.getFiles(order.getAdminWeightSlipPostLoad()));
+
+        orderDTO.setSellerTransactionCertificate(s3Service.getFiles(order.getSellerTransactionCertificate()));
+        orderDTO.setAdminTransactionCertificate(s3Service.getFiles(order.getAdminTransactionCertificate()));
+
+// Set dates and times
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
         orderDTO.setBuyerPurchaseOrderURLTime(order.getBuyerPurchaseOrderURLTime());
 
-        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL());
         orderDTO.setAdminPurchaseInvoiceURLDate(order.getAdminPurchaseInvoiceURLDate());
         orderDTO.setAdminPurchaseInvoiceURLTime(order.getAdminPurchaseInvoiceURLTime());
 
-        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL());
         orderDTO.setAdminPurchaseOrderURLDate(order.getAdminPurchaseOrderURLDate());
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
+        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
+        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
+
+        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
+        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
+
+        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
+        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
+
+        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
+        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
+
+        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
+        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
+
+        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
+        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
+
+        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
+        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
+
+        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
+        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
+
+        orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
+        orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
+
+        orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
+        orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
+
+        orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
+        orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
+
+        orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
+        orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
+
+        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
+        orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
+
+        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
+        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+
+        orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
+        orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
+
+// Notify buyer and seller actions
         orderDTO.setAdminNotifyBuyerToPay(order.getAdminNotifyBuyerToPay());
         orderDTO.setAdminNotifyBuyerToPayDate(order.getAdminNotifyBuyerToPayDate());
         orderDTO.setAdminNotifyBuyerToPayTime(order.getAdminNotifyBuyerToPayTime());
@@ -977,50 +1045,23 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setBuyer1stPaymentTime(order.getBuyer1stPaymentTime());
 
         orderDTO.setBuyerClearedPayment(order.getBuyerClearedPayment());
+
         orderDTO.setAdminNotifySellerToDispatch(order.getAdminNotifySellerToDispatch());
         orderDTO.setAdminNotifySellerToDispatchDate(order.getAdminNotifySellerToDispatchDate());
         orderDTO.setAdminNotifySellerToDispatchTime(order.getAdminNotifySellerToDispatchTime());
 
-        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL());
-        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
-        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
-
+// Seller processing and dispatch details
         orderDTO.setSellerProcessingOrderDate(order.getSellerProcessingOrderDate());
         orderDTO.setSellerProcessingOrderTime(order.getSellerProcessingOrderTime());
         orderDTO.setSellerDispatchOrderDate(order.getSellerDispatchOrderDate());
         orderDTO.setSellerDispatchOrderTime(order.getSellerDispatchOrderTime());
         orderDTO.setSellerDispatchPeriod(order.getSellerDispatchPeriod());
 
+// Seller courier and tracking details
         orderDTO.setSellerCourierCompany(order.getSellerCourierCompany());
         orderDTO.setSellerOrderTrackerId(order.getSellerOrderTrackerId());
-        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg());
-        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
-        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
 
-        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg());
-        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
-        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
-
-        orderDTO.setSellerEWayBill(order.getSellerEWayBill());
-        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
-        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
-
-        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice());
-        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
-        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
-
-        orderDTO.setSellerLRCopy(order.getSellerLRCopy());
-        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
-        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
-
-        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad());
-        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
-        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
-
-        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad());
-        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
-        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
-
+// Admin received and processing details
         orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
         orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
 
@@ -1030,39 +1071,15 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminDispatchedOrderDate(order.getAdminDispatchedOrderDate());
         orderDTO.setAdminDispatchedOrderTime(order.getAdminDispatchedOrderTime());
 
+// Admin courier and tracking details
         orderDTO.setAdminCourierCompany(order.getAdminCourierCompany());
         orderDTO.setAdminOrderTrackerId(order.getAdminOrderTrackerId());
 
-        orderDTO.setAdminEWayBill(order.getAdminEWayBill());
-        orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
-        orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
-
-        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice());
-        orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
-        orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
-
-        orderDTO.setAdminLRCopy(order.getAdminLRCopy());
-        orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
-        orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
-
-        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad());
-        orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
-        orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
-
-        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad());
-        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
-        orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
-
-        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate());
-        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
-        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
-
-        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate());
-        orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
-        orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
-
+// Buyer received order details
         orderDTO.setBuyerReceivedOrderDate(order.getBuyerReceivedOrderDate());
         orderDTO.setBuyerReceivedOrderTime(order.getBuyerReceivedOrderTime());
+
+// Return the orderDTO with all fields set accordingly
 
         return orderDTO;
     }
@@ -1121,60 +1138,68 @@ public class OrderServiceImpl implements OrderService {
                 .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
 
-        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL());
+        // Assuming s3Service is your service for handling file uploads to S3
+
+        String adminPurchaseOrderUrl = null;
+        if (order.getAdminPurchaseOrderURL() != null) {
+            adminPurchaseOrderUrl = s3Service.getFiles(order.getAdminPurchaseOrderURL());
+        }
+        orderDTO.setAdminPurchaseOrderURL(adminPurchaseOrderUrl);
         orderDTO.setAdminPurchaseOrderURLDate(order.getAdminPurchaseOrderURLDate());
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
+// Handle other file uploads similarly
+        orderDTO.setSellerPurchaseInvoiceURL(s3Service.getFiles(order.getSellerPurchaseInvoiceURL()));
+        orderDTO.setSellerOrderLoadingVehicleImg(s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()));
+        orderDTO.setSellerLoadedSealedVehicleImg(s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()));
+        orderDTO.setSellerEWayBill(s3Service.getFiles(order.getSellerEWayBill()));
+        orderDTO.setSellerPaymentInvoice(s3Service.getFiles(order.getSellerPaymentInvoice()));
+        orderDTO.setSellerLRCopy(s3Service.getFiles(order.getSellerLRCopy()));
+        orderDTO.setSellerWeightSlipPreLoad(s3Service.getFiles(order.getSellerWeightSlipPreLoad()));
+        orderDTO.setSellerWeightSlipPostLoad(s3Service.getFiles(order.getSellerWeightSlipPostLoad()));
+        orderDTO.setSellerTransactionCertificate(s3Service.getFiles(order.getSellerTransactionCertificate()));
+
+// Set dates and times
+        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
+        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
+        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
+        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
+        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
+        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
+        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
+        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
+        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
+        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
+        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
+        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
+        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
+        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
+        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
+        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
+        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
+        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+
+// Admin received order date and time
+        orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
+        orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
+
+// Notify seller and dispatch details
         orderDTO.setAdminNotifySellerToDispatch(order.getAdminNotifySellerToDispatch());
         orderDTO.setAdminNotifySellerToDispatchDate(order.getAdminNotifySellerToDispatchDate());
         orderDTO.setAdminNotifySellerToDispatchTime(order.getAdminNotifySellerToDispatchTime());
 
-        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL());
-        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
-        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
-
+// Seller processing and dispatch details
         orderDTO.setSellerProcessingOrderDate(order.getSellerProcessingOrderDate());
         orderDTO.setSellerProcessingOrderTime(order.getSellerProcessingOrderTime());
         orderDTO.setSellerDispatchOrderDate(order.getSellerDispatchOrderDate());
         orderDTO.setSellerDispatchOrderTime(order.getSellerDispatchOrderTime());
         orderDTO.setSellerDispatchPeriod(order.getSellerDispatchPeriod());
 
+// Seller courier and tracking details
         orderDTO.setSellerCourierCompany(order.getSellerCourierCompany());
         orderDTO.setSellerOrderTrackerId(order.getSellerOrderTrackerId());
-        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg());
-        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
-        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
 
-        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg());
-        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
-        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
-
-        orderDTO.setSellerEWayBill(order.getSellerEWayBill());
-        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
-        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
-
-        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice());
-        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
-        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
-
-        orderDTO.setSellerLRCopy(order.getSellerLRCopy());
-        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
-        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
-
-        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad());
-        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
-        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
-
-        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad());
-        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
-        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
-
-        orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
-        orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
-
-        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate());
-        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
-        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+// Return the orderDTO with all fields set accordingly
 
         return orderDTO;
     }
