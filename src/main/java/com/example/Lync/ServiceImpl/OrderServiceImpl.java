@@ -958,27 +958,27 @@ public class OrderServiceImpl implements OrderService {
 
         // Assuming s3Service is your service for handling file uploads to S3
 
-        orderDTO.setBuyerPurchaseOrderURL(s3Service.getFiles(order.getBuyerPurchaseOrderURL()));
-        orderDTO.setAdminPurchaseInvoiceURL(s3Service.getFiles(order.getAdminPurchaseInvoiceURL()));
-        orderDTO.setAdminPurchaseOrderURL(s3Service.getFiles(order.getAdminPurchaseOrderURL()));
+        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
+        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getAdminPurchaseInvoiceURL()) : null);
+        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL() != null ? s3Service.getFiles(order.getAdminPurchaseOrderURL()) : null);
 
-        orderDTO.setSellerPurchaseInvoiceURL(s3Service.getFiles(order.getSellerPurchaseInvoiceURL()));
-        orderDTO.setSellerOrderLoadingVehicleImg(s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()));
-        orderDTO.setSellerLoadedSealedVehicleImg(s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()));
-        orderDTO.setSellerEWayBill(s3Service.getFiles(order.getSellerEWayBill()));
-        orderDTO.setSellerPaymentInvoice(s3Service.getFiles(order.getSellerPaymentInvoice()));
-        orderDTO.setSellerLRCopy(s3Service.getFiles(order.getSellerLRCopy()));
-        orderDTO.setSellerWeightSlipPreLoad(s3Service.getFiles(order.getSellerWeightSlipPreLoad()));
-        orderDTO.setSellerWeightSlipPostLoad(s3Service.getFiles(order.getSellerWeightSlipPostLoad()));
+        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getSellerPurchaseInvoiceURL()) : null);
+        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg() != null ? s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()) : null);
+        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg() != null ? s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()) : null);
+        orderDTO.setSellerEWayBill(order.getSellerEWayBill() != null ? s3Service.getFiles(order.getSellerEWayBill()) : null);
+        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice() != null ? s3Service.getFiles(order.getSellerPaymentInvoice()) : null);
+        orderDTO.setSellerLRCopy(order.getSellerLRCopy() != null ? s3Service.getFiles(order.getSellerLRCopy()) : null);
+        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPreLoad()) : null);
+        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPostLoad()) : null);
 
-        orderDTO.setAdminEWayBill(s3Service.getFiles(order.getAdminEWayBill()));
-        orderDTO.setAdminPaymentInvoice(s3Service.getFiles(order.getAdminPaymentInvoice()));
-        orderDTO.setAdminLRCopy(s3Service.getFiles(order.getAdminLRCopy()));
-        orderDTO.setAdminWeightSlipPreLoad(s3Service.getFiles(order.getAdminWeightSlipPreLoad()));
-        orderDTO.setAdminWeightSlipPostLoad(s3Service.getFiles(order.getAdminWeightSlipPostLoad()));
+        orderDTO.setAdminEWayBill(order.getAdminEWayBill() != null ? s3Service.getFiles(order.getAdminEWayBill()) : null);
+        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice() != null ? s3Service.getFiles(order.getAdminPaymentInvoice()) : null);
+        orderDTO.setAdminLRCopy(order.getAdminLRCopy() != null ? s3Service.getFiles(order.getAdminLRCopy()) : null);
+        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPreLoad()) : null);
+        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPostLoad()) : null);
 
-        orderDTO.setSellerTransactionCertificate(s3Service.getFiles(order.getSellerTransactionCertificate()));
-        orderDTO.setAdminTransactionCertificate(s3Service.getFiles(order.getAdminTransactionCertificate()));
+        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate() != null ? s3Service.getFiles(order.getSellerTransactionCertificate()) : null);
+        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate() != null ? s3Service.getFiles(order.getAdminTransactionCertificate()) : null);
 
 // Set dates and times
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
@@ -1149,15 +1149,15 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
 // Handle other file uploads similarly
-        orderDTO.setSellerPurchaseInvoiceURL(s3Service.getFiles(order.getSellerPurchaseInvoiceURL()));
-        orderDTO.setSellerOrderLoadingVehicleImg(s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()));
-        orderDTO.setSellerLoadedSealedVehicleImg(s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()));
-        orderDTO.setSellerEWayBill(s3Service.getFiles(order.getSellerEWayBill()));
-        orderDTO.setSellerPaymentInvoice(s3Service.getFiles(order.getSellerPaymentInvoice()));
-        orderDTO.setSellerLRCopy(s3Service.getFiles(order.getSellerLRCopy()));
-        orderDTO.setSellerWeightSlipPreLoad(s3Service.getFiles(order.getSellerWeightSlipPreLoad()));
-        orderDTO.setSellerWeightSlipPostLoad(s3Service.getFiles(order.getSellerWeightSlipPostLoad()));
-        orderDTO.setSellerTransactionCertificate(s3Service.getFiles(order.getSellerTransactionCertificate()));
+        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getSellerPurchaseInvoiceURL()) : null);
+        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg() != null ? s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()) : null);
+        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg() != null ? s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()) : null);
+        orderDTO.setSellerEWayBill(order.getSellerEWayBill() != null ? s3Service.getFiles(order.getSellerEWayBill()) : null);
+        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice() != null ? s3Service.getFiles(order.getSellerPaymentInvoice()) : null);
+        orderDTO.setSellerLRCopy(order.getSellerLRCopy() != null ? s3Service.getFiles(order.getSellerLRCopy()) : null);
+        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPreLoad()) : null);
+        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPostLoad()) : null);
+        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate() != null ? s3Service.getFiles(order.getSellerTransactionCertificate()) : null);
 
 // Set dates and times
         orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
