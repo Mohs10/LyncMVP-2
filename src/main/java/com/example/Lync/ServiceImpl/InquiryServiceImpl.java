@@ -470,7 +470,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public Page<InquiryDTO> adminGetAllInquiry(Pageable pageable) {
         // Fetch paginated inquiries
-        Page<Inquiry> inquiriesPage = inquiryRepository.findAll(pageable);
+        Page<Inquiry> inquiriesPage = inquiryRepository.findAllInquiriesSorted(pageable);
 
         // Map inquiries to DTOs
         List<InquiryDTO> inquiryDTOS = inquiriesPage.stream()
@@ -559,9 +559,7 @@ public class InquiryServiceImpl implements InquiryService {
                         System.err.println("Error processing inquiry with QId " + inquiry.getQId() + ": " + e.getMessage());
                     }
                     return inquiryDTO;
-                }).sorted(Comparator.comparing(InquiryDTO::getRaiseDate)
-                        .thenComparing(InquiryDTO::getRaiseTime)
-                        .reversed()).collect(Collectors.toList());
+                }).collect(Collectors.toList());
 
         return new PageImpl<>(inquiryDTOS, pageable, inquiriesPage.getTotalElements());
     }
