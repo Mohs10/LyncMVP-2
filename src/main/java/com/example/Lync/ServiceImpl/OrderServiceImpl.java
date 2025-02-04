@@ -863,6 +863,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setFormName(product.getForms().stream()
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+                    orderDTO.setStatus(order.getStatus());
                 return orderDTO;
                 }).toList();
     }
@@ -878,6 +879,7 @@ public class OrderServiceImpl implements OrderService {
          orderDTO.setOId(oId);
          orderDTO.setQId(order.getQId());
          orderDTO.setBuyerUId(order.getBuyerUId());
+        orderDTO.setStatus(order.getStatus());
         Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
@@ -957,6 +959,7 @@ public class OrderServiceImpl implements OrderService {
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
                     orderDTO.setProductQuantity(order.getProductQuantity());
+                    orderDTO.setStatus(order.getStatus());
                     return orderDTO;
                 }).toList();
     }
@@ -970,6 +973,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setQId(order.getQId());
         orderDTO.setBuyerUId(order.getBuyerUId());
         orderDTO.setSellerUId(order.getSellerUId());
+        orderDTO.setStatus(order.getStatus());
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setBuyerFinalPrice(order.getBuyerFinalPrice());
         orderDTO.setBuyerPaid(order.getBuyerPaid());
@@ -1141,6 +1145,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setFormName(product.getForms().stream()
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+                    orderDTO.setStatus(order.getStatus());
                     return orderDTO;
                 }).toList();
     }
@@ -1156,6 +1161,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOId(oId);
         orderDTO.setQId(order.getQId());
         orderDTO.setSellerUId(order.getSellerUId());
+        orderDTO.setStatus(order.getStatus());
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setSellerFinalPrice(order.getSellerFinalPrice());
         orderDTO.setAdminAddressId(order.getAdminAddressId());
