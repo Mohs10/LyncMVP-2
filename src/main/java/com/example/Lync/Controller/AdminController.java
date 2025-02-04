@@ -196,7 +196,7 @@ public class AdminController {
 
     @GetMapping("/allInquiries")
     public ResponseEntity<?> getInquiries(Pageable pageable){
-        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10, pageable.getSort());
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 4, pageable.getSort());
         Page<InquiryDTO> inquiryDTOS = inquiryService.adminGetAllInquiry(pageRequest);
         return ResponseEntity.ok(inquiryDTOS);
     }

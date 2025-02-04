@@ -83,6 +83,7 @@ public class InquiryDTO {
     private String imageUrl;
     private String location;
 
+    private List<String> spIds;
     private List<String> sellerUIds; //Inquiry can be sent to multiple seller, so this is to capture sellers list.
     private Long adminAddressId;
     private List<SellerNegotiateDTO> sellerNegotiations;

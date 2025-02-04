@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     private ProductRepository productRepository;
+    private SellerProductRepository sellerProductRepository;
 
 
     @Override
@@ -69,6 +70,11 @@ public class OrderServiceImpl implements OrderService {
         order.setBuyerPurchaseOrderURLDate(LocalDate.now());
         order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderRepository.save(order);
+
+        SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
+                .orElseThrow(() -> new RuntimeException("Seller product is not found with the given Id : " + inquiry.getSpId()));
+        sellerProduct.setAvailableAmount(sellerProduct.getAvailableAmount() - inquiry.getQuantity());
+        sellerProductRepository.save(sellerProduct);
 
         Notification notification = new Notification();
         notification.setNotificationId(UUID.randomUUID().toString());
