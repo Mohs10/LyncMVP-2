@@ -69,6 +69,7 @@ public class OrderServiceImpl implements OrderService {
         order.setBuyerPurchaseOrderURL(key);
         order.setBuyerPurchaseOrderURLDate(LocalDate.now());
         order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Buyer uploaded the purchase order");
         orderRepository.save(order);
 
         SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
@@ -103,6 +104,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPurchaseInvoiceURL(key);
         order.setAdminPurchaseInvoiceURLDate(LocalDate.now());
         order.setAdminPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded purchase invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -132,6 +134,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPurchaseOrderURL(key);
         order.setAdminPurchaseOrderURLDate(LocalDate.now());
         order.setAdminPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded purchase order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -159,6 +162,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminNotifyBuyerToPay(amount);
         order.setAdminNotifyBuyerToPayDate(LocalDate.now());
         order.setAdminNotifyBuyerToPayTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin notified buyer to pay");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -191,6 +195,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminNotifySellerToDispatch(true);
         order.setAdminNotifySellerToDispatchDate(LocalDate.now());
         order.setAdminNotifySellerToDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin notified seller to dispatch");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -221,6 +226,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerPurchaseInvoiceURL(key);
         order.setSellerPurchaseInvoiceURLDate(LocalDate.now());
         order.setSellerPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded purchase invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -248,6 +254,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerProcessingOrderDate(LocalDate.now());
         order.setSellerProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller processed the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -275,6 +282,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerDispatchOrderDate(LocalDate.now());
         order.setSellerDispatchOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller dispatched the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -302,6 +310,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerCourierCompany(orderDTO.getSellerCourierCompany());
         order.setSellerOrderTrackerId(orderDTO.getSellerOrderTrackerId());
+        order.setStatus("Seller added transportation details");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -332,6 +341,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerOrderLoadingVehicleImg(s3Key);
         order.setSellerOrderLoadingVehicleImgDate(LocalDate.now());
         order.setSellerOrderLoadingVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded order loaded vehicle image");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -361,6 +371,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerLoadedSealedVehicleImg(s3Key);
         order.setSellerLoadedSealedVehicleImgDate(LocalDate.now());
         order.setSellerLoadedSealedVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded loaded & sealed vehicle image");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -390,6 +401,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerEWayBill(s3Key);
         order.setSellerEWayBillDate(LocalDate.now());
         order.setSellerEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded E-Way bill");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -419,6 +431,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerPaymentInvoice(s3Key);
         order.setSellerPaymentInvoiceDate(LocalDate.now());
         order.setSellerPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded payment invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -448,6 +461,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerLRCopy(s3Key);
         order.setSellerLRCopyDate(LocalDate.now());
         order.setSellerLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded LR copy");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -477,6 +491,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerWeightSlipPreLoad(s3Key);
         order.setSellerWeightSlipPreLoadDate(LocalDate.now());
         order.setSellerWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded weight slip of pre-loaded vehicle");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -506,6 +521,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerWeightSlipPostLoad(s3Key);
         order.setSellerWeightSlipPostLoadDate(LocalDate.now());
         order.setSellerWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -530,6 +546,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminReceivedOrderDate(LocalDate.now());
         order.setAdminReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin received the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -555,6 +572,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminProcessingOrderDate(LocalDate.now());
         order.setAdminProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin processing the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -580,6 +598,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminDispatchedOrderDate(LocalDate.now());
         order.setAdminDispatchedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin dispatched the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -607,6 +626,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminEWayBill(key);
         order.setAdminEWayBillDate(LocalDate.now());
         order.setAdminEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded E-Way bill");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -634,6 +654,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPaymentInvoice(key);
         order.setAdminPaymentInvoiceDate(LocalDate.now());
         order.setAdminPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded payment invoice");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -661,6 +682,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminLRCopy(key);
         order.setAdminLRCopyDate(LocalDate.now());
         order.setAdminLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded LR copy");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -688,6 +710,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminWeightSlipPreLoad(key);
         order.setAdminWeightSlipPreLoadDate(LocalDate.now());
         order.setAdminWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded weight slip of pre-load vehicle");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -715,6 +738,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminWeightSlipPostLoad(key);
         order.setAdminWeightSlipPostLoadDate(LocalDate.now());
         order.setAdminWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -745,6 +769,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerTransactionCertificate(s3Key);
         order.setSellerTransactionCertificateDate(LocalDate.now());
         order.setSellerTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded transaction certificate");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -771,6 +796,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminTransactionCertificate(key);
         order.setAdminTransactionCertificateDate(LocalDate.now());
         order.setAdminTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded transaction certificate");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -799,6 +825,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setBuyerReceivedOrderDate(LocalDate.now());
         order.setBuyerReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Buyer received the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
