@@ -956,6 +956,34 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
 
 
+//    public PriceRangeProjection priceRangeByProductId(Long productId) {
+//        List<SellerProduct> sellerProducts = sellerProductRepository.findByPId(productId);
+//
+//        if (sellerProducts.isEmpty()) {
+//            System.out.println("No products found for the given productId.");
+//            return null; // Return null if no products are found
+//        }
+//
+//        PriceRangeProjection priceRangeProjection = new PriceRangeProjection();
+//        priceRangeProjection.setProductId(productId);
+//
+//        Double minPrice = sellerProducts.stream()
+//                .mapToDouble(SellerProduct::getMinPrice)
+//                .min()
+//                .orElse(Double.MAX_VALUE);
+//
+//        Double maxPrice = sellerProducts.stream()
+//                .mapToDouble(SellerProduct::getMaxPrice)
+//                .max()
+//                .orElse(Double.MIN_VALUE);
+//
+//        priceRangeProjection.setMinPrice(minPrice);
+//        priceRangeProjection.setMaxPrice(maxPrice);
+//
+//        return priceRangeProjection; // Return the computed PriceRangeProjection
+//    }
+
+//Margin added
     public PriceRangeProjection priceRangeByProductId(Long productId) {
         List<SellerProduct> sellerProducts = sellerProductRepository.findByPId(productId);
 
@@ -963,34 +991,9 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
             System.out.println("No products found for the given productId.");
             return null; // Return null if no products are found
         }
-
-        PriceRangeProjection priceRangeProjection = new PriceRangeProjection();
-        priceRangeProjection.setProductId(productId);
-
-        Double minPrice = sellerProducts.stream()
-                .mapToDouble(SellerProduct::getMinPrice)
-                .min()
-                .orElse(Double.MAX_VALUE);
-
-        Double maxPrice = sellerProducts.stream()
-                .mapToDouble(SellerProduct::getMaxPrice)
-                .max()
-                .orElse(Double.MIN_VALUE);
-
-        priceRangeProjection.setMinPrice(minPrice);
-        priceRangeProjection.setMaxPrice(maxPrice);
-
-        return priceRangeProjection; // Return the computed PriceRangeProjection
-    }
-
-//Margin added
-    public PriceRangeProjection priceRangeByProductId(Long productId, double margin) {
-        List<SellerProduct> sellerProducts = sellerProductRepository.findByPId(productId);
-
-        if (sellerProducts.isEmpty()) {
-            System.out.println("No products found for the given productId.");
-            return null; // Return null if no products are found
-        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with Id : " + productId));
+        Float percentage = product.getCategory().getPercentage();
 
         PriceRangeProjection priceRangeProjection = new PriceRangeProjection();
         priceRangeProjection.setProductId(productId);
@@ -998,13 +1001,13 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         // Compute min and max prices with the margin applied
         Double minPrice = sellerProducts.stream()
                 .mapToDouble(SellerProduct::getMinPrice)
-                .map(price -> price + margin) // Add margin to the min price
+                .map(price -> Math.round(price + (price * (percentage / 100)))) // Add margin to the min price
                 .min()
                 .orElse(Double.MAX_VALUE);
 
         Double maxPrice = sellerProducts.stream()
                 .mapToDouble(SellerProduct::getMaxPrice)
-                .map(price -> price + margin) // Add margin to the max price
+                .map(price -> Math.round(price + (price * (percentage / 100)))) // Add margin to the max price
                 .max()
                 .orElse(Double.MIN_VALUE);
 

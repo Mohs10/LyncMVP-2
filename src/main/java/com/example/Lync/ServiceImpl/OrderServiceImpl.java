@@ -47,50 +47,66 @@ public class OrderServiceImpl implements OrderService {
         if (!buyerId.equals(inquiry.getBuyerId())) {
             throw new UnauthorizedException("Unauthorized: The buyer Id does not match with the respective query's buyer Id.");
         }
-//        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
-//                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
         String key = s3Service.buyerUploadPurchaseOrder(qId, file);
-        Order order = new Order();
-        Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
-        String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String nextOrderNumber = String.format("%03d", orderCount + 1);
-        String orderId = "OD" + dateFormatter + nextOrderNumber;
 
-        order.setOId(orderId);
-        order.setQId(qId);
-        order.setBuyerUId(inquiry.getBuyerId());
-        order.setSellerUId(inquiry.getSellerUId());
-        order.setPId(inquiry.getProductId());
-        order.setProductQuantity(inquiry.getQuantity());
-        order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
-        order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-//        order.setAdminAddressId(sampleOrder.getAdminAddressId());
-//        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
-        order.setBuyerPurchaseOrderURL(key);
-        order.setBuyerPurchaseOrderURLDate(LocalDate.now());
-        order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        order.setStatus("Buyer uploaded the purchase order");
-        orderRepository.save(order);
+        String orderIdE = getOIdByQId(qId);
+        if (orderIdE != null) {
+            // Order exists, update it
+            Order existingOrder = orderRepository.findById(orderIdE)
+                    .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderIdE));
+            existingOrder.setBuyerPurchaseOrderURL(key);
+            existingOrder.setBuyerPurchaseOrderURLDate(LocalDate.now());
+            existingOrder.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            existingOrder.setStatus("Buyer uploaded the purchase order");
+            orderRepository.save(existingOrder);
+        } else {
 
-        SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
-                .orElseThrow(() -> new RuntimeException("Seller product is not found with the given Id : " + inquiry.getSpId()));
-        sellerProduct.setAvailableAmount(sellerProduct.getAvailableAmount() - inquiry.getQuantity());
-        sellerProductRepository.save(sellerProduct);
+    //        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
+    //                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
+            Order order = new Order();
+            Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
+            String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String nextOrderNumber = String.format("%03d", orderCount + 1);
+            String orderId = "OD" + dateFormatter + nextOrderNumber;
 
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + qId);
-        notification.setIsAdmin(true);
-        notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(orderId);
+            order.setOId(orderId);
+            order.setQId(qId);
+            order.setBuyerUId(inquiry.getBuyerId());
+            order.setSellerUId(inquiry.getSellerUId());
+            order.setPId(inquiry.getProductId());
+            order.setProductQuantity(inquiry.getQuantity());
+            order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
+            order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+    //        order.setAdminAddressId(sampleOrder.getAdminAddressId());
+    //        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
+            order.setBuyerPurchaseOrderURL(key);
+            order.setBuyerPurchaseOrderURLDate(LocalDate.now());
+            order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            order.setStatus("Buyer uploaded the purchase order");
+            orderRepository.save(order);
 
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-        notificationRepository.save(notification);
+            SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
+                    .orElseThrow(() -> new RuntimeException("Seller product is not found with the given Id : " + inquiry.getSpId()));
+            System.out.println();
+            sellerProduct.setAvailableAmount(sellerProduct.getAvailableAmount() - inquiry.getQuantity());
+            sellerProductRepository.save(sellerProduct);
 
+            Notification notification = new Notification();
+            notification.setNotificationId(UUID.randomUUID().toString());
+            notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + qId);
+            notification.setIsAdmin(true);
+            notification.setIsRead(false);
+            notification.setDate(LocalDate.now());
+            notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            notification.setSoId(orderId);
+
+    // Send the notification to the 'notification.queue' with the correct routing key
+            rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+            messagingTemplate.convertAndSend("/topic/notifications", notification);
+            notificationRepository.save(notification);
+
+
+        }
         return "You uploaded the purchase order successfully";
     }
 

@@ -44,6 +44,7 @@ public class AdminController {
     private final AdminAddressService adminAddressService;
     private final NotificationService notificationService;
     private final OrderService orderService;
+    private final CategoryService categoryService;
 
     // Removed the duplicate UserInfoService field
     public AdminController(S3Service s3Service,
@@ -55,7 +56,7 @@ public class AdminController {
                            AuthenticationManager authenticationManager,
                            OtpService otpService,
                            OTPStorageService otpStorageService, InquiryService inquiryService, AdminAddressService adminAddressService,
-                           NotificationService notificationServices, OrderService orderService) {
+                           NotificationService notificationServices, OrderService orderService, CategoryService categoryService) {
         this.s3Service = s3Service;
         this.service = service;
         this.jwtService = jwtService;
@@ -67,6 +68,7 @@ public class AdminController {
         this.adminAddressService = adminAddressService;
         this.notificationService = notificationServices;
         this.orderService = orderService;
+        this.categoryService = categoryService;
     }
 
 
@@ -187,6 +189,12 @@ public class AdminController {
     public ResponseEntity<String> disableWaive(@PathVariable String userId, @RequestParam Boolean disable){
         String message = sellerBuyerService.enableWaiveSampleFree(userId, disable);
         return ResponseEntity.ok(message);
+    }
+
+    @PatchMapping("/updateCategoryPercent/{categoryId}")
+    public ResponseEntity<String> updatePercentage(@PathVariable Long categoryId, @RequestBody Float percentage){
+        String respond = categoryService.updatePercentage(categoryId, percentage);
+        return new ResponseEntity<>(respond, HttpStatus.CREATED);
     }
 
 

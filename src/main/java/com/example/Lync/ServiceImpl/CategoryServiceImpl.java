@@ -29,4 +29,15 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
+
+    @Override
+    public String updatePercentage(Long categoryId, Float percentage) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found with the given Id : " + categoryId));
+        category.setPercentage(percentage);
+        categoryRepository.save(category);
+        return "Updated " + category.getCategoryName() + " category with " + percentage + " %." ;
+    }
+
+
 }
