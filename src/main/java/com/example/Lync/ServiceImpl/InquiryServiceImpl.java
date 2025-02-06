@@ -1979,6 +1979,13 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
         sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
 
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry Id not found with given Id: " + sampleOrder.getQId()));
+        String key = null;
+        if (inquiry.getInvoiceUrl() != null) {
+            key = s3Service.getSampleInvoice(inquiry.getInvoiceUrl());
+        }
+        sampleOrderDTO.setInvoiceUrl(key);
         sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
         return sampleOrderDTO;
@@ -2157,6 +2164,7 @@ public class InquiryServiceImpl implements InquiryService {
                     sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
                     sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
 
+                    sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
                     return sampleOrderDTO;
                 })
                 .toList();
@@ -2234,6 +2242,9 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
         sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
 
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry Id not found with given Id: " + sampleOrder.getQId()));
+        sampleOrderDTO.setInvoiceUrl(inquiry.getInvoiceUrl() != null ? s3Service.getFiles(inquiry.getInvoiceUrl()) : null);
         sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
         return sampleOrderDTO;
