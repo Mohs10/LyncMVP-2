@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     private ProductRepository productRepository;
+    private SellerProductRepository sellerProductRepository;
 
 
     @Override
@@ -46,45 +47,66 @@ public class OrderServiceImpl implements OrderService {
         if (!buyerId.equals(inquiry.getBuyerId())) {
             throw new UnauthorizedException("Unauthorized: The buyer Id does not match with the respective query's buyer Id.");
         }
-//        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
-//                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
         String key = s3Service.buyerUploadPurchaseOrder(qId, file);
 
-        Order order = new Order();
-        Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
-        String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String nextOrderNumber = String.format("%03d", orderCount + 1);
-        String orderId = "OD" + dateFormatter + nextOrderNumber;
+        String orderIdE = getOIdByQId(qId);
+        if (orderIdE != null) {
+            // Order exists, update it
+            Order existingOrder = orderRepository.findById(orderIdE)
+                    .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderIdE));
+            existingOrder.setBuyerPurchaseOrderURL(key);
+            existingOrder.setBuyerPurchaseOrderURLDate(LocalDate.now());
+            existingOrder.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            existingOrder.setStatus("Buyer uploaded the purchase order");
+            orderRepository.save(existingOrder);
+        } else {
 
-        order.setOId(orderId);
-        order.setQId(qId);
-        order.setBuyerUId(inquiry.getBuyerId());
-        order.setSellerUId(inquiry.getSellerUId());
-        order.setPId(inquiry.getProductId());
-        order.setProductQuantity(inquiry.getQuantity());
-        order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
-        order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-//        order.setAdminAddressId(sampleOrder.getAdminAddressId());
-//        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
-        order.setBuyerPurchaseOrderURL(key);
-        order.setBuyerPurchaseOrderURLDate(LocalDate.now());
-        order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        orderRepository.save(order);
+    //        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
+    //                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
+            Order order = new Order();
+            Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
+            String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String nextOrderNumber = String.format("%03d", orderCount + 1);
+            String orderId = "OD" + dateFormatter + nextOrderNumber;
 
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + sampleOrder.getQId());
-        notification.setIsAdmin(true);
-        notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(orderId);
+            order.setOId(orderId);
+            order.setQId(qId);
+            order.setBuyerUId(inquiry.getBuyerId());
+            order.setSellerUId(inquiry.getSellerUId());
+            order.setPId(inquiry.getProductId());
+            order.setProductQuantity(inquiry.getQuantity());
+            order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
+            order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+    //        order.setAdminAddressId(sampleOrder.getAdminAddressId());
+    //        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
+            order.setBuyerPurchaseOrderURL(key);
+            order.setBuyerPurchaseOrderURLDate(LocalDate.now());
+            order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            order.setStatus("Buyer uploaded the purchase order");
+            orderRepository.save(order);
 
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-        notificationRepository.save(notification);
+            SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
+                    .orElseThrow(() -> new RuntimeException("Seller product is not found with the given Id : " + inquiry.getSpId()));
+            System.out.println();
+            sellerProduct.setAvailableAmount(sellerProduct.getAvailableAmount() - inquiry.getQuantity());
+            sellerProductRepository.save(sellerProduct);
 
+            Notification notification = new Notification();
+            notification.setNotificationId(UUID.randomUUID().toString());
+            notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + qId);
+            notification.setIsAdmin(true);
+            notification.setIsRead(false);
+            notification.setDate(LocalDate.now());
+            notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            notification.setSoId(orderId);
+
+    // Send the notification to the 'notification.queue' with the correct routing key
+            rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+            messagingTemplate.convertAndSend("/topic/notifications", notification);
+            notificationRepository.save(notification);
+
+
+        }
         return "You uploaded the purchase order successfully";
     }
 
@@ -98,6 +120,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPurchaseInvoiceURL(key);
         order.setAdminPurchaseInvoiceURLDate(LocalDate.now());
         order.setAdminPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded purchase invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -127,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPurchaseOrderURL(key);
         order.setAdminPurchaseOrderURLDate(LocalDate.now());
         order.setAdminPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded purchase order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -154,6 +178,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminNotifyBuyerToPay(amount);
         order.setAdminNotifyBuyerToPayDate(LocalDate.now());
         order.setAdminNotifyBuyerToPayTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin notified buyer to pay");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -186,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminNotifySellerToDispatch(true);
         order.setAdminNotifySellerToDispatchDate(LocalDate.now());
         order.setAdminNotifySellerToDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin notified seller to dispatch");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -216,6 +242,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerPurchaseInvoiceURL(key);
         order.setSellerPurchaseInvoiceURLDate(LocalDate.now());
         order.setSellerPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded purchase invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -243,6 +270,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerProcessingOrderDate(LocalDate.now());
         order.setSellerProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller processed the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -270,6 +298,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerDispatchOrderDate(LocalDate.now());
         order.setSellerDispatchOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller dispatched the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -297,6 +326,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setSellerCourierCompany(orderDTO.getSellerCourierCompany());
         order.setSellerOrderTrackerId(orderDTO.getSellerOrderTrackerId());
+        order.setStatus("Seller added transportation details");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -327,6 +357,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerOrderLoadingVehicleImg(s3Key);
         order.setSellerOrderLoadingVehicleImgDate(LocalDate.now());
         order.setSellerOrderLoadingVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded order loaded vehicle image");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -356,6 +387,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerLoadedSealedVehicleImg(s3Key);
         order.setSellerLoadedSealedVehicleImgDate(LocalDate.now());
         order.setSellerLoadedSealedVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded loaded & sealed vehicle image");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -385,6 +417,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerEWayBill(s3Key);
         order.setSellerEWayBillDate(LocalDate.now());
         order.setSellerEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded E-Way bill");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -414,6 +447,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerPaymentInvoice(s3Key);
         order.setSellerPaymentInvoiceDate(LocalDate.now());
         order.setSellerPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded payment invoice");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -443,6 +477,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerLRCopy(s3Key);
         order.setSellerLRCopyDate(LocalDate.now());
         order.setSellerLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded LR copy");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -472,6 +507,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerWeightSlipPreLoad(s3Key);
         order.setSellerWeightSlipPreLoadDate(LocalDate.now());
         order.setSellerWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded weight slip of pre-loaded vehicle");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -501,6 +537,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerWeightSlipPostLoad(s3Key);
         order.setSellerWeightSlipPostLoadDate(LocalDate.now());
         order.setSellerWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -525,6 +562,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminReceivedOrderDate(LocalDate.now());
         order.setAdminReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin received the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -550,6 +588,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminProcessingOrderDate(LocalDate.now());
         order.setAdminProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin processing the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -575,6 +614,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminDispatchedOrderDate(LocalDate.now());
         order.setAdminDispatchedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin dispatched the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -602,6 +642,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminEWayBill(key);
         order.setAdminEWayBillDate(LocalDate.now());
         order.setAdminEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded E-Way bill");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -629,6 +670,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminPaymentInvoice(key);
         order.setAdminPaymentInvoiceDate(LocalDate.now());
         order.setAdminPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded payment invoice");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -656,6 +698,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminLRCopy(key);
         order.setAdminLRCopyDate(LocalDate.now());
         order.setAdminLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded LR copy");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -683,6 +726,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminWeightSlipPreLoad(key);
         order.setAdminWeightSlipPreLoadDate(LocalDate.now());
         order.setAdminWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded weight slip of pre-load vehicle");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -710,6 +754,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminWeightSlipPostLoad(key);
         order.setAdminWeightSlipPostLoadDate(LocalDate.now());
         order.setAdminWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -740,6 +785,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerTransactionCertificate(s3Key);
         order.setSellerTransactionCertificateDate(LocalDate.now());
         order.setSellerTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Seller uploaded transaction certificate");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -766,6 +812,7 @@ public class OrderServiceImpl implements OrderService {
         order.setAdminTransactionCertificate(key);
         order.setAdminTransactionCertificateDate(LocalDate.now());
         order.setAdminTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Admin uploaded transaction certificate");
         orderRepository.save(order);
 
         Notification noti = new Notification();
@@ -794,6 +841,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setBuyerReceivedOrderDate(LocalDate.now());
         order.setBuyerReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setStatus("Buyer received the order");
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -811,43 +859,6 @@ public class OrderServiceImpl implements OrderService {
         notificationRepository.save(notification);
         return "You received the Product";
     }
-
-    @Override
-    public String paymentIdReceived(String orderId, String paymentId , String buyerId) {
-
-        // Fetch the order from the repository
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with given Order ID: " + orderId));
-
-        // Update the payment ID for the order
-        order.setPaymentId(paymentId);
-
-        // Save the updated order back to the repository
-        orderRepository.save(order);
-
-        // Create and configure a notification
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Payment has been successfully received for Order ID: " + orderId +
-                ". Buyer ID: " + buyerId + " has acknowledged the receipt of the product.");
-        notification.setIsAdmin(true);
-        notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(orderId);
-
-        // Send the notification to the message queue and WebSocket topic
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
-
-        // Save the notification to the repository
-        notificationRepository.save(notification);
-
-        // Return a success message
-        return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
-    }
-
-
 
     @Override
     public List<OrderDTO> buyerGetAllOrders(String buyerId) {
@@ -868,6 +879,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setFormName(product.getForms().stream()
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+                    orderDTO.setStatus(order.getStatus());
                 return orderDTO;
                 }).toList();
     }
@@ -883,6 +895,7 @@ public class OrderServiceImpl implements OrderService {
          orderDTO.setOId(oId);
          orderDTO.setQId(order.getQId());
          orderDTO.setBuyerUId(order.getBuyerUId());
+        orderDTO.setStatus(order.getStatus());
         Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
@@ -898,10 +911,10 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setBuyerPaid(order.getBuyerPaid());
         orderDTO.setBuyerAddressId(order.getBuyerAddressId());
 
-        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL());
+        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
         orderDTO.setBuyerPurchaseOrderURLTime(order.getBuyerPurchaseOrderURLTime());
-        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL());
+        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getAdminPurchaseInvoiceURL()) : null);
         orderDTO.setAdminPurchaseInvoiceURLDate(order.getAdminPurchaseInvoiceURLDate());
         orderDTO.setAdminPurchaseInvoiceURLTime(order.getAdminPurchaseInvoiceURLTime());
         orderDTO.setAdminNotifyBuyerToPay(order.getAdminNotifyBuyerToPay());
@@ -919,22 +932,22 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminDispatchedOrderTime(order.getAdminDispatchedOrderTime());
         orderDTO.setAdminCourierCompany(order.getAdminCourierCompany());
         orderDTO.setAdminOrderTrackerId(order.getAdminOrderTrackerId());
-        orderDTO.setAdminEWayBill(order.getAdminEWayBill());
+        orderDTO.setAdminEWayBill(order.getAdminEWayBill() != null ? s3Service.getFiles(order.getAdminEWayBill()) : null);
         orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
         orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
-        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice());
+        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice() != null ? s3Service.getFiles(order.getAdminPaymentInvoice()) : null);
         orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
         orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
-        orderDTO.setAdminLRCopy(order.getAdminLRCopy());
+        orderDTO.setAdminLRCopy(order.getAdminLRCopy() != null ? s3Service.getFiles(order.getAdminLRCopy()) : null);
         orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
         orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
-        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad());
+        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPreLoad()) : null);
         orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
         orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
         orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad());
-        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
+        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPostLoad()) : null);
         orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
-        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate());
+        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate() != null ? s3Service.getFiles(order.getAdminTransactionCertificate()) : null);
         orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
         orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
         orderDTO.setBuyerReceivedOrderDate(order.getBuyerReceivedOrderDate());
@@ -962,6 +975,7 @@ public class OrderServiceImpl implements OrderService {
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
                     orderDTO.setProductQuantity(order.getProductQuantity());
+                    orderDTO.setStatus(order.getStatus());
                     return orderDTO;
                 }).toList();
     }
@@ -975,6 +989,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setQId(order.getQId());
         orderDTO.setBuyerUId(order.getBuyerUId());
         orderDTO.setSellerUId(order.getSellerUId());
+        orderDTO.setStatus(order.getStatus());
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setBuyerFinalPrice(order.getBuyerFinalPrice());
         orderDTO.setBuyerPaid(order.getBuyerPaid());
@@ -994,18 +1009,86 @@ public class OrderServiceImpl implements OrderService {
                 .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
 
-        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL());
+        // Assuming s3Service is your service for handling file uploads to S3
+
+        orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
+        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getAdminPurchaseInvoiceURL()) : null);
+        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL() != null ? s3Service.getFiles(order.getAdminPurchaseOrderURL()) : null);
+
+        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getSellerPurchaseInvoiceURL()) : null);
+        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg() != null ? s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()) : null);
+        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg() != null ? s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()) : null);
+        orderDTO.setSellerEWayBill(order.getSellerEWayBill() != null ? s3Service.getFiles(order.getSellerEWayBill()) : null);
+        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice() != null ? s3Service.getFiles(order.getSellerPaymentInvoice()) : null);
+        orderDTO.setSellerLRCopy(order.getSellerLRCopy() != null ? s3Service.getFiles(order.getSellerLRCopy()) : null);
+        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPreLoad()) : null);
+        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPostLoad()) : null);
+
+        orderDTO.setAdminEWayBill(order.getAdminEWayBill() != null ? s3Service.getFiles(order.getAdminEWayBill()) : null);
+        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice() != null ? s3Service.getFiles(order.getAdminPaymentInvoice()) : null);
+        orderDTO.setAdminLRCopy(order.getAdminLRCopy() != null ? s3Service.getFiles(order.getAdminLRCopy()) : null);
+        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPreLoad()) : null);
+        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad() != null ? s3Service.getFiles(order.getAdminWeightSlipPostLoad()) : null);
+
+        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate() != null ? s3Service.getFiles(order.getSellerTransactionCertificate()) : null);
+        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate() != null ? s3Service.getFiles(order.getAdminTransactionCertificate()) : null);
+
+// Set dates and times
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
         orderDTO.setBuyerPurchaseOrderURLTime(order.getBuyerPurchaseOrderURLTime());
 
-        orderDTO.setAdminPurchaseInvoiceURL(order.getAdminPurchaseInvoiceURL());
         orderDTO.setAdminPurchaseInvoiceURLDate(order.getAdminPurchaseInvoiceURLDate());
         orderDTO.setAdminPurchaseInvoiceURLTime(order.getAdminPurchaseInvoiceURLTime());
 
-        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL());
         orderDTO.setAdminPurchaseOrderURLDate(order.getAdminPurchaseOrderURLDate());
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
+        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
+        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
+
+        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
+        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
+
+        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
+        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
+
+        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
+        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
+
+        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
+        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
+
+        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
+        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
+
+        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
+        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
+
+        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
+        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
+
+        orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
+        orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
+
+        orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
+        orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
+
+        orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
+        orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
+
+        orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
+        orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
+
+        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
+        orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
+
+        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
+        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+
+        orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
+        orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
+
+// Notify buyer and seller actions
         orderDTO.setAdminNotifyBuyerToPay(order.getAdminNotifyBuyerToPay());
         orderDTO.setAdminNotifyBuyerToPayDate(order.getAdminNotifyBuyerToPayDate());
         orderDTO.setAdminNotifyBuyerToPayTime(order.getAdminNotifyBuyerToPayTime());
@@ -1015,50 +1098,23 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setBuyer1stPaymentTime(order.getBuyer1stPaymentTime());
 
         orderDTO.setBuyerClearedPayment(order.getBuyerClearedPayment());
+
         orderDTO.setAdminNotifySellerToDispatch(order.getAdminNotifySellerToDispatch());
         orderDTO.setAdminNotifySellerToDispatchDate(order.getAdminNotifySellerToDispatchDate());
         orderDTO.setAdminNotifySellerToDispatchTime(order.getAdminNotifySellerToDispatchTime());
 
-        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL());
-        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
-        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
-
+// Seller processing and dispatch details
         orderDTO.setSellerProcessingOrderDate(order.getSellerProcessingOrderDate());
         orderDTO.setSellerProcessingOrderTime(order.getSellerProcessingOrderTime());
         orderDTO.setSellerDispatchOrderDate(order.getSellerDispatchOrderDate());
         orderDTO.setSellerDispatchOrderTime(order.getSellerDispatchOrderTime());
         orderDTO.setSellerDispatchPeriod(order.getSellerDispatchPeriod());
 
+// Seller courier and tracking details
         orderDTO.setSellerCourierCompany(order.getSellerCourierCompany());
         orderDTO.setSellerOrderTrackerId(order.getSellerOrderTrackerId());
-        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg());
-        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
-        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
 
-        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg());
-        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
-        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
-
-        orderDTO.setSellerEWayBill(order.getSellerEWayBill());
-        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
-        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
-
-        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice());
-        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
-        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
-
-        orderDTO.setSellerLRCopy(order.getSellerLRCopy());
-        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
-        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
-
-        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad());
-        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
-        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
-
-        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad());
-        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
-        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
-
+// Admin received and processing details
         orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
         orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
 
@@ -1068,39 +1124,15 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminDispatchedOrderDate(order.getAdminDispatchedOrderDate());
         orderDTO.setAdminDispatchedOrderTime(order.getAdminDispatchedOrderTime());
 
+// Admin courier and tracking details
         orderDTO.setAdminCourierCompany(order.getAdminCourierCompany());
         orderDTO.setAdminOrderTrackerId(order.getAdminOrderTrackerId());
 
-        orderDTO.setAdminEWayBill(order.getAdminEWayBill());
-        orderDTO.setAdminEWayBillDate(order.getAdminEWayBillDate());
-        orderDTO.setAdminEWayBillTime(order.getAdminEWayBillTime());
-
-        orderDTO.setAdminPaymentInvoice(order.getAdminPaymentInvoice());
-        orderDTO.setAdminPaymentInvoiceDate(order.getAdminPaymentInvoiceDate());
-        orderDTO.setAdminPaymentInvoiceTime(order.getAdminPaymentInvoiceTime());
-
-        orderDTO.setAdminLRCopy(order.getAdminLRCopy());
-        orderDTO.setAdminLRCopyDate(order.getAdminLRCopyDate());
-        orderDTO.setAdminLRCopyTime(order.getAdminLRCopyTime());
-
-        orderDTO.setAdminWeightSlipPreLoad(order.getAdminWeightSlipPreLoad());
-        orderDTO.setAdminWeightSlipPreLoadDate(order.getAdminWeightSlipPreLoadDate());
-        orderDTO.setAdminWeightSlipPreLoadTime(order.getAdminWeightSlipPreLoadTime());
-
-        orderDTO.setAdminWeightSlipPostLoad(order.getAdminWeightSlipPostLoad());
-        orderDTO.setAdminWeightSlipPostLoadDate(order.getAdminWeightSlipPostLoadDate());
-        orderDTO.setAdminWeightSlipPostLoadTime(order.getAdminWeightSlipPostLoadTime());
-
-        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate());
-        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
-        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
-
-        orderDTO.setAdminTransactionCertificate(order.getAdminTransactionCertificate());
-        orderDTO.setAdminTransactionCertificateDate(order.getAdminTransactionCertificateDate());
-        orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
-
+// Buyer received order details
         orderDTO.setBuyerReceivedOrderDate(order.getBuyerReceivedOrderDate());
         orderDTO.setBuyerReceivedOrderTime(order.getBuyerReceivedOrderTime());
+
+// Return the orderDTO with all fields set accordingly
 
         return orderDTO;
     }
@@ -1112,8 +1144,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> sellerGetAllOrders(String sellerId) {
+        System.out.println(sellerId);
         return orderRepository.findAll().stream()
-                .filter(order -> order.getBuyerUId().equals(sellerId))
+                .filter(order -> {
+                    String orderSellerId = order.getSellerUId();
+                    return orderSellerId != null && orderSellerId.equals(sellerId);
+                })
                 .map(order -> {
                     OrderDTO orderDTO = new OrderDTO();
                     Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
@@ -1129,6 +1165,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setFormName(product.getForms().stream()
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+                    orderDTO.setStatus(order.getStatus());
                     return orderDTO;
                 }).toList();
     }
@@ -1144,6 +1181,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOId(oId);
         orderDTO.setQId(order.getQId());
         orderDTO.setSellerUId(order.getSellerUId());
+        orderDTO.setStatus(order.getStatus());
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setSellerFinalPrice(order.getSellerFinalPrice());
         orderDTO.setAdminAddressId(order.getAdminAddressId());
@@ -1159,60 +1197,68 @@ public class OrderServiceImpl implements OrderService {
                 .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
 
-        orderDTO.setAdminPurchaseOrderURL(order.getAdminPurchaseOrderURL());
+        // Assuming s3Service is your service for handling file uploads to S3
+
+        String adminPurchaseOrderUrl = null;
+        if (order.getAdminPurchaseOrderURL() != null) {
+            adminPurchaseOrderUrl = s3Service.getFiles(order.getAdminPurchaseOrderURL());
+        }
+        orderDTO.setAdminPurchaseOrderURL(adminPurchaseOrderUrl);
         orderDTO.setAdminPurchaseOrderURLDate(order.getAdminPurchaseOrderURLDate());
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
+// Handle other file uploads similarly
+        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getSellerPurchaseInvoiceURL()) : null);
+        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg() != null ? s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()) : null);
+        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg() != null ? s3Service.getFiles(order.getSellerLoadedSealedVehicleImg()) : null);
+        orderDTO.setSellerEWayBill(order.getSellerEWayBill() != null ? s3Service.getFiles(order.getSellerEWayBill()) : null);
+        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice() != null ? s3Service.getFiles(order.getSellerPaymentInvoice()) : null);
+        orderDTO.setSellerLRCopy(order.getSellerLRCopy() != null ? s3Service.getFiles(order.getSellerLRCopy()) : null);
+        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPreLoad()) : null);
+        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad() != null ? s3Service.getFiles(order.getSellerWeightSlipPostLoad()) : null);
+        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate() != null ? s3Service.getFiles(order.getSellerTransactionCertificate()) : null);
+
+// Set dates and times
+        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
+        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
+        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
+        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
+        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
+        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
+        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
+        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
+        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
+        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
+        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
+        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
+        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
+        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
+        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
+        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
+        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
+        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+
+// Admin received order date and time
+        orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
+        orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
+
+// Notify seller and dispatch details
         orderDTO.setAdminNotifySellerToDispatch(order.getAdminNotifySellerToDispatch());
         orderDTO.setAdminNotifySellerToDispatchDate(order.getAdminNotifySellerToDispatchDate());
         orderDTO.setAdminNotifySellerToDispatchTime(order.getAdminNotifySellerToDispatchTime());
 
-        orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL());
-        orderDTO.setSellerPurchaseInvoiceURLDate(order.getSellerPurchaseInvoiceURLDate());
-        orderDTO.setSellerPurchaseInvoiceURLTime(order.getSellerPurchaseInvoiceURLTime());
-
+// Seller processing and dispatch details
         orderDTO.setSellerProcessingOrderDate(order.getSellerProcessingOrderDate());
         orderDTO.setSellerProcessingOrderTime(order.getSellerProcessingOrderTime());
         orderDTO.setSellerDispatchOrderDate(order.getSellerDispatchOrderDate());
         orderDTO.setSellerDispatchOrderTime(order.getSellerDispatchOrderTime());
         orderDTO.setSellerDispatchPeriod(order.getSellerDispatchPeriod());
 
+// Seller courier and tracking details
         orderDTO.setSellerCourierCompany(order.getSellerCourierCompany());
         orderDTO.setSellerOrderTrackerId(order.getSellerOrderTrackerId());
-        orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg());
-        orderDTO.setSellerOrderLoadingVehicleImgDate(order.getSellerOrderLoadingVehicleImgDate());
-        orderDTO.setSellerOrderLoadingVehicleImgTime(order.getSellerOrderLoadingVehicleImgTime());
 
-        orderDTO.setSellerLoadedSealedVehicleImg(order.getSellerLoadedSealedVehicleImg());
-        orderDTO.setSellerLoadedSealedVehicleImgDate(order.getSellerLoadedSealedVehicleImgDate());
-        orderDTO.setSellerLoadedSealedVehicleImgTime(order.getSellerLoadedSealedVehicleImgTime());
-
-        orderDTO.setSellerEWayBill(order.getSellerEWayBill());
-        orderDTO.setSellerEWayBillDate(order.getSellerEWayBillDate());
-        orderDTO.setSellerEWayBillTime(order.getSellerEWayBillTime());
-
-        orderDTO.setSellerPaymentInvoice(order.getSellerPaymentInvoice());
-        orderDTO.setSellerPaymentInvoiceDate(order.getSellerPaymentInvoiceDate());
-        orderDTO.setSellerPaymentInvoiceTime(order.getSellerPaymentInvoiceTime());
-
-        orderDTO.setSellerLRCopy(order.getSellerLRCopy());
-        orderDTO.setSellerLRCopyDate(order.getSellerLRCopyDate());
-        orderDTO.setSellerLRCopyTime(order.getSellerLRCopyTime());
-
-        orderDTO.setSellerWeightSlipPreLoad(order.getSellerWeightSlipPreLoad());
-        orderDTO.setSellerWeightSlipPreLoadDate(order.getSellerWeightSlipPreLoadDate());
-        orderDTO.setSellerWeightSlipPreLoadTime(order.getSellerWeightSlipPreLoadTime());
-
-        orderDTO.setSellerWeightSlipPostLoad(order.getSellerWeightSlipPostLoad());
-        orderDTO.setSellerWeightSlipPostLoadDate(order.getSellerWeightSlipPostLoadDate());
-        orderDTO.setSellerWeightSlipPostLoadTime(order.getSellerWeightSlipPostLoadTime());
-
-        orderDTO.setAdminReceivedOrderDate(order.getAdminReceivedOrderDate());
-        orderDTO.setAdminReceivedOrderTime(order.getAdminReceivedOrderTime());
-
-        orderDTO.setSellerTransactionCertificate(order.getSellerTransactionCertificate());
-        orderDTO.setSellerTransactionCertificateDate(order.getSellerTransactionCertificateDate());
-        orderDTO.setSellerTransactionCertificateTime(order.getSellerTransactionCertificateTime());
+// Return the orderDTO with all fields set accordingly
 
         return orderDTO;
     }

@@ -29,6 +29,7 @@ public class Order {
     private Long adminAddressId;
     private Long buyerAddressId;
     private String paymentId;
+    private String status;
 
     private String buyerPurchaseOrderURL;
     private LocalDate buyerPurchaseOrderURLDate;
@@ -146,8 +147,6 @@ public class Order {
 
     private LocalDate buyerReceivedOrderDate;
     private LocalTime buyerReceivedOrderTime;
-
-
 
 
     // Getters and Setters

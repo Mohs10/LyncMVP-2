@@ -1,6 +1,8 @@
 package com.example.Lync.Repository;
 
 import com.example.Lync.Entity.Inquiry;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,5 +21,8 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
 
     @Query("SELECT i FROM Inquiry i WHERE i.buyerId = :buyerId")
     List<Inquiry> findByBuyerId(@Param("buyerId") String buyerUId);
+
+    @Query("SELECT i FROM Inquiry i ORDER BY i.raiseDate DESC, i.raiseTime DESC")
+    Page<Inquiry> findAllInquiriesSorted(Pageable pageable);
 
 }

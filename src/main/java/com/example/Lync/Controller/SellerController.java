@@ -616,11 +616,12 @@ public class SellerController {
         SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
                 new RuntimeException("SellerBuyer details not found for email: " + username)
         );
+        System.out.println(sellerDetails.getUserId());
         List<OrderDTO> respond = orderService.sellerGetAllOrders(sellerDetails.getUserId());
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
-    @PostMapping("/sellerGetOrderDetails/{oId}")
+    @GetMapping("/sellerGetOrderDetails/{oId}")
     public ResponseEntity<OrderDTO> sellerGetOrderDetails(@PathVariable String oId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

@@ -21,6 +21,7 @@ public class Inquiry {
     private String qId;
     private String buyerId; // Reference to buyer (User)
     private Long osId;
+    private String spId;
 
     // Product details
     private Long productId; // Reference to Product

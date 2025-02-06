@@ -318,53 +318,6 @@ public class InquiryServiceImpl implements InquiryService {
                 }).collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<InquiryDTO> buyerGetsInquiries(String buyerUId) {
-//        return inquiryRepository.findAll().stream()
-//                .filter(inquiry -> inquiry.getBuyerId().equals(buyerUId)) // Filter inquiries by buyer ID
-//                .map(inquiry -> {
-//                    // Create a new InquiryDTO
-//                    InquiryDTO inquiryDTO = new InquiryDTO();
-//                    inquiryDTO.setQId(inquiry.getQId());
-//                    inquiryDTO.setProductId(inquiry.getProductId());
-//
-//                    // Debugging information
-//                    System.out.println("Inquiry Product ID (DTO): " + inquiryDTO.getProductId());
-//                    System.out.println("Inquiry Product ID (Entity): " + inquiry.getProductId());
-//
-//                    // Fetch the product by its ID
-//                    Product product = productRepository.findById(inquiry.getProductId())
-//                            .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
-//
-//                    // Debugging information
-//                    System.out.println("Fetched Product: " + product);
-//
-//                    // Populate product-related details
-//                    inquiryDTO.setProductName(product.getProductName());
-//                    inquiryDTO.setVarietyName(
-//                            product.getVarieties().stream()
-//                                    .map(Variety::getVarietyName)
-//                                    .collect(Collectors.joining(", ")) // Use joining for better readability
-//                    );
-//                    inquiryDTO.setFormName(
-//                            product.getForms().stream()
-//                                    .map(Form::getFormName)
-//                                    .collect(Collectors.joining(", "))
-//                    );
-//
-//                    // Populate other fields
-//                    inquiryDTO.setProductFormId(inquiry.getProductFormId());
-//                    inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
-//                    inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
-//
-//                    // Debugging information
-//                    System.out.println("Service Buyer UID: " + buyerUId);
-//
-//                    return inquiryDTO;
-//                })
-//                .collect(Collectors.toList()); // Collect the stream to a list
-//
-//    }
 
     @Override
     public List<InquiryDTO> buyerGetsInquiries(String buyerUId) {
@@ -517,7 +470,7 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public Page<InquiryDTO> adminGetAllInquiry(Pageable pageable) {
         // Fetch paginated inquiries
-        Page<Inquiry> inquiriesPage = inquiryRepository.findAll(pageable);
+        Page<Inquiry> inquiriesPage = inquiryRepository.findAllInquiriesSorted(pageable);
 
         // Map inquiries to DTOs
         List<InquiryDTO> inquiryDTOS = inquiriesPage.stream()
@@ -606,8 +559,7 @@ public class InquiryServiceImpl implements InquiryService {
                         System.err.println("Error processing inquiry with QId " + inquiry.getQId() + ": " + e.getMessage());
                     }
                     return inquiryDTO;
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
 
         return new PageImpl<>(inquiryDTOS, pageable, inquiriesPage.getTotalElements());
     }
@@ -903,180 +855,81 @@ public class InquiryServiceImpl implements InquiryService {
 
 
 
-
-
-//    private InquiryDTO mapToAdminDTO(Inquiry inquiry){
-//        System.out.println("map to dto Inquiry" + inquiry);
-//        InquiryDTO inquiryDTO = new InquiryDTO();
-//        System.out.println("map to Dto InquiryDTO" + inquiryDTO);
-//        inquiryDTO.setQId(inquiry.getQId());
-//        inquiryDTO.setBuyerUId(inquiry.getBuyerId());
-//        inquiryDTO.setProductId(inquiry.getProductId());
+//    @Override
+//    public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
+//        Inquiry inquiry = inquiryRepository.findByQId(qId)
+//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
 //
-//        Product product = productRepository.findById(inquiry.getProductId())
-//                .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
-//        System.out.println("maptoDto" + product);
-//        inquiryDTO.setProductName(product.getProductName());
-//        inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
-//        inquiryDTO.setVarietyName(product.getVarieties().stream()
-//                .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
-//                .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
-//        inquiryDTO.setProductFormId(inquiry.getProductFormId());
-//        inquiryDTO.setFormName(product.getForms().stream()
-//                .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
-//                .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
-//
-//
-//        //Order Specification
-//        inquiryDTO.setQuantity(inquiry.getQuantity());
-//        inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
-//        inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
-////        inquiryDTO.setCertificate(inquiry.getCertificate());
-//        inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
-//        inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
-//        inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
-//        inquiryDTO.setNpop(inquiry.getNpop());
-//        inquiryDTO.setNop(inquiry.getNop());
-//        inquiryDTO.setEu(inquiry.getEu());
-//        inquiryDTO.setGsdc(inquiry.getGsdc());
-//        inquiryDTO.setIpm(inquiry.getIpm());
-//        inquiryDTO.setOther(inquiry.getOther());
-//        inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
-//        inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
-//        inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
-//        inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
-//        inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
-//        inquiryDTO.setCountry(inquiry.getCountry());
-//        inquiryDTO.setState(inquiry.getState());
-//        inquiryDTO.setCity(inquiry.getCity());
-//        inquiryDTO.setPincode(inquiry.getPincode());
-//        inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
-//
-// Fetch specifications for the inquiry
-//        List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
-//        System.out.println(specifications);
-//
-//        // Map specifications to SpecificationDTO
-//        List<SpecificationDTO> specificationDTOs = specifications.stream()
-//                .map(spec -> {
-//                    SpecificationDTO dto = new SpecificationDTO();
-//                    dto.setSpecificationName(spec.getSpecificationName());
-//                    dto.setSpecificationValue(spec.getSpecificationValue());
-//                    dto.setSpecificationValueUnits(spec.getSpecificationValueUnits());
-//                    return dto;
-//                })
-//                .toList();
-//
-//        inquiryDTO.setSpecifications(specificationDTOs);
-//
-//        inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
-//        inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
-//        inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
-//        inquiryDTO.setSellerUId(inquiry.getSellerUId());
-//        inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-//        inquiryDTO.setSentDate(inquiry.getSentDate());
-//        inquiryDTO.setSentTime(inquiry.getSentTime());
-//        inquiryDTO.setUnit(inquiry.getUnit());
-//
-//        OrderStatus orderStatus = orderStatusRepository.findByOsId(inquiry.getOsId());
-//        inquiryDTO.setOsId(orderStatus.getOsId());
-//        inquiryDTO.setDate(orderStatus.getDate());
-//        inquiryDTO.setTime(orderStatus.getTime());
-//        inquiryDTO.setDescription(orderStatus.getDescription());
-//        inquiryDTO.setImageUrl(orderStatus.getImageUrl());
-//        inquiryDTO.setLocation(orderStatus.getLocation());
-//        System.out.println(orderStatus);
-//
-//        // Fetch SellerNegotiates and map them
-//        List<SellerNegotiate> negotiations = sellerNegotiateRepository.findByQId(inquiry.getQId());
-//
-//
-//
-//        List<SellerNegotiateDTO> negotiationDTOs = negotiations.stream()
-//                .map(neg -> {
-//                    SellerNegotiateDTO dto = new SellerNegotiateDTO();
-//                    dto.setSellerUId(neg.getSellerUId());
-//                    SellerBuyer seller = sellerBuyerRepository.findById(neg.getSellerUId())
-//                            .orElseThrow(() -> new RuntimeException("Seller not found with given ID : " + neg.getSellerUId()));
-//                    dto.setSellerName(seller.getFullName());
-//                    dto.setEmail(seller.getEmail());
-//                    dto.setPhoneNumber(seller.getPhoneNumber());
-//                    dto.setAdminCountry(seller.getCountry());
-//                    dto.setAdminState(seller.getState());
-//                    dto.setAdminCity(seller.getCity());
-//                    dto.setAdminPinCode(seller.getPinCode());
-//                    dto.setAdminAddress(seller.getAddress());
-//
-//                    SellerProduct sellerProduct = sellerProductRepository.findBySellerIdAndProductId(neg.getSellerUId(), inquiry.getProductId())
-//                            .orElseThrow(() -> new RuntimeException("SellerProduct not found."));
-//                    System.out.println(sellerProduct);
-//                    dto.setAvailableAmount(sellerProduct.getAvailableAmount());
-//                    dto.setMaxPrice(sellerProduct.getMaxPrice());
-//                    dto.setMinPrice(sellerProduct.getMinPrice());
-//
-//                    dto.setSnId(neg.getSnId());
-//                    dto.setAdminInitialPrice(neg.getAdminInitialPrice());
-//                    dto.setAipDate(neg.getAipDate());
-//                    dto.setAipTime(neg.getAipTime());
-//                    dto.setAvgLeadTime(neg.getAvgLeadTime());
-//                    dto.setAdminDeliveryAddress(neg.getAdminDeliveryAddress());
-//                    dto.setInstruction(neg.getInstruction());
-//                    dto.setSellerNegotiatePrice(neg.getSellerNegotiatePrice());
-//                    dto.setSnpDate(neg.getSnpDate());
-//                    dto.setSnpTime(neg.getSnpTime());
-//                    dto.setAdminFinalPrice(neg.getAdminFinalPrice());
-//                    dto.setAfpDate(neg.getAfpDate());
-//                    dto.setAfpTime(neg.getAfpTime());
-//                    dto.setStatus(neg.getStatus());
-//                    dto.setAdminAddressId(neg.getAdminAddressId());
-//                    return dto;
-//                })
-//                .toList();
-//        inquiryDTO.setSellerNegotiations(negotiationDTOs);
-//
-//
-//
-       // Fetch BuyerNegotiate entity
-//        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(inquiry.getQId());
-//        System.out.println(negotiate);
-//
-//        if (negotiate != null) {
-//            inquiryDTO.setAdminInitialPrice(negotiate.getAdminInitialPrice());
-//            inquiryDTO.setComment(negotiate.getComment());
-//            inquiryDTO.setPaymentTerm(negotiate.getPaymentTerm());
-//            inquiryDTO.setAipDate(negotiate.getAipDate());
-//            inquiryDTO.setAipTime(negotiate.getAipTime());
-//            inquiryDTO.setBuyerNegotiatePrice(negotiate.getBuyerNegotiatePrice());
-//            inquiryDTO.setBnpDate(negotiate.getBnpDate());
-//            inquiryDTO.setBnpTime(negotiate.getBnpTime());
-//            inquiryDTO.setAdminFinalPrice(negotiate.getAdminFinalPrice());
-//            inquiryDTO.setAfpDate(negotiate.getAfpDate());
-//            inquiryDTO.setAfpTime(negotiate.getAfpTime());
-//            inquiryDTO.setStatus(negotiate.getStatus());
-//        } else {
-//            // Set fields to null or provide default values
-//            inquiryDTO.setAdminInitialPrice(null);
-//            inquiryDTO.setComment(null);
-//            inquiryDTO.setPaymentTerm(null);
-//            inquiryDTO.setAipDate(null);
-//            inquiryDTO.setAipTime(null);
-//            inquiryDTO.setBuyerNegotiatePrice(null);
-//            inquiryDTO.setBnpDate(null);
-//            inquiryDTO.setBnpTime(null);
-//            inquiryDTO.setAdminFinalPrice(null);
-//            inquiryDTO.setAfpDate(null);
-//            inquiryDTO.setAfpTime(null);
-//            inquiryDTO.setStatus(null);
+//        if (!"Query Raised".equals(inquiry.getOrderStatus())) {
+//            throw new RuntimeException("Query already sent to sellers already.");
 //        }
 //
+//        List<String> successfulSellers = new ArrayList<>();
 //
+//        // Get all sellers selling the specified product
+//        List<SellerProduct> validSellerProducts = sellerProductRepository
+//                .findByPId(inquiry.getProductId());
 //
-//        System.out.println("map to Dto InquiryDTO" + inquiryDTO);
-//        return inquiryDTO;
+//        // Extract the seller IDs from the validSellerProducts list
+//        Set<String> validSellerIds = validSellerProducts.stream()
+//                .map(SellerProduct::getSellerId)
+//                .collect(Collectors.toSet());
 //
+//        Map<String, String> sellerToSpIdMap = validSellerProducts.stream()
+//                .collect(Collectors.toMap(SellerProduct::getSellerId, SellerProduct::getSpId));
+//
+//            for(String sellerUId : inquiryDTO.getSellerUIds()) {
+//                if (validSellerIds.contains(sellerUId)) { //to be changed
+//
+//                    inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
+//                    inquiry.setSentDate(LocalDate.now());
+//                    inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+//                    inquiryRepository.save(inquiry);
+//
+//                    // Create a new entry in SellerNegotiate for tracking
+//                    SellerNegotiate sellerNegotiate = new SellerNegotiate();
+//                    sellerNegotiate.setQId(qId);
+//                    sellerNegotiate.setSellerUId(sellerUId);
+//                    sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
+//                    sellerNegotiate.setAipDate(LocalDate.now());
+//                    sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+//                    sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
+//                    sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
+//
+//                    sellerNegotiate.setStatus("Inquiry send to Seller");
+//                    sellerNegotiateRepository.save(sellerNegotiate);
+//
+//                    Notification notification = new Notification();
+//                    notification.setNotificationId(UUID.randomUUID().toString());
+//                    notification.setMessage("You have received a new query request from Lyncc with ID : " + qId);
+//                    notification.setSellerId(sellerUId);
+//                    notification.setIsAdmin(false);
+//                    notification.setIsRead(false);
+//                    notification.setDate(LocalDate.now());
+//                    notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+//                    notification.setInquiryId(qId);
+//
+//// Send the notification to the 'notification.queue' with the correct routing key
+//                    rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
+//                    messagingTemplate.convertAndSend("/topic/notifications/seller/" + sellerUId, notification);
+//                    notificationRepository.save(notification);
+//
+//                    OrderStatus orderStatus = new OrderStatus();
+//                    orderStatus.setOId(qId);
+//                    orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
+//                    orderStatus.setDescription(inquiryDTO.getDescription());
+//                    orderStatusRepository.save(orderStatus);
+//
+//                    inquiry.setOsId(orderStatus.getOsId());
+//                    inquiryRepository.save(inquiry);
+//
+//                    successfulSellers.add(sellerUId);
+//                } else {
+//                    return "Seller with ID: " + sellerUId + " is not selling the specified product.";
+//                }
+//            }
+//        return "Inquiry sent to sellers with IDs: " + (successfulSellers.isEmpty() ? "None" : String.join(", ", successfulSellers));
 //    }
-
-
 
     @Override
     public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
@@ -1087,100 +940,56 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Query already sent to sellers already.");
         }
 
-        List<String> successfulSellers = new ArrayList<>();
+        for (String spId : inquiryDTO.getSpIds()) {
+            SellerProduct sellerProduct = sellerProductRepository.findById(spId)
+                    .orElseThrow(() -> new RuntimeException("Seller Product not found with the given Id : " + spId));
+            String sellerUId = sellerProduct.getSellerId();
 
-        // Get all sellers selling the specified product
-        List<SellerProduct> validSellerProducts = sellerProductRepository
-                .findByPId(inquiry.getProductId());
+            inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
+            inquiry.setSentDate(LocalDate.now());
+            inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        // Extract the seller IDs from the validSellerProducts list
-        Set<String> validSellerIds = validSellerProducts.stream()
-                .map(SellerProduct::getSellerId)
-                .collect(Collectors.toSet());
+            OrderStatus orderStatus = new OrderStatus();
+            orderStatus.setOId(qId);
+            orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
+            orderStatus.setDescription(inquiryDTO.getDescription());
+            orderStatusRepository.save(orderStatus);
+            inquiry.setOsId(orderStatus.getOsId());
+            inquiryRepository.save(inquiry);
 
-            for(String sellerUId : inquiryDTO.getSellerUIds()) {
-                if (validSellerIds.contains(sellerUId)) { //to be changed
+            // Create a new entry in SellerNegotiate for tracking
+            SellerNegotiate sellerNegotiate = new SellerNegotiate();
+            sellerNegotiate.setQId(qId);
+            sellerNegotiate.setSpId(spId);
+            sellerNegotiate.setSellerUId(sellerUId);
+            sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
+            sellerNegotiate.setAipDate(LocalDate.now());
+            sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
+            sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
+            sellerNegotiate.setStatus("Inquiry send to Seller");
+            sellerNegotiateRepository.save(sellerNegotiate);
 
-                    inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
-                    inquiry.setSentDate(LocalDate.now());
-                    inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-                    inquiryRepository.save(inquiry);
+            Notification notification = new Notification();
+            notification.setNotificationId(UUID.randomUUID().toString());
+            notification.setMessage("You have received a new query request from Lyncc with ID : " + qId);
+            notification.setSellerId(sellerUId);
+            notification.setIsAdmin(false);
+            notification.setIsRead(false);
+            notification.setDate(LocalDate.now());
+            notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            notification.setInquiryId(qId);
 
-                    // Create a new entry in SellerNegotiate for tracking
-                    SellerNegotiate sellerNegotiate = new SellerNegotiate();
-                    sellerNegotiate.setQId(qId);
-                    sellerNegotiate.setSellerUId(sellerUId);
-                    sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
-                    sellerNegotiate.setAipDate(LocalDate.now());
-                    sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-                    sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
-                    sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
+            // Send the notification to the 'notification.queue' with the correct routing key
+            rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
+            messagingTemplate.convertAndSend("/topic/notifications/seller/" + sellerUId, notification);
+            notificationRepository.save(notification);
 
-                    sellerNegotiate.setStatus("Inquiry send to Seller");
-                    sellerNegotiateRepository.save(sellerNegotiate);
+        }
 
-                    Notification notification = new Notification();
-                    notification.setNotificationId(UUID.randomUUID().toString());
-                    notification.setMessage("You have received a new query request from Lyncc with ID : " + qId);
-                    notification.setSellerId(sellerUId);
-                    notification.setIsAdmin(false);
-                    notification.setIsRead(false);
-                    notification.setDate(LocalDate.now());
-                    notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-                    notification.setInquiryId(qId);
-
-// Send the notification to the 'notification.queue' with the correct routing key
-                    rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
-                    messagingTemplate.convertAndSend("/topic/notifications/seller/" + sellerUId, notification);
-                    notificationRepository.save(notification);
-
-                    OrderStatus orderStatus = new OrderStatus();
-                    orderStatus.setOId(qId);
-                    orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
-                    orderStatus.setDescription(inquiryDTO.getDescription());
-                    orderStatusRepository.save(orderStatus);
-
-                    inquiry.setOsId(orderStatus.getOsId());
-                    inquiryRepository.save(inquiry);
-
-                    successfulSellers.add(sellerUId);
-                } else {
-                    return "Seller with ID: " + sellerUId + " is not selling the specified product.";
-                }
-            }
-        return "Inquiry sent to sellers with IDs: " + (successfulSellers.isEmpty() ? "None" : String.join(", ", successfulSellers));
+        return "Inquiry sent to sellers with IDs: ";
     }
 
-//    @Override
-//    public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
-////        Inquiry inquiry = inquiryRepository.findByQId(qId);
-//        Inquiry inquiry = inquiryQIdCache.get(qId);
-//
-//
-//        if(sellerProductRepository.findBySellerIdAndProductId(inquiryDTO.getSellerUId(), inquiry.getProductId()).isPresent()){
-//            inquiry.setSellerUId(inquiryDTO.getSellerUId());
-//            inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
-//            inquiry.setSentPrice(inquiryDTO.getSentPrice());
-//            inquiry.setSentDate(LocalDate.now());
-//            inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//            inquiryRepository.save(inquiry);
-//            System.out.println(inquiry.getSentPrice());
-//
-//            OrderStatus orderStatus = new OrderStatus();
-//            orderStatus.setOId(qId);
-//            orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
-//            orderStatus.setDescription(inquiryDTO.getDescription());
-//            orderStatusRepository.save(orderStatus);
-//
-//            inquiry.setOsId(orderStatus.getOsId());
-//            inquiryRepository.save(inquiry);
-//
-//            return "Inquiry sent to seller successfully.";
-//        }else {
-//            return "Seller is not selling the specified product.";
-//        }
-//
-//    }
 
     //Admin checks all sellers selling a particular product
     @Override
@@ -1581,6 +1390,7 @@ public class InquiryServiceImpl implements InquiryService {
         sellerNegotiateRepository.save(sellerNegotiate);
 
         // Update the Inquiry entity with the selected seller details
+        inquiry.setSpId(sellerNegotiate.getSpId());
         inquiry.setSellerUId(sellerNegotiate.getSellerUId());
         inquiry.setSentDate(LocalDate.now());
         inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -2169,6 +1979,13 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
         sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
 
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry Id not found with given Id: " + sampleOrder.getQId()));
+        String key = null;
+        if (inquiry.getInvoiceUrl() != null) {
+            key = s3Service.getSampleInvoice(inquiry.getInvoiceUrl());
+        }
+        sampleOrderDTO.setInvoiceUrl(key);
         sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
         return sampleOrderDTO;
@@ -2347,6 +2164,7 @@ public class InquiryServiceImpl implements InquiryService {
                     sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());
                     sampleOrderDTO.setAdminSendToSellerTime(sampleOrder.getAdminSendToSellerTime());
 
+                    sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
                     return sampleOrderDTO;
                 })
                 .toList();
@@ -2424,6 +2242,9 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setBuyerRejectDate(sampleOrder.getBuyerRejectDate());
         sampleOrderDTO.setBuyerRejectTime(sampleOrder.getBuyerRejectTime());
 
+        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
+                .orElseThrow(() -> new RuntimeException("Inquiry Id not found with given Id: " + sampleOrder.getQId()));
+        sampleOrderDTO.setInvoiceUrl(inquiry.getInvoiceUrl() != null ? s3Service.getFiles(inquiry.getInvoiceUrl()) : null);
         sampleOrderDTO.setStatus(sampleOrder.getCurrentStatus());
 
         return sampleOrderDTO;
@@ -2949,6 +2770,18 @@ public class InquiryServiceImpl implements InquiryService {
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
 
         return s3Service.getFiles(inquiry.getPurchaseOrderUrl());
+    }
+
+    public List<InquiryDTO> getALl(){
+        List<Inquiry> inquiries =inquiryRepository.findAll();
+//        return inquiries.stream().sorted((o1, o2) -> o1.getPincode()- o2.getPincode())
+        return inquiries.stream().sorted(Comparator.comparingInt(Inquiry::getPincode))
+                .map(inquiry -> {
+                    InquiryDTO inquiryDTO = new InquiryDTO();
+                    inquiryDTO.setQId(inquiry.getQId());
+                    inquiryDTO.setPincode(inquiry.getPincode());
+                    return inquiryDTO;
+                }).toList();
     }
 
 }

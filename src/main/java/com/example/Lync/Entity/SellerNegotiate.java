@@ -22,6 +22,7 @@ public class SellerNegotiate {
     private Long snId;
     private String qId;
     private String sellerUId; // Reference to seller (User)
+    private String spId;
     private Double adminInitialPrice;
     private LocalDate aipDate;
     private LocalTime aipTime;

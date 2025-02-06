@@ -16,6 +16,7 @@ public class OrderDTO {
     private String qId;
     private String buyerUId; // Reference to buyer (User)
     private String sellerUId; // Reference to seller (User)
+    private String status;
 
     // Product details
     private String productName; // Reference to Product

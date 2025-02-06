@@ -5,6 +5,9 @@ import java.util.List;
 
 public interface CategoryService {
     String addCategory(Category category);
+
     List<Category> getAllCategories();
+
+    String updatePercentage(Long categoryId, Float percentage);
 }
 
