@@ -1144,8 +1144,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDTO> sellerGetAllOrders(String sellerId) {
+        System.out.println(sellerId);
         return orderRepository.findAll().stream()
-                .filter(order -> order.getBuyerUId().equals(sellerId))
+                .filter(order -> {
+                    String orderSellerId = order.getSellerUId();
+                    return orderSellerId != null && orderSellerId.equals(sellerId);
+                })
                 .map(order -> {
                     OrderDTO orderDTO = new OrderDTO();
                     Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
