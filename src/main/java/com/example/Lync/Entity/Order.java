@@ -1,5 +1,6 @@
 package com.example.Lync.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 public class Order {
     @Id
     private String oId;
+    @Column(unique = true, nullable = false)
     private String qId;
     private String buyerUId; // Reference to buyer (User)
     private String sellerUId; // Reference to seller (User)
@@ -30,6 +32,9 @@ public class Order {
     private Long buyerAddressId;
     private String paymentId;
     private String status;
+
+    private String sellerSopURL;
+    private String buyerSopURL;
 
     private String buyerPurchaseOrderURL;
     private LocalDate buyerPurchaseOrderURLDate;

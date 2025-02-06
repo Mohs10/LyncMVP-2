@@ -367,8 +367,8 @@ public class AdminController {
 
 
     @PostMapping("/adminNotifySellerToDispatch/{oId}")
-    public ResponseEntity<String> adminNotifySellerToDispatch(@PathVariable String oId){
-        String message = orderService.adminNotifySellerToDispatch(oId);
+    public ResponseEntity<String> adminNotifySellerToDispatch(@PathVariable String oId, @RequestBody Long adminAddressId){
+        String message = orderService.adminNotifySellerToDispatch(oId, adminAddressId);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
@@ -443,6 +443,10 @@ public class AdminController {
         return new ResponseEntity<>(orderService.getOIdByQId(qId), HttpStatus.OK);
     }
 
+    @GetMapping("/setBuyerFinalPrice")
+    public ResponseEntity<String> setBuyerFinalPrice(){
+        return new ResponseEntity<>(orderService.setBuyerFinalPrice(), HttpStatus.OK);
+    }
 
 
 

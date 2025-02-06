@@ -18,7 +18,7 @@ public interface OrderService {
 
 //    String buyer1stPayment(String oId, String buyerId);
 
-    String adminNotifySellerToDispatch(String oId);
+    String adminNotifySellerToDispatch(String oId, Long addressId);
 
     String sellerUploadPurchaseInvoice(String oId, String sellerId, MultipartFile file) throws IOException;
 
@@ -77,6 +77,8 @@ public interface OrderService {
     List<OrderDTO> sellerGetAllOrders(String sellerId);
 
     OrderDTO sellerGetOrderDetails(String oId, String sellerId);
+
+    String setBuyerFinalPrice();
 
 
 

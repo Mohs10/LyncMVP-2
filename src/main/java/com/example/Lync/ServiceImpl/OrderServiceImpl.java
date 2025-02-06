@@ -19,9 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -38,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private SimpMessagingTemplate messagingTemplate;
     private ProductRepository productRepository;
     private SellerProductRepository sellerProductRepository;
+    private BuyerNegotiateRepository buyerNegotiateRepository;
+    private TestRepository testRepository;
 
 
     @Override
@@ -61,13 +61,25 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.save(existingOrder);
         } else {
 
-    //        SampleOrder sampleOrder = sampleOrderRepository.findByQId(qId)
-    //                .orElseThrow(() -> new RuntimeException("Sample Order not found with given Id : " + qId));
             Order order = new Order();
             Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
             String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String nextOrderNumber = String.format("%03d", orderCount + 1);
             String orderId = "OD" + dateFormatter + nextOrderNumber;
+
+            List<Test> tests = testRepository.findByQueryId(qId);
+            for (Test test : tests) {
+                if (order.getSellerSopURL() == null && test.getSopForSellerUrl() != null) {
+                    order.setSellerSopURL(test.getSopForSellerUrl());
+                }
+                if (order.getBuyerSopURL() == null && test.getSopForBuyerUrl() != null) {
+                    order.setBuyerSopURL(test.getSopForBuyerUrl());
+                }
+                if (order.getSellerSopURL() != null && order.getBuyerSopURL() != null) {
+                    break;  // Exit loop once both URLs are set
+                }
+            }
+
 
             order.setOId(orderId);
             order.setQId(qId);
@@ -77,11 +89,10 @@ public class OrderServiceImpl implements OrderService {
             order.setProductQuantity(inquiry.getQuantity());
             order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
             order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
-    //        order.setAdminAddressId(sampleOrder.getAdminAddressId());
-    //        order.setBuyerAddressId(sampleOrder.getBuyerAddressId());
             order.setBuyerPurchaseOrderURL(key);
             order.setBuyerPurchaseOrderURLDate(LocalDate.now());
             order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+
             order.setStatus("Buyer uploaded the purchase order");
             orderRepository.save(order);
 
@@ -181,6 +192,8 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus("Admin notified buyer to pay");
         orderRepository.save(order);
 
+
+
         Notification noti = new Notification();
         noti.setNotificationId(UUID.randomUUID().toString());
         noti.setMessage("Lyncc requested you to pay : " + amount + "for Order Id : " + oId);
@@ -205,13 +218,14 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public String adminNotifySellerToDispatch(String oId) {
+    public String adminNotifySellerToDispatch(String oId, Long addressId) {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminNotifySellerToDispatch(true);
         order.setAdminNotifySellerToDispatchDate(LocalDate.now());
         order.setAdminNotifySellerToDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin notified seller to dispatch");
+        order.setAdminAddressId(addressId);
         orderRepository.save(order);
 
         Notification notification = new Notification();
@@ -910,6 +924,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setBuyerPaid(order.getBuyerPaid());
         orderDTO.setBuyerAddressId(order.getBuyerAddressId());
+        orderDTO.setBuyerSopURL(order.getBuyerSopURL() != null ? s3Service.getFiles(order.getBuyerSopURL()) : null);
 
         orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
         orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
@@ -996,6 +1011,8 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setSellerFinalPrice(order.getSellerFinalPrice());
         orderDTO.setAdminAddressId(order.getAdminAddressId());
         orderDTO.setBuyerAddressId(order.getBuyerAddressId());
+        orderDTO.setBuyerSopURL(order.getBuyerSopURL() != null ? s3Service.getFiles(order.getBuyerSopURL()) : null);
+        orderDTO.setSellerSopURL(order.getSellerSopURL() != null ? s3Service.getFiles(order.getSellerSopURL()) : null);
         orderDTO.setPaymentId(order.getPaymentId());
         Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
@@ -1185,6 +1202,9 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setProductQuantity(order.getProductQuantity());
         orderDTO.setSellerFinalPrice(order.getSellerFinalPrice());
         orderDTO.setAdminAddressId(order.getAdminAddressId());
+        orderDTO.setSellerSopURL(order.getSellerSopURL() != null ? s3Service.getFiles(order.getSellerSopURL()) : null);
+
+
         Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
@@ -1296,6 +1316,34 @@ public class OrderServiceImpl implements OrderService {
 
         // Return a success message
         return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
+    }
+
+
+    @Override
+    public String setBuyerFinalPrice() {
+        List<BuyerNegotiate> buyerNegotiates = buyerNegotiateRepository.findAll();
+        buyerNegotiates.forEach(buyerNegotiate -> {
+            System.out.println(buyerNegotiate.getQId());
+            System.out.println("1");
+            Optional<Inquiry> inquiryOptional = inquiryRepository.findByQId(buyerNegotiate.getQId());
+            System.out.println("2");
+            String orderId = orderRepository.findOIdByQId(buyerNegotiate.getQId());
+            if (orderId != null){
+                Optional<Order> orderOptional = orderRepository.findById(orderId);
+                orderOptional.ifPresent(order -> {
+                    order.setBuyerFinalPrice(buyerNegotiate.getAdminFinalPrice());
+                    orderRepository.save(order);
+                });
+            }
+            System.out.println("3");
+
+            inquiryOptional.ifPresent(inquiry -> {
+                inquiry.setBuyerFinalPrice(buyerNegotiate.getAdminFinalPrice());
+                inquiryRepository.save(inquiry);
+            });
+
+        });
+        return "Done";
     }
 
 

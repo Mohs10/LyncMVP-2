@@ -18,6 +18,9 @@ public class OrderDTO {
     private String sellerUId; // Reference to seller (User)
     private String status;
 
+    private String sellerSopURL;
+    private String buyerSopURL;
+
     // Product details
     private String productName; // Reference to Product
     private String formName; // ID for the form of the product
