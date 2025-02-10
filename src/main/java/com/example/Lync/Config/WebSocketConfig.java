@@ -20,7 +20,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 //        public void registerStompEndpoints(StompEndpointRegistry registry) {
 //            registry.addEndpoint("/ws")
 //                    .setAllowedOriginPatterns(
-//                            "http://localhost:5173",
+
 //                            "http://lyncorganikness.ap-south-1.elasticbeanstalk.com",
 //                            "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
 //                            "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com").withSockJS();
