@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, String> {
     @Query("SELECT COUNT(o) FROM Order o WHERE o.buyerPurchaseOrderURLDate = :currentDate")
@@ -13,4 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     @Query("SELECT o.oId FROM Order o WHERE o.qId = :qId")
     String findOIdByQId(String qId);
+
+    List<Order> findByBuyerUId(String buyerUId);
+
 }

@@ -777,11 +777,21 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         return sellerProductRepository.save(existingSellerProduct);
     }
 
+    @Override
+    public String updateInventory(String sellerProductId, Double updatedAvailableAmount) {
+        SellerProduct sellerProduct = sellerProductRepository.findById(sellerProductId)
+                .orElseThrow(() -> new RuntimeException("Seller Product not found with ID: " + sellerProductId));
 
+        if (updatedAvailableAmount == null || updatedAvailableAmount <= 0) {
+            throw new IllegalArgumentException("Available amount must be greater than zero.");
+        }
 
+        sellerProduct.setAvailableAmount(updatedAvailableAmount);
+        sellerProductRepository.save(sellerProduct);
 
-
-
+        return "Inventory updated successfully for Seller Product ID: " + sellerProductId +
+                ". New available amount: " + updatedAvailableAmount;
+    }
 
 
     @Override
@@ -1095,6 +1105,27 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         dto.setCountry(sellerBuyerAddress.getCountry());
         dto.setPincode(sellerBuyerAddress.getPincode());
         return dto;
+    }
+
+
+    @Override
+    public String changeStatusForSellerBuyer(String userId, Boolean isActive) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Seller/Buyer not found with ID: " + userId));
+
+        sellerBuyer.setActiveUser(isActive);
+        sellerBuyerRepository.save(sellerBuyer);
+
+        String statusMessage = isActive ? "activated" : "deactivated";
+        return "Seller/Buyer with ID: " + userId + " has been successfully " + statusMessage + ".";
+    }
+
+    @Override
+    public Boolean checkIfProductExists(Long productId, Long productVarietyId, Long productFormId, String sellerId) {
+
+        System.out.println("OLO Working");
+
+        return sellerProductRepository.checkSellerProduct(productId,productVarietyId,productFormId,sellerId);
     }
 
 

@@ -2,12 +2,16 @@ package com.example.Lync.Controller;
 
 import com.example.Lync.DTO.RazorpayOrderDTO;
 import com.example.Lync.DTO.RazorpayPaymentDTO;
+import com.example.Lync.Entity.SellerBuyer;
+import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Service.RazorpayService;
 import com.razorpay.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,9 @@ public class RazorpayController {
     @Autowired
     private RazorpayService razorpayService;
 
+
+    @Autowired
+    private SellerBuyerRepository sellerBuyerRepository;
     // API to create an order
     @PostMapping("/create-order")
 //    @PreAuthorize("hasAuthority('ROLE_BUYER')")
@@ -88,6 +95,46 @@ public class RazorpayController {
             System.err.println("Error fetching orders: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to fetch orders. Please try again later.");
+        }
+    }
+    @GetMapping("/BuyerPayments")
+    @PreAuthorize("hasAuthority('ROLE_BUYER')")
+    public ResponseEntity<?> fetchAllPaymentsByBuyer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        try {
+            List<RazorpayPaymentDTO> allPayment =  razorpayService.fetchAllPaymentsByEmail(email);
+            return ResponseEntity.ok(allPayment);
+        } catch (Exception e) {
+            System.err.println("Error fetching orders: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch orders. Please try again later.");
+        }
+    }
+
+
+    @GetMapping("/fetchOrderByReceipt")
+    public ResponseEntity<List<RazorpayOrderDTO>> fetchOrdersByReceipt(@RequestParam String receipt) {
+        try {
+            List<RazorpayOrderDTO> orders = razorpayService.fetchByReceipt(receipt);
+            if (orders.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @GetMapping("/fetchPaymentById")
+    public ResponseEntity<RazorpayPaymentDTO> fetchPaymentById(@RequestParam String paymentId) {
+        try {
+            RazorpayPaymentDTO paymentDTO = razorpayService.fetchByPaymentId(paymentId);
+            return ResponseEntity.ok(paymentDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
     }
 }

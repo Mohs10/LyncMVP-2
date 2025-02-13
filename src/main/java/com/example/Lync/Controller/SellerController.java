@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -220,6 +221,55 @@ public class SellerController {
 
         return ResponseEntity.ok(updatedSellerProduct); // Returns the updated SellerProduct with 200 OK
     }
+
+
+
+    @PutMapping("/update-inventory")
+    public ResponseEntity<String> updateInventory(@RequestBody Map<String, Object> requestBody) {
+        String sellerProductId = (String) requestBody.get("sellerProductId");
+        Double updatedAvailableAmount = (Double) requestBody.get("updatedAvailableAmount");
+
+        if (sellerProductId == null || updatedAvailableAmount == null) {
+            return ResponseEntity.badRequest().body("Invalid request. 'sellerProductId' and 'updatedAvailableAmount' are required.");
+        }
+
+        try {
+            String message = sellerBuyerService.updateInventory(sellerProductId, updatedAvailableAmount);
+            return ResponseEntity.ok(message);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/check-product-existence")
+    public ResponseEntity<Map<String, Object>> checkSellerProduct(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Long productId = Long.parseLong(request.get("productId").toString());
+            Long productVarietyId = Long.parseLong(request.get("productVarietyId").toString());
+            Long productFormId = Long.parseLong(request.get("productFormId").toString());
+            String sellerId = request.get("sellerId").toString();
+
+            Boolean exists = sellerBuyerService.checkIfProductExists(productId, productVarietyId, productFormId, sellerId);
+
+            response.put("exists", exists);
+            response.put("message", exists ? "Product exists, Update the existing product." : "Product does not exist.");
+
+            return exists ? ResponseEntity.ok(response)
+                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            response.put("exists", false);
+            response.put("message", "Invalid request payload.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+
+
+
 
 
     @GetMapping("/sellerProduct")

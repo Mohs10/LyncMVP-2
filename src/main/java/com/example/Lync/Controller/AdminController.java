@@ -187,7 +187,7 @@ public class AdminController {
 
     @PostMapping("/disableWaiveSampleFree/{userId}")
     public ResponseEntity<String> disableWaive(@PathVariable String userId, @RequestParam Boolean disable){
-        String message = sellerBuyerService.enableWaiveSampleFree(userId, disable);
+        String message = sellerBuyerService.disableWaiveSampleFree(userId, disable);
         return ResponseEntity.ok(message);
     }
 
@@ -198,6 +198,19 @@ public class AdminController {
     }
 
 
+
+    @PutMapping("/change-status")
+    public ResponseEntity<String> changeStatusForSellerBuyer(@RequestBody Map<String, Object> requestBody) {
+        String userId = (String) requestBody.get("userId");
+        Boolean isActive = (Boolean) requestBody.get("isActive");
+
+        if (userId == null || isActive == null) {
+            return ResponseEntity.badRequest().body("Invalid request. 'userId' and 'isActive' are required.");
+        }
+
+        String message = sellerBuyerService.changeStatusForSellerBuyer(userId, isActive);
+        return ResponseEntity.ok(message);
+    }
 
 
 

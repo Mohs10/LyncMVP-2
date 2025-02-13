@@ -56,6 +56,7 @@ public interface SellerBuyerService {
     public String uploadSellerProductCertificate(String sellerProductId, MultipartFile productCertificate) throws IOException ;
 
         public SellerProduct editSellerProduct(SellerProduct existingSellerProduct, SellerProductDTO sellerProductDTO) throws Exception ;
+    public String updateInventory(String sellerProductId, Double updatedAvailableAmount) ;
 
         public List<SellerProduct> getSellerProductsBySeller(String sellerId) ;
     public List<SellerProductDTO> getSellerProductDTOsBySeller(String sellerId) ;
@@ -79,4 +80,8 @@ public interface SellerBuyerService {
 
     public SellerBuyerDTO convertToSellerBuyerDTO(SellerBuyer sellerBuyer);
 
+
+    public String changeStatusForSellerBuyer(String userId, Boolean isActive);
+
+    public Boolean checkIfProductExists(Long productId, Long productVarietyId, Long productFormId, String sellerId) ;
     }

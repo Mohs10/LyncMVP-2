@@ -111,19 +111,33 @@ public class RazorpayServiceImpl implements RazorpayService {
     }
 
 
-    public RazorpayOrderDTO fetchByReceipt(String receipt) throws Exception {
+//    public RazorpayOrderDTO fetchByReceipt(String receipt) throws Exception {
+//        try {
+//            JSONObject options = new JSONObject();
+//            options.put("receipt", receipt); // Filter by receipt (if supported)
+//
+//            List<Order> orders = razorpayClient.orders.fetchAll(options);
+//            return orders.stream()
+//                    .map(this::toOrderDto)
+//                    .findFirst()
+//                    .orElse(null);
+//        } catch (Exception e) {
+//            throw new Exception("Failed to fetch order by receipt: " + e.getMessage(), e);
+//        }
+//    }
+
+
+    public List<RazorpayOrderDTO> fetchByReceipt(String receipt) throws Exception {
         try {
             JSONObject options = new JSONObject();
-            options.put("receipt", receipt); // Filter by receipt (if supported)
+            options.put("receipt", receipt); // Filter by receipt
 
             List<Order> orders = razorpayClient.orders.fetchAll(options);
-
             return orders.stream()
                     .map(this::toOrderDto)
-                    .findFirst()
-                    .orElse(null);
+                    .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new Exception("Failed to fetch order by receipt: " + e.getMessage(), e);
+            throw new Exception("Failed to fetch orders by receipt: " + e.getMessage(), e);
         }
     }
 
@@ -138,6 +152,8 @@ public class RazorpayServiceImpl implements RazorpayService {
             throw new Exception("Failed to fetch payment with ID " + paymentId + ": " + e.getMessage(), e);
         }
     }
+
+
 
 
 
@@ -178,6 +194,43 @@ public class RazorpayServiceImpl implements RazorpayService {
             throw new Exception("Failed to fetch all payments: " + e.getMessage(), e);
         }
     }
+
+
+    public List<RazorpayPaymentDTO> fetchAllPaymentsByBuyerId() throws Exception {
+        try {
+            // Fetch all orders for Admin from Razorpay
+            JSONObject options = new JSONObject();
+            options.put("count", 100); // Limit the number of orders fetched
+
+            List<Payment> payments = razorpayClient.payments.fetchAll(options); // Pass options to fetchAll
+
+            // Convert to DTO list
+            return payments.stream()
+                    .map(this::toPaymentDto) // Convert each order to a DTO
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new Exception("Failed to fetch all payments: " + e.getMessage(), e);
+        }
+    }
+
+    public List<RazorpayPaymentDTO> fetchAllPaymentsByEmail(String buyerEmail) throws Exception {
+        try {
+            JSONObject options = new JSONObject();
+            // Fetch all payments from Razorpay
+            List<Payment> payments = razorpayClient.payments.fetchAll(options);
+
+            // Filter payments by email
+
+            return payments.stream()
+                    .filter(payment -> buyerEmail != null && buyerEmail.equals(getStringOrDefault(payment, "email")))
+                    .map(this::toPaymentDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new Exception("Failed to fetch payments for email " + buyerEmail + ": " + e.getMessage(), e);
+        }
+    }
+
+
 
 
     private RazorpayOrderDTO toOrderDto(Order order) {
