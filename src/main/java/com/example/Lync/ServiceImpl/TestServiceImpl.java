@@ -106,7 +106,10 @@ public class TestServiceImpl implements TestService {
         // Save the initial TestStatus entry
         testStatusRepository.save(initialStatus);
 
-
+        Inquiry inquiry1 = inquiryRepository.findByQId(savedTest.getQueryId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id: " + savedTest.getQueryId()));
+        inquiry1.setOptedTesting(true);
+        inquiryRepository.save(inquiry1);
 
         String adminMessage = String.format(
                 "Testing request has been raised from the Buyer: %s for Query with id: %s",

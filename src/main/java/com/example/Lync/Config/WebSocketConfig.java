@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
         @Override
         public void configureMessageBroker(MessageBrokerRegistry config) {
-            config.enableSimpleBroker("/topic", "/queue");
+            config.enableSimpleBroker("/topic");
             config.setApplicationDestinationPrefixes("/app");
         }
 
@@ -29,22 +29,22 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 //
 //        }
 
-        @Override
-        public void registerStompEndpoints(StompEndpointRegistry registry) {
-            registry.addEndpoint("/ws")
-                    .setAllowedOriginPatterns(
-                            "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
-                            "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com",
-                            "http://localhost:5173/",
-                            "*"
-                    ).withSockJS();
-        }
-
-
 //        @Override
 //        public void registerStompEndpoints(StompEndpointRegistry registry) {
 //            registry.addEndpoint("/ws")
-//                    .setAllowedOriginPatterns("*").withSockJS();
+//                    .setAllowedOriginPatterns(
+//                            "http://lync-reactjs-bucket.s3-website.ap-south-1.amazonaws.com",
+//                            "http://buyerwebportal.s3-website.ap-south-1.amazonaws.com",
+//                            "http://localhost:5173/",
+//                            "*"
+//                    ).withSockJS();
 //        }
+
+
+        @Override
+        public void registerStompEndpoints(StompEndpointRegistry registry) {
+            registry.addEndpoint("/ws")
+                    .setAllowedOriginPatterns("*").withSockJS();
+        }
     }
 

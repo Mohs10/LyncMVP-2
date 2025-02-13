@@ -23,6 +23,9 @@ public class InquiryDTO {
     private Long productFormId; // ID for the form of the product
     private Long productVarietyId;
 
+    private Boolean optedSample;
+    private Boolean optedTesting;
+
     private String productName;
     private String FormName;
     private String varietyName;

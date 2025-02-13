@@ -23,6 +23,9 @@ public class Inquiry {
     private Long osId;
     private String spId;
 
+    private Boolean optedSample;
+    private Boolean optedTesting;
+
     // Product details
     private Long productId; // Reference to Product
     private Long productFormId; // ID for the form of the product

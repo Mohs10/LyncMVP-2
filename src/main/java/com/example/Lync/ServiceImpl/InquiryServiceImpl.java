@@ -1705,6 +1705,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(5L));
+        inquiry.setOptedSample(true);
         inquiryRepository.save(inquiry);
 
         Notification notification = new Notification();
