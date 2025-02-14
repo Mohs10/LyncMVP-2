@@ -418,7 +418,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         sellerBuyerDTO.setWarehouseCity(sellerBuyer.getWarehouseCity());
         sellerBuyerDTO.setWarehousePinCode(sellerBuyer.getWarehousePinCode());
         sellerBuyerDTO.setWaiveSampleFree(sellerBuyer.getWaiveSampleFree());
-
+        sellerBuyerDTO.setActiveUser(sellerBuyer.getActiveUser());
 //        sellerBuyerDTO.setProfilePictureUrl(s3Service.getUserImagePresignedUrl(sellerBuyer.getProfilePictureUrl()));
 //        sellerBuyerDTO.setCertificateUrl(s3Service.getUserCertificatePresignedUrl(sellerBuyer.getCertificateUrl()));
 //        sellerBuyerDTO.setCancelledChequeUrl(s3Service.getUserCancelledChequePresignedUrl(sellerBuyer.getCancelledChequeUrl()));
