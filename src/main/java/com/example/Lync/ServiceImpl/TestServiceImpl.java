@@ -443,7 +443,11 @@ public class TestServiceImpl implements TestService {
         test.setTestPassed(dto.getTestPassed());
         test.setFailureReason(dto.getFailureReason());
         test.setTestingCompletedAt(LocalDate.now());
-        testRepository.save(test);
+        Test savedTest =  testRepository.save(test);
+        // Construct a notification message for the admin
+        String buyerMessage = String.format(
+                "Test result has been uploaded for test Id : " +  testId
+        );
 
         // Create a TestStatus entry for the test result upload
         TestStatus status = new TestStatus();
@@ -458,6 +462,7 @@ public class TestServiceImpl implements TestService {
         // Save the TestStatus entry
         testStatusRepository.save(status);
 
+        sendNotificationBasedOnRoleOrUser(savedTest, "BUYER", buyerMessage);
         return "Test results uploaded";
     }
 

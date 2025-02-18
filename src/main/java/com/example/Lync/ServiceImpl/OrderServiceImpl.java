@@ -1319,6 +1319,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+
+
     @Override
     public String setBuyerFinalPrice() {
         List<BuyerNegotiate> buyerNegotiates = buyerNegotiateRepository.findAll();

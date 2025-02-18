@@ -22,6 +22,7 @@ public class SellerReceiveInquiryDTO {
     private String type;
     private Long productFormId; // ID for the form of the product
     private Long productVarietyId;
+    private String productImageURL;
 
     //Order Specification
     private Double quantity;

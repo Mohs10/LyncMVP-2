@@ -138,6 +138,7 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+        sellerReceiveInquiryDTO.setProductImageURL(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -357,6 +358,7 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setProductFormId(inquiry.getProductFormId());
                 inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
                 inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
+                inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                 // Fetch specifications for the inquiry
                 List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -520,6 +522,7 @@ public class InquiryServiceImpl implements InquiryService {
                         inquiryDTO.setCity(inquiry.getCity());
                         inquiryDTO.setPincode(inquiry.getPincode());
                         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+                        inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                         // Fetch and set inquiry specifications
                         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
