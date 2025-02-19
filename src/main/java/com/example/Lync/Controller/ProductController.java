@@ -321,6 +321,12 @@ public class ProductController {
     }
 
 
+    @GetMapping("/top-selling")
+    public ResponseEntity<List<Map<String, Object>>> getTopSellingProducts() {
+        return ResponseEntity.ok(productService.getTopSellingProducts());
+    }
+
+
 
 }
 

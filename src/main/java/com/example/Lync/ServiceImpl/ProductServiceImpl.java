@@ -473,6 +473,24 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    public List<Map<String, Object>> getTopSellingProducts() {
+        List<Object[]> rawResults = productRepository.getTopSellingProducts();
+
+        return rawResults.stream().map(obj -> {
+            Map<String, Object> map = new HashMap<>();
+            Long productId = ((Number) obj[0]).longValue();
+            Long totalOrders = ((Number) obj[1]).longValue();
+
+            // Fetch Product entity
+            Optional<Product> productOpt = productRepository.findById(productId);
+            if (productOpt.isPresent()) {
+                map.put("product",toDTO(productOpt.get()) ); // Store entire Product object
+                map.put("totalOrders", totalOrders);
+            }
+            return map;
+        }).filter(map -> !map.isEmpty()).collect(Collectors.toList());
+    }
+
 
 
 }
