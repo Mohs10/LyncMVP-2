@@ -456,10 +456,6 @@ public class AdminController {
         return new ResponseEntity<>(orderService.getOIdByQId(qId), HttpStatus.OK);
     }
 
-    @GetMapping("/setBuyerFinalPrice")
-    public ResponseEntity<String> setBuyerFinalPrice(){
-        return new ResponseEntity<>(orderService.setBuyerFinalPrice(), HttpStatus.OK);
-    }
 
 
 

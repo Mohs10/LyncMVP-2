@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationDTO {
+public class    NotificationDTO {
     private String notificationId;
     private String message;
     private String buyerId;

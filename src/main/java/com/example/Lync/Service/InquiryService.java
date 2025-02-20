@@ -34,8 +34,6 @@ public interface InquiryService {
 
     List<InquiryDTO> sellerNewInquiries(String sellerUId); //Seller only having status 2 inquiry
 
-//    List<InquiryDTO> buyerGetsStatus1n2Inquiries();
-
     void buyerRejectsInquiries(String qId, String description, String buyerUId) throws Exception; //Buyer can reject status 1, 2 inquiries
 
     SellerReceiveInquiryDTO sellerOpenInquiry(Long snId, String sellerUId) throws Exception;
@@ -67,10 +65,6 @@ public interface InquiryService {
     String buyerRejectedQuery(String qId, String buyerUId);
 
 //    void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception;
-
-
-
-
 
     String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception;
 

@@ -20,7 +20,6 @@ public interface SellerProductRepository extends JpaRepository<SellerProduct, St
             "AND sps.specificationName IN :specificationNames")
     List<SellerProduct> findBySpecificationAndProductAttributes(List<String> specificationNames, Long productId, Long productFormId, Long productVarietyId);
 
-
     @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId AND sp.productFormId = :productFormId AND sp.productVarietyId = :productVarietyId")
     List<SellerProduct> findByProductIdAndProductFormIdAndProductVarietyId(@Param("productId") Long productId, @Param("productFormId") Long productFormId, @Param("productVarietyId") Long productVarietyId);
 

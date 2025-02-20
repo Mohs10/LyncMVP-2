@@ -78,13 +78,6 @@ public interface OrderService {
 
     OrderDTO sellerGetOrderDetails(String oId, String sellerId);
 
-    String setBuyerFinalPrice();
-
-
-
-
     String paymentIdReceived (String orderId, String paymentId , String buyerId);
-
-
 
 }

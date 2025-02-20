@@ -856,84 +856,6 @@ public class InquiryServiceImpl implements InquiryService {
         return inquiryDTO;
     }
 
-
-
-//    @Override
-//    public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
-//        Inquiry inquiry = inquiryRepository.findByQId(qId)
-//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-//
-//        if (!"Query Raised".equals(inquiry.getOrderStatus())) {
-//            throw new RuntimeException("Query already sent to sellers already.");
-//        }
-//
-//        List<String> successfulSellers = new ArrayList<>();
-//
-//        // Get all sellers selling the specified product
-//        List<SellerProduct> validSellerProducts = sellerProductRepository
-//                .findByPId(inquiry.getProductId());
-//
-//        // Extract the seller IDs from the validSellerProducts list
-//        Set<String> validSellerIds = validSellerProducts.stream()
-//                .map(SellerProduct::getSellerId)
-//                .collect(Collectors.toSet());
-//
-//        Map<String, String> sellerToSpIdMap = validSellerProducts.stream()
-//                .collect(Collectors.toMap(SellerProduct::getSellerId, SellerProduct::getSpId));
-//
-//            for(String sellerUId : inquiryDTO.getSellerUIds()) {
-//                if (validSellerIds.contains(sellerUId)) { //to be changed
-//
-//                    inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
-//                    inquiry.setSentDate(LocalDate.now());
-//                    inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//                    inquiryRepository.save(inquiry);
-//
-//                    // Create a new entry in SellerNegotiate for tracking
-//                    SellerNegotiate sellerNegotiate = new SellerNegotiate();
-//                    sellerNegotiate.setQId(qId);
-//                    sellerNegotiate.setSellerUId(sellerUId);
-//                    sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
-//                    sellerNegotiate.setAipDate(LocalDate.now());
-//                    sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//                    sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
-//                    sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
-//
-//                    sellerNegotiate.setStatus("Inquiry send to Seller");
-//                    sellerNegotiateRepository.save(sellerNegotiate);
-//
-//                    Notification notification = new Notification();
-//                    notification.setNotificationId(UUID.randomUUID().toString());
-//                    notification.setMessage("You have received a new query request from Lyncc with ID : " + qId);
-//                    notification.setSellerId(sellerUId);
-//                    notification.setIsAdmin(false);
-//                    notification.setIsRead(false);
-//                    notification.setDate(LocalDate.now());
-//                    notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//                    notification.setInquiryId(qId);
-//
-//// Send the notification to the 'notification.queue' with the correct routing key
-//                    rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
-//                    messagingTemplate.convertAndSend("/topic/notifications/seller/" + sellerUId, notification);
-//                    notificationRepository.save(notification);
-//
-//                    OrderStatus orderStatus = new OrderStatus();
-//                    orderStatus.setOId(qId);
-//                    orderStatus.setStatus(statusRepository.findSMeaningBySId(2L));
-//                    orderStatus.setDescription(inquiryDTO.getDescription());
-//                    orderStatusRepository.save(orderStatus);
-//
-//                    inquiry.setOsId(orderStatus.getOsId());
-//                    inquiryRepository.save(inquiry);
-//
-//                    successfulSellers.add(sellerUId);
-//                } else {
-//                    return "Seller with ID: " + sellerUId + " is not selling the specified product.";
-//                }
-//            }
-//        return "Inquiry sent to sellers with IDs: " + (successfulSellers.isEmpty() ? "None" : String.join(", ", successfulSellers));
-//    }
-
     @Override
     public String sendInquiryToSeller(String qId, InquiryDTO inquiryDTO) { //status - 2
         Inquiry inquiry = inquiryRepository.findByQId(qId)
@@ -1071,15 +993,6 @@ public class InquiryServiceImpl implements InquiryService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<InquiryDTO> buyerGetsStatus1n2Inquiries() {
-//        return inquiryRepository.findAll().stream()
-//                .map(this::mapToAdminDTO)
-//                .filter(inquiryDTO -> inquiryDTO.getOrderStatus().equals(statusRepository.findSMeaningBySId(1L)) ||
-//                                      inquiryDTO.getOrderStatus().equals(statusRepository.findSMeaningBySId(2L)))
-//
-//                .collect(Collectors.toList());
-//    }
 
     //Buyer can reject status 1, 2 inquiries
     @Override
@@ -1172,7 +1085,7 @@ public class InquiryServiceImpl implements InquiryService {
     public String sellerRejectQuery(Long snId, String sellerUId) throws Exception {
         SellerNegotiate sellerNegotiate = sellerNegotiateRepository.findById(snId)
                 .orElseThrow(()-> new RuntimeException("Negotiation not found with given Id : " + snId));
-//        if (sellerNegotiate )
+
         sellerNegotiate.setStatus("Seller Rejected the Inquiry");
         sellerNegotiateRepository.save(sellerNegotiate);
 
@@ -1486,7 +1399,7 @@ public class InquiryServiceImpl implements InquiryService {
 
 // Send the notification to the 'notification.queue' with the correct routing key
         rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
-//        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
+        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
         notificationRepository.save(notification);
         log.info("Sending WebSocket notification to destination: /topic/notifications/buyer/{}", inquiry.getBuyerId());
         log.info("Notification Payload: {}", notification);
@@ -1620,43 +1533,6 @@ public class InquiryServiceImpl implements InquiryService {
 
         return "You rejected the Query";
     }
-
-
-//    @Override
-//    public void sellerOrderSample(String qId, SampleOrderDTO sampleOrderDTO) throws Exception {
-//        SampleOrder sampleOrder = new SampleOrder();
-//        OrderStatus orderStatus = new OrderStatus();
-////        Inquiry inquiry = inquiryRepository.findByQId(qId);
-//        Inquiry inquiry = inquiryQIdCache.get(qId);
-//        if(inquiry == null){
-//            throw new Exception("Inquiry not found with qId: " + qId);
-//        }
-//        LocalDate currentDate = LocalDate.now();
-//
-//        Long count = sampleOrderRepository.countSampleOrderByCurrentDate(currentDate);
-//        String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-//        String nextInquiryNumber = String.format("%03d", count + 1);
-//        String soId = "SO" + formattedDate + nextInquiryNumber;
-//
-//        sampleOrder.setSoId(soId);
-//        sampleOrder.setQId(qId);
-//        sampleOrder.setBuyerUId(inquiry.getBuyerId());
-//        sampleOrder.setSellerUId(inquiry.getSellerUId());
-//        sampleOrder.setProductId(inquiry.getProductId());
-//
-////        sampleOrder.setStockLocation(sampleOrderDTO.getStockLocation());
-//        sampleOrderRepository.save(sampleOrder);
-//
-//        orderStatus.setOId(qId);
-//        orderStatus.setStatus(statusRepository.findSMeaningBySId(5L));
-//        orderStatus.setDescription(sampleOrderDTO.getDescription());
-//        orderStatusRepository.save(orderStatus);
-//
-//        inquiry.setOsId(orderStatus.getOsId());
-//        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(5L));
-//        inquiryRepository.save(inquiry);
-//
-//    }
 
     @Override
     public String buyerRequestSample(String qId, String buyerUId, SampleOrderDTO sampleOrderDTO) throws Exception {
@@ -2254,52 +2130,6 @@ public class InquiryServiceImpl implements InquiryService {
         return sampleOrderDTO;
     }
 
-//    @Override
-//    public String sellerApproveSampleOrder(String soId, String sellerUId) {
-//
-//        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
-//                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
-//
-//        sampleOrder.setSellerRespondDate(LocalDate.now());
-//        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//        sampleOrder.setCurrentStatus("Seller Accepted the sample Order");
-//        sampleOrderRepository.save(sampleOrder);
-//
-//        OrderStatus orderStatus = new OrderStatus();
-//        orderStatus.setOId(sampleOrder.getQId());
-//        orderStatus.setStatus(statusRepository.findSMeaningBySId(9L));
-//        orderStatusRepository.save(orderStatus);
-//
-//        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
-//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
-//        inquiry.setOsId(orderStatus.getOsId());
-//        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(9L));
-//        inquiryRepository.save(inquiry);
-//
-//        return "You accepted the sample order.";
-//    }
-//
-//    @Override
-//    public String sellerDeclineSampleOrder(String soId, String sellerUId) {
-//        SampleOrder sampleOrder = sampleOrderRepository.findById(soId)
-//                .orElseThrow(() -> new RuntimeException("SampleOrder not found with ID: " + soId));
-//        sampleOrder.setSellerRespondDate(LocalDate.now());
-//        sampleOrder.setSellerRespondTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-//        sampleOrder.setCurrentStatus("Seller Declined the sample Order");
-//
-//        OrderStatus orderStatus = new OrderStatus();
-//        orderStatus.setOId(sampleOrder.getQId());
-//        orderStatus.setStatus(statusRepository.findSMeaningBySId(10L));
-//        orderStatusRepository.save(orderStatus);
-//
-//        Inquiry inquiry = inquiryRepository.findByQId(sampleOrder.getQId())
-//                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + sampleOrder.getQId()));
-//        inquiry.setOsId(orderStatus.getOsId());
-//        inquiry.setOrderStatus(statusRepository.findSMeaningBySId(10L));
-//        inquiryRepository.save(inquiry);
-//        return "You declined the sample order.";
-//    }
-
     @Override
     public String sellerPackagingSample(String soId, String sellerUId) {
 
@@ -2539,21 +2369,6 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setOsId(orderStatus.getOsId());
         inquiry.setOrderStatus(statusRepository.findSMeaningBySId(15L));
         inquiryRepository.save(inquiry);
-
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("Lyncc dispatched sample for query ID : " + sampleOrder.getQId());
-        notification.setSellerId(sampleOrder.getSellerUId());
-        notification.setIsRead(false);
-        notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        notification.setSoId(soId);
-
-// Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.SELLER_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications/seller/" + sampleOrder.getSellerUId(), notification);
-        notificationRepository.save(notification);
 
         Notification noti = new Notification();
         noti.setNotificationId(UUID.randomUUID().toString());

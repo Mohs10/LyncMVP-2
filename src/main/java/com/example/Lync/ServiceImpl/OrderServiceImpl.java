@@ -211,11 +211,6 @@ public class OrderServiceImpl implements OrderService {
         return "You requested the buyer with Id " + order.getBuyerUId() + " to pay " + amount;
     }
 
-//    @Override
-//    public String buyer1stPayment(String oId, String buyerId) {
-//        return "";
-//    }
-
 
     @Override
     public String adminNotifySellerToDispatch(String oId, Long addressId) {
@@ -1317,36 +1312,5 @@ public class OrderServiceImpl implements OrderService {
         // Return a success message
         return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
     }
-
-
-
-
-    @Override
-    public String setBuyerFinalPrice() {
-        List<BuyerNegotiate> buyerNegotiates = buyerNegotiateRepository.findAll();
-        buyerNegotiates.forEach(buyerNegotiate -> {
-            System.out.println(buyerNegotiate.getQId());
-            System.out.println("1");
-            Optional<Inquiry> inquiryOptional = inquiryRepository.findByQId(buyerNegotiate.getQId());
-            System.out.println("2");
-            String orderId = orderRepository.findOIdByQId(buyerNegotiate.getQId());
-            if (orderId != null){
-                Optional<Order> orderOptional = orderRepository.findById(orderId);
-                orderOptional.ifPresent(order -> {
-                    order.setBuyerFinalPrice(buyerNegotiate.getAdminFinalPrice());
-                    orderRepository.save(order);
-                });
-            }
-            System.out.println("3");
-
-            inquiryOptional.ifPresent(inquiry -> {
-                inquiry.setBuyerFinalPrice(buyerNegotiate.getAdminFinalPrice());
-                inquiryRepository.save(inquiry);
-            });
-
-        });
-        return "Done";
-    }
-
 
 }

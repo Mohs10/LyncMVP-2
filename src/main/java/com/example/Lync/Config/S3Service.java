@@ -454,6 +454,7 @@ public class S3Service {
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
+
     public String uploadSellerProductImage2(String userId ,String productId, MultipartFile image) throws IOException {
         // Define the S3 key for the product image
         String fileName = image.getOriginalFilename();

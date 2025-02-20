@@ -329,7 +329,6 @@ public class SellerController {
         AdminAddress adminAddress = adminAddressService.sellerGetAdminAddressById(adminAddressId, sellerDetails.getUserId());
 
         return new ResponseEntity<>(adminAddress, HttpStatus.OK);
-
     }
 
 

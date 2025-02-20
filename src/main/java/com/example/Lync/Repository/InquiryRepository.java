@@ -19,7 +19,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, String> {
     @Query("SELECT i FROM Inquiry i WHERE i.qId= :qId")
     Optional<Inquiry> findByQId(String qId);
 
-    @Query("SELECT i FROM Inquiry i WHERE i.buyerId = :buyerId")
+    @Query("SELECT i FROM Inquiry i WHERE i.buyerId = :buyerId ORDER BY i.raiseDate DESC")
     List<Inquiry> findByBuyerId(@Param("buyerId") String buyerUId);
 
     @Query("SELECT i FROM Inquiry i ORDER BY i.raiseDate DESC, i.raiseTime DESC")
