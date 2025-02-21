@@ -17,4 +17,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     List<Order> findByBuyerUId(String buyerUId);
 
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.buyerUId = :buyerUId AND FUNCTION('YEAR', o.buyerPurchaseOrderURLDate) = :year AND FUNCTION('MONTH', o.buyerPurchaseOrderURLDate) = :month")
+    Long countOrdersByBuyerInMonthAndYear(@Param("buyerUId") String buyerUId, @Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT COUNT (o) FROM Order o WHERE o.sellerUId = :sellerUId AND FUNCTION('YEAR', o.buyerPurchaseOrderURLDate) = :year AND FUNCTION('MONTH', o.buyerPurchaseOrderURLDate) = :month")
+    Long countOrdersBySellerInMonthAndYear(@Param("sellerUId") String sellerUId, @Param("year") int year, @Param("month") int month);
+
 }

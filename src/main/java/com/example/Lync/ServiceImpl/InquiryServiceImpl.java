@@ -2039,6 +2039,7 @@ public class InquiryServiceImpl implements InquiryService {
                             .filter(variety -> variety.getVarietyId().equals(sampleOrder.getProductVarietyId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
 
+                    sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
                     sampleOrderDTO.setAdminSendQtyToSeller(sampleOrder.getAdminSendQtyToSeller());
                     sampleOrderDTO.setAdminAddressId(sampleOrder.getAdminAddressId());
                     sampleOrderDTO.setAdminSendToSellerDate(sampleOrder.getAdminSendToSellerDate());

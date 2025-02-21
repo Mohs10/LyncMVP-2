@@ -47,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
         if (!buyerId.equals(inquiry.getBuyerId())) {
             throw new UnauthorizedException("Unauthorized: The buyer Id does not match with the respective query's buyer Id.");
         }
+        if (inquiry.getBuyerFinalPrice() == null) {
+            throw new RuntimeException("Negotiation is not completed yet for Inquiry Id : " + qId);
+        }
         String key = s3Service.buyerUploadPurchaseOrder(qId, file);
 
         String orderIdE = getOIdByQId(qId);
@@ -1311,6 +1314,16 @@ public class OrderServiceImpl implements OrderService {
 
         // Return a success message
         return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
+    }
+
+    @Override
+    public Long getOrderCountByBuyer(String buyerUId, int year, int month) {
+        return orderRepository.countOrdersByBuyerInMonthAndYear(buyerUId, year, month);
+    }
+
+    @Override
+    public Long getOrderCountBySeller(String sellerUId, int year, int month) {
+        return orderRepository.countOrdersBySellerInMonthAndYear(sellerUId, year, month);
     }
 
 }

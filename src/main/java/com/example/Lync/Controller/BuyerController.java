@@ -468,6 +468,18 @@ public class BuyerController {
         }
     }
 
+    @GetMapping("/countByBuyerOrder")
+    public ResponseEntity<Long> getOrderCountByBuyer(@RequestParam int year, @RequestParam int month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        Long count = orderService.getOrderCountByBuyer(buyerDetails.getUserId(), year, month);
+        return ResponseEntity.ok(count);
+    }
+
 
 
 }

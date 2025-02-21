@@ -80,4 +80,8 @@ public interface OrderService {
 
     String paymentIdReceived (String orderId, String paymentId , String buyerId);
 
+    Long getOrderCountByBuyer(String buyerUId, int year, int month);
+
+    Long getOrderCountBySeller(String sellerUId, int year, int month);
+
 }

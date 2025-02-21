@@ -681,5 +681,17 @@ public class SellerController {
         return new ResponseEntity<>(respond, HttpStatus.OK);
     }
 
+    @GetMapping("/countBySellerOrder")
+    public ResponseEntity<Long> getOrderCountBySeller(@RequestParam int year, @RequestParam int month) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer sellerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        Long count = orderService.getOrderCountBySeller(sellerDetails.getUserId(), year, month);
+        return ResponseEntity.ok(count);
+    }
+
 
 }
