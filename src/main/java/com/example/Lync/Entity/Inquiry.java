@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -67,8 +69,8 @@ public class Inquiry {
 //    private String dd;
 
 
-    private LocalDate raiseDate = LocalDate.now();
-    private LocalTime raiseTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDate raiseDate = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate();
+    private LocalTime raiseTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
 
     private String orderStatus;
     private String sellerUId; // Reference to seller(User) selectedSeller
