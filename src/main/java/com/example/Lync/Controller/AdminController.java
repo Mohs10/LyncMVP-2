@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -462,13 +464,24 @@ public class AdminController {
 
 
     @GetMapping("/time")
-    public ResponseEntity<?> getTime(){
+    public ResponseEntity<Map<String, Object>> getTime(){
         System.out.println("UTC" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         System.out.println("LocalDate" + LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-
         System.out.println("ISTDate" + ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         System.out.println("IST" + ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
-        return null;
+
+        LocalTime utcTime = ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
+        LocalDate istDate = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate();
+        LocalTime istTime = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
+        LocalTime localTime = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("UTC" , utcTime.toString());
+        response.put("Local Time", localTime.toString());
+        response.put("IST Date", istDate.toString());
+        response.put("IST Time", istTime.toString());
+
+        return ResponseEntity.ok(response);
     }
 
 
