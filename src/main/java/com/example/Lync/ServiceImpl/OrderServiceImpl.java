@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -58,15 +60,15 @@ public class OrderServiceImpl implements OrderService {
             Order existingOrder = orderRepository.findById(orderIdE)
                     .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderIdE));
             existingOrder.setBuyerPurchaseOrderURL(key);
-            existingOrder.setBuyerPurchaseOrderURLDate(LocalDate.now());
-            existingOrder.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            existingOrder.setBuyerPurchaseOrderURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            existingOrder.setBuyerPurchaseOrderURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
             existingOrder.setStatus("Buyer uploaded the purchase order");
             orderRepository.save(existingOrder);
         } else {
 
             Order order = new Order();
-            Long orderCount = orderRepository.countOrderByCurrentDate(LocalDate.now());
-            String dateFormatter = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            Long orderCount = orderRepository.countOrderByCurrentDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            String dateFormatter = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String nextOrderNumber = String.format("%03d", orderCount + 1);
             String orderId = "OD" + dateFormatter + nextOrderNumber;
 
@@ -93,8 +95,8 @@ public class OrderServiceImpl implements OrderService {
             order.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
             order.setSellerFinalPrice(inquiry.getSellerFinalPrice());
             order.setBuyerPurchaseOrderURL(key);
-            order.setBuyerPurchaseOrderURLDate(LocalDate.now());
-            order.setBuyerPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            order.setBuyerPurchaseOrderURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            order.setBuyerPurchaseOrderURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
             order.setStatus("Buyer uploaded the purchase order");
             orderRepository.save(order);
@@ -110,8 +112,8 @@ public class OrderServiceImpl implements OrderService {
             notification.setMessage("Buyer with ID : " + buyerId + " has uploaded the purchase order for query ID : " + qId);
             notification.setIsAdmin(true);
             notification.setIsRead(false);
-            notification.setDate(LocalDate.now());
-            notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
             notification.setSoId(orderId);
 
     // Send the notification to the 'notification.queue' with the correct routing key
@@ -132,8 +134,8 @@ public class OrderServiceImpl implements OrderService {
         String key = s3Service.adminUploadPurchaseInvoice(oId, file);
 
         order.setAdminPurchaseInvoiceURL(key);
-        order.setAdminPurchaseInvoiceURLDate(LocalDate.now());
-        order.setAdminPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminPurchaseInvoiceURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminPurchaseInvoiceURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded purchase invoice");
         orderRepository.save(order);
 
@@ -143,8 +145,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setBuyerId(order.getBuyerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -162,8 +164,8 @@ public class OrderServiceImpl implements OrderService {
         String key = s3Service.adminUploadPurchaseOrder(oId, file);
 
         order.setAdminPurchaseOrderURL(key);
-        order.setAdminPurchaseOrderURLDate(LocalDate.now());
-        order.setAdminPurchaseOrderURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminPurchaseOrderURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminPurchaseOrderURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded purchase order");
         orderRepository.save(order);
 
@@ -173,8 +175,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setSellerId(order.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -190,8 +192,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminNotifyBuyerToPay(amount);
-        order.setAdminNotifyBuyerToPayDate(LocalDate.now());
-        order.setAdminNotifyBuyerToPayTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminNotifyBuyerToPayDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminNotifyBuyerToPayTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin notified buyer to pay");
         orderRepository.save(order);
 
@@ -203,8 +205,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -220,8 +222,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         order.setAdminNotifySellerToDispatch(true);
-        order.setAdminNotifySellerToDispatchDate(LocalDate.now());
-        order.setAdminNotifySellerToDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminNotifySellerToDispatchDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminNotifySellerToDispatchTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin notified seller to dispatch");
         order.setAdminAddressId(addressId);
         orderRepository.save(order);
@@ -232,8 +234,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setSellerId(order.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -252,8 +254,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String key = s3Service.sellerPurchaseInvoice(oId, file);
         order.setSellerPurchaseInvoiceURL(key);
-        order.setSellerPurchaseInvoiceURLDate(LocalDate.now());
-        order.setSellerPurchaseInvoiceURLTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerPurchaseInvoiceURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerPurchaseInvoiceURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded purchase invoice");
         orderRepository.save(order);
 
@@ -262,8 +264,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the purchase invoice for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -280,8 +282,8 @@ public class OrderServiceImpl implements OrderService {
         if (!sellerId.equals(order.getSellerUId())) {
             throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
         }
-        order.setSellerProcessingOrderDate(LocalDate.now());
-        order.setSellerProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerProcessingOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerProcessingOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller processed the order");
         orderRepository.save(order);
 
@@ -290,8 +292,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " is processing the product for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -308,8 +310,8 @@ public class OrderServiceImpl implements OrderService {
         if (!sellerId.equals(order.getSellerUId())) {
             throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
         }
-        order.setSellerDispatchOrderDate(LocalDate.now());
-        order.setSellerDispatchOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerDispatchOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerDispatchOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller dispatched the order");
         orderRepository.save(order);
 
@@ -318,8 +320,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has dispatched the product for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -346,8 +348,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has updated transportation details for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -367,8 +369,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerOrderLoadingVehicleImg(oId, file);
         order.setSellerOrderLoadingVehicleImg(s3Key);
-        order.setSellerOrderLoadingVehicleImgDate(LocalDate.now());
-        order.setSellerOrderLoadingVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerOrderLoadingVehicleImgDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerOrderLoadingVehicleImgTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded order loaded vehicle image");
         orderRepository.save(order);
 
@@ -377,8 +379,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the order loaded vehicle image for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -397,8 +399,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerLoadedSealedVehicleImg(oId, file);
         order.setSellerLoadedSealedVehicleImg(s3Key);
-        order.setSellerLoadedSealedVehicleImgDate(LocalDate.now());
-        order.setSellerLoadedSealedVehicleImgTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerLoadedSealedVehicleImgDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerLoadedSealedVehicleImgTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded loaded & sealed vehicle image");
         orderRepository.save(order);
 
@@ -407,8 +409,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the loaded & sealed vehicle image for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -427,8 +429,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerEWayBill(oId, file);
         order.setSellerEWayBill(s3Key);
-        order.setSellerEWayBillDate(LocalDate.now());
-        order.setSellerEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerEWayBillDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerEWayBillTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded E-Way bill");
         orderRepository.save(order);
 
@@ -437,8 +439,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the E-way Bill for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -457,8 +459,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerPaymentInvoice(oId, file);
         order.setSellerPaymentInvoice(s3Key);
-        order.setSellerPaymentInvoiceDate(LocalDate.now());
-        order.setSellerPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerPaymentInvoiceDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerPaymentInvoiceTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded payment invoice");
         orderRepository.save(order);
 
@@ -467,8 +469,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the payment invoice for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -487,8 +489,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerLRCopy(oId, file);
         order.setSellerLRCopy(s3Key);
-        order.setSellerLRCopyDate(LocalDate.now());
-        order.setSellerLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerLRCopyDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerLRCopyTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded LR copy");
         orderRepository.save(order);
 
@@ -497,8 +499,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the LR Copy for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -517,8 +519,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerWeightSlipPreLoad(oId, file);
         order.setSellerWeightSlipPreLoad(s3Key);
-        order.setSellerWeightSlipPreLoadDate(LocalDate.now());
-        order.setSellerWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerWeightSlipPreLoadDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerWeightSlipPreLoadTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded weight slip of pre-loaded vehicle");
         orderRepository.save(order);
 
@@ -527,8 +529,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the weight slip for the pre-loaded vehicle for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -547,8 +549,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerWeightSlipPostLoad(oId, file);
         order.setSellerWeightSlipPostLoad(s3Key);
-        order.setSellerWeightSlipPostLoadDate(LocalDate.now());
-        order.setSellerWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerWeightSlipPostLoadDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerWeightSlipPostLoadTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
@@ -557,8 +559,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the weight slip for the post-loaded vehicle for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -572,8 +574,8 @@ public class OrderServiceImpl implements OrderService {
     public String adminReceivedOrder(String oId) {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        order.setAdminReceivedOrderDate(LocalDate.now());
-        order.setAdminReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminReceivedOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminReceivedOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin received the order");
         orderRepository.save(order);
 
@@ -583,8 +585,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setSellerId(order.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -598,8 +600,8 @@ public class OrderServiceImpl implements OrderService {
     public String adminProcessingOrder(String oId) {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        order.setAdminProcessingOrderDate(LocalDate.now());
-        order.setAdminProcessingOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminProcessingOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminProcessingOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin processing the order");
         orderRepository.save(order);
 
@@ -609,8 +611,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setSellerId(order.getBuyerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
         // Send the notification to the 'notification.queue' with the correct routing key
@@ -624,8 +626,8 @@ public class OrderServiceImpl implements OrderService {
     public String adminDispatchedOrder(String oId) {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
-        order.setAdminDispatchedOrderDate(LocalDate.now());
-        order.setAdminDispatchedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminDispatchedOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminDispatchedOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin dispatched the order");
         orderRepository.save(order);
 
@@ -635,8 +637,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setSellerId(order.getBuyerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setOId(oId);
 
         // Send the notification to the 'notification.queue' with the correct routing key
@@ -652,8 +654,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminEWayBill(oId, file);
         order.setAdminEWayBill(key);
-        order.setAdminEWayBillDate(LocalDate.now());
-        order.setAdminEWayBillTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminEWayBillDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminEWayBillTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded E-Way bill");
         orderRepository.save(order);
 
@@ -663,8 +665,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -680,8 +682,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminPaymentInvoice(oId, file);
         order.setAdminPaymentInvoice(key);
-        order.setAdminPaymentInvoiceDate(LocalDate.now());
-        order.setAdminPaymentInvoiceTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminPaymentInvoiceDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminPaymentInvoiceTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded payment invoice");
         orderRepository.save(order);
 
@@ -691,8 +693,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -708,8 +710,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminLRCopy(oId, file);
         order.setAdminLRCopy(key);
-        order.setAdminLRCopyDate(LocalDate.now());
-        order.setAdminLRCopyTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminLRCopyDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminLRCopyTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded LR copy");
         orderRepository.save(order);
 
@@ -719,8 +721,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -736,8 +738,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminWeightSlipPreLoaded(oId, file);
         order.setAdminWeightSlipPreLoad(key);
-        order.setAdminWeightSlipPreLoadDate(LocalDate.now());
-        order.setAdminWeightSlipPreLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminWeightSlipPreLoadDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminWeightSlipPreLoadTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded weight slip of pre-load vehicle");
         orderRepository.save(order);
 
@@ -747,8 +749,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -764,8 +766,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminWeightSlipPostLoaded(oId, file);
         order.setAdminWeightSlipPostLoad(key);
-        order.setAdminWeightSlipPostLoadDate(LocalDate.now());
-        order.setAdminWeightSlipPostLoadTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminWeightSlipPostLoadDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminWeightSlipPostLoadTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded weight slip of post-loaded vehicle");
         orderRepository.save(order);
 
@@ -775,8 +777,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -795,8 +797,8 @@ public class OrderServiceImpl implements OrderService {
         }
         String s3Key = s3Service.sellerUploadTransactionCertificate(oId, file);
         order.setSellerTransactionCertificate(s3Key);
-        order.setSellerTransactionCertificateDate(LocalDate.now());
-        order.setSellerTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setSellerTransactionCertificateDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setSellerTransactionCertificateTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Seller uploaded transaction certificate");
         orderRepository.save(order);
 
@@ -805,8 +807,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Seller with ID : " + sellerId + " has uploaded the Transaction Certificate for Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -822,8 +824,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
         String key = s3Service.adminUploadTransactionCertificate(oId, file);
         order.setAdminTransactionCertificate(key);
-        order.setAdminTransactionCertificateDate(LocalDate.now());
-        order.setAdminTransactionCertificateTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setAdminTransactionCertificateDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setAdminTransactionCertificateTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Admin uploaded transaction certificate");
         orderRepository.save(order);
 
@@ -833,8 +835,8 @@ public class OrderServiceImpl implements OrderService {
         noti.setBuyerId(order.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setOId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -851,8 +853,8 @@ public class OrderServiceImpl implements OrderService {
         if (!buyerId.equals(order.getBuyerUId())) {
             throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
         }
-        order.setBuyerReceivedOrderDate(LocalDate.now());
-        order.setBuyerReceivedOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setBuyerReceivedOrderDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        order.setBuyerReceivedOrderTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         order.setStatus("Buyer received the order");
         orderRepository.save(order);
 
@@ -861,8 +863,8 @@ public class OrderServiceImpl implements OrderService {
         notification.setMessage("Buyer with ID : " + buyerId + " has received the product with Order ID: " + oId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(oId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1301,8 +1303,8 @@ public class OrderServiceImpl implements OrderService {
                 ". Buyer ID: " + buyerId + " has acknowledged the receipt of the product.");
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(orderId);
 
         // Send the notification to the message queue and WebSocket topic

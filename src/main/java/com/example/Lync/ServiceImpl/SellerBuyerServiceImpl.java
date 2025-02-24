@@ -109,7 +109,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
 
     public String generateUserId() {
         String prefix = "LYNC";
-        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String datePart = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         int uniqueNumber = counter.incrementAndGet(); // Increment to get a new unique number
 
         return String.format("%s%s%03d", prefix, datePart, uniqueNumber); // LYNCYYYYMMDDXXX
@@ -166,8 +166,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         notification.setMessage("New Seller with ID : " + sellerBuyer.getUserId() + " registration on Lyncc");
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
 // Send the notification to the 'notification.queue' with the correct routing key
         rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
@@ -202,8 +202,8 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         notification.setMessage("New Buyer with ID : " + sellerBuyer.getUserId() + " registration on Lyncc");
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
 // Send the notification to the 'notification.queue' with the correct routing key
         rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);

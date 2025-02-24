@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @AllArgsConstructor
 @Data
@@ -28,7 +30,7 @@ public class SellerBuyer {
     private String city;
     private String pinCode;
     private String address;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
     private LocalDateTime updatedAt;
     private Boolean seller;
     private Boolean buyer;

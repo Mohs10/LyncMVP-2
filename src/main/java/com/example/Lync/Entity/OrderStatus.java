@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Entity
@@ -22,8 +24,8 @@ public class OrderStatus {
     private Long osId;
     private String oId; // Reference to orderId
     private String status;
-    private LocalDate date= LocalDate.now();
-    private LocalTime time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDate date = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate();
+    private LocalTime time = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
     private String description;
     private String imageUrl;
     private String location;

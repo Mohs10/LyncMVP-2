@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +62,7 @@ public class StandardOperatingProcedureServiceImpl implements StandardOperatingP
         if (repository.findAll().size() >= 2) {
             throw new IllegalStateException("Cannot add more than 2 StandardOperatingProcedure entries.");
         }
-        dto.setDate(LocalDate.now());
+        dto.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         // Map DTO to entity and save it
         StandardOperatingProcedure poc = mapToEntity(dto);
         StandardOperatingProcedure savedPoc = repository.save(poc);

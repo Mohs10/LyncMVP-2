@@ -203,7 +203,7 @@ public class InquiryServiceImpl implements InquiryService {
         // Create and populate the Inquiry object
         Inquiry inquiry = new Inquiry();
         OrderStatus orderStatus = new OrderStatus();
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate();
 
         Long inquiryCount = inquiryRepository.countInquiryByCurrentDate(currentDate);
         String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -283,8 +283,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("You received a new query request from buyer with ID : " + buyerUId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(inquiryId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -873,8 +873,8 @@ public class InquiryServiceImpl implements InquiryService {
             String sellerUId = sellerProduct.getSellerId();
 
             inquiry.setOrderStatus(statusRepository.findSMeaningBySId(2L));
-            inquiry.setSentDate(LocalDate.now());
-            inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            inquiry.setSentDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            inquiry.setSentTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
             OrderStatus orderStatus = new OrderStatus();
             orderStatus.setOId(qId);
@@ -890,8 +890,8 @@ public class InquiryServiceImpl implements InquiryService {
             sellerNegotiate.setSpId(spId);
             sellerNegotiate.setSellerUId(sellerUId);
             sellerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
-            sellerNegotiate.setAipDate(LocalDate.now());
-            sellerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            sellerNegotiate.setAipDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            sellerNegotiate.setAipTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
             sellerNegotiate.setAvgLeadTime(inquiryDTO.getAvgLeadTime());
             sellerNegotiate.setAdminAddressId(inquiryDTO.getAdminAddressId());
             sellerNegotiate.setStatus("Inquiry send to Seller");
@@ -903,8 +903,8 @@ public class InquiryServiceImpl implements InquiryService {
             notification.setSellerId(sellerUId);
             notification.setIsAdmin(false);
             notification.setIsRead(false);
-            notification.setDate(LocalDate.now());
-            notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+            notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
             notification.setInquiryId(qId);
 
             // Send the notification to the 'notification.queue' with the correct routing key
@@ -1096,8 +1096,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " has rejected the query with ID : " + sellerNegotiate.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1121,8 +1121,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " has accepted the query with ID : " + sellerNegotiate.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1144,8 +1144,8 @@ public class InquiryServiceImpl implements InquiryService {
         }
 
         sellerNegotiate.setSellerNegotiatePrice(amount);
-        sellerNegotiate.setSnpDate(LocalDate.now());
-        sellerNegotiate.setSnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sellerNegotiate.setSnpDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sellerNegotiate.setSnpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sellerNegotiate.setStatus("Seller Negotiated");
         sellerNegotiateRepository.save(sellerNegotiate);
 
@@ -1154,8 +1154,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " has negotiated the amount of " + amount + " for query with ID : " + sellerNegotiate.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1178,8 +1178,8 @@ public class InquiryServiceImpl implements InquiryService {
         }
 
         sellerNegotiate.setAdminFinalPrice(amount);
-        sellerNegotiate.setAfpDate(LocalDate.now());
-        sellerNegotiate.setAfpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sellerNegotiate.setAfpDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sellerNegotiate.setAfpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 //        sellerNegotiate.setAfpTime(ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sellerNegotiate.setStatus("Admin send the Final price");
         sellerNegotiateRepository.save(sellerNegotiate);
@@ -1190,8 +1190,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(sellerNegotiate.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1227,8 +1227,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " has accepted the final price for query with ID : " + sellerNegotiate.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1264,8 +1264,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " has rejected the final price for query with ID : " + sellerNegotiate.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1311,8 +1311,8 @@ public class InquiryServiceImpl implements InquiryService {
         // Update the Inquiry entity with the selected seller details
         inquiry.setSpId(sellerNegotiate.getSpId());
         inquiry.setSellerUId(sellerNegotiate.getSellerUId());
-        inquiry.setSentDate(LocalDate.now());
-        inquiry.setSentTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        inquiry.setSentDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        inquiry.setSentTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         // Set the final price in the Inquiry based on availability of Admin's final price
         if (sellerNegotiate.getAdminFinalPrice() != null) {
@@ -1338,8 +1338,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(sellerNegotiate.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1363,8 +1363,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(sellerNegotiate.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(sellerNegotiate.getQId());
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1388,8 +1388,8 @@ public class InquiryServiceImpl implements InquiryService {
         buyerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
         buyerNegotiate.setComment(inquiryDTO.getComment());
         buyerNegotiate.setPaymentTerm(inquiryDTO.getPaymentTerm());
-        buyerNegotiate.setAipDate(LocalDate.now());
-        buyerNegotiate.setAipTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        buyerNegotiate.setAipDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        buyerNegotiate.setAipTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 //        buyerNegotiate.setAfpTime(ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         buyerNegotiate.setStatus("Admin sent the quotation to buyer.");
@@ -1401,8 +1401,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setBuyerId(inquiry.getBuyerId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1420,8 +1420,8 @@ public class InquiryServiceImpl implements InquiryService {
     public String buyerNegotiatePrice(String qId, String buyerUId, Double amount) {
         BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(qId);
         negotiate.setBuyerNegotiatePrice(amount);
-        negotiate.setBnpDate(LocalDate.now());
-        negotiate.setBnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        negotiate.setBnpDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 //        System.out.println("1st" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime());
 //        System.out.println("2nd" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 //        negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
@@ -1431,7 +1431,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setBuyerFinalPrice(amount);
         inquiryRepository.save(inquiry);
 
-        negotiate.setBnpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         negotiate.setStatus("Buyer negotiated the price");
         buyerNegotiateRepository.save(negotiate);
 
@@ -1440,8 +1440,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has negotiated the amount of " + amount + " for query ID : " + qId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1456,14 +1456,14 @@ public class InquiryServiceImpl implements InquiryService {
     public String adminFinalPriceToBuyer(String qId, Double amount) {
         BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(qId);
         negotiate.setAdminFinalPrice(amount);
-        negotiate.setAfpDate(LocalDate.now());
-        negotiate.setAfpTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        negotiate.setAfpDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        negotiate.setAfpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         negotiate.setStatus("Admin Sent the Final Price");
         buyerNegotiateRepository.save(negotiate);
 
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        inquiry.setBuyerFinalPrice(amount);
+        inquiry.setBuyerFinalPrice(null);
         inquiryRepository.save(inquiry);
 
         Notification notification = new Notification();
@@ -1472,8 +1472,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setBuyerId(negotiate.getBuyerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1511,8 +1511,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has accepted the query with ID : " + qId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1545,8 +1545,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has rejected the query with ID : " + qId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -1576,7 +1576,7 @@ public class InquiryServiceImpl implements InquiryService {
         SampleOrder sampleOrder = new SampleOrder();
         OrderStatus orderStatus = new OrderStatus();
 
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate();
 
         Long count = sampleOrderRepository.countSampleOrderByCurrentDate(currentDate);
         String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -1596,8 +1596,8 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrder.setBuyerUnit(sampleOrderDTO.getBuyerUnit());
         sampleOrder.setBuyerAddressId(sampleOrderDTO.getBuyerAddressId());
         sampleOrder.setBuyerAmount(sampleOrderDTO.getBuyerAmount());
-        sampleOrder.setBuyerRequestDate(LocalDate.now());
-        sampleOrder.setBuyerRequestTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setBuyerRequestDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setBuyerRequestTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer Requested for Sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -1615,8 +1615,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has requested sample for query with ID : " + qId);
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2003,8 +2003,8 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrder.setAdminUnit(sampleOrderDTO.getAdminUnit());
         sampleOrder.setAdminAddressId(sampleOrderDTO.getAdminAddressId());
         sampleOrder.setAdminEDDToSeller(sampleOrderDTO.getAdminEDDToSeller());
-        sampleOrder.setAdminSendToSellerDate(LocalDate.now());
-        sampleOrder.setAdminSendToSellerTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setAdminSendToSellerDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setAdminSendToSellerTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Admin forwarded the sample request to seller.");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2023,8 +2023,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(inquiry.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2166,8 +2166,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Seller is not assigned for the Sample Order");
         }
 
-        sampleOrder.setSellerPackagingDate(LocalDate.now());
-        sampleOrder.setSellerPackagingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setSellerPackagingDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setSellerPackagingTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Seller Packaging the sample Order");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2187,8 +2187,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " started packaging sample for query ID : " + sampleOrder.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2210,8 +2210,8 @@ public class InquiryServiceImpl implements InquiryService {
                 throw new RuntimeException("Packaging is pending");
             }
 
-        sampleOrder.setSellerDispatchDate(LocalDate.now());
-            sampleOrder.setSellerDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setSellerDispatchDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            sampleOrder.setSellerDispatchTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
             sampleOrder.setTransportationBySeller(transportationBySeller);
             sampleOrder.setCurrentStatus("Seller Dispatched the sample Order");
             sampleOrderRepository.save(sampleOrder);
@@ -2232,8 +2232,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Seller with ID : " + sellerUId + " dispatched sample for query ID : " + sampleOrder.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2255,8 +2255,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Seller has not sent the sample yet");
         }
 
-        sampleOrder.setAdminReceiveDate(LocalDate.now());
-        sampleOrder.setAdminReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setAdminReceiveDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setAdminReceiveTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Admin Received the Sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2277,8 +2277,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(sampleOrder.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2292,8 +2292,8 @@ public class InquiryServiceImpl implements InquiryService {
         noti.setSellerId(sampleOrder.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2316,8 +2316,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("You did not received the sample yet");
         }
 
-        sampleOrder.setAdminProcessingDate(LocalDate.now());
-        sampleOrder.setAdminProcessingTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setAdminProcessingDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setAdminProcessingTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Admin Processed the sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2338,8 +2338,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setSellerId(sampleOrder.getSellerUId());
         notification.setIsRead(false);
         notification.setIsAdmin(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2353,8 +2353,8 @@ public class InquiryServiceImpl implements InquiryService {
         noti.setSellerId(sampleOrder.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2376,8 +2376,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("You did not process the sample yet");
         }
 
-        sampleOrder.setAdminDispatchDate(LocalDate.now());
-        sampleOrder.setAdminDispatchTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setAdminDispatchDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setAdminDispatchTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setTransportationByAdmin(sampleOrderDTO.getTransportationByAdmin());
         sampleOrder.setAdminDDToBuyer(sampleOrderDTO.getAdminDDToBuyer());
         sampleOrder.setCurrentStatus("Admin dispatched the sample");
@@ -2400,8 +2400,8 @@ public class InquiryServiceImpl implements InquiryService {
         noti.setBuyerId(sampleOrder.getBuyerUId());
         noti.setIsRead(false);
         noti.setIsAdmin(false);
-        noti.setDate(LocalDate.now());
-        noti.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        noti.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        noti.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         noti.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2423,8 +2423,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Admin did not dispatch the sample yet");
         }
 
-        sampleOrder.setBuyerReceiveDate(LocalDate.now());
-        sampleOrder.setBuyerReceiveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setBuyerReceiveDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setBuyerReceiveTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer received the sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2444,8 +2444,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has received the sample for query ID : " + sampleOrder.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2469,8 +2469,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Already you had rejected the sample");
         }
 
-        sampleOrder.setBuyerApproveDate(LocalDate.now());
-        sampleOrder.setBuyerApproveTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setBuyerApproveDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setBuyerApproveTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer approved the sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2490,8 +2490,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has accepted the sample for query ID : " + sampleOrder.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2505,8 +2505,8 @@ public class InquiryServiceImpl implements InquiryService {
         notify.setSellerId(sampleOrder.getSellerUId());
         notify.setIsRead(false);
         notify.setIsAdmin(false);
-        notify.setDate(LocalDate.now());
-        notify.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notify.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notify.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notify.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2530,8 +2530,8 @@ public class InquiryServiceImpl implements InquiryService {
             throw new RuntimeException("Already you had rejected the sample");
         }
 
-        sampleOrder.setBuyerRejectDate(LocalDate.now());
-        sampleOrder.setBuyerRejectTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        sampleOrder.setBuyerRejectDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        sampleOrder.setBuyerRejectTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         sampleOrder.setCurrentStatus("Buyer rejected the sample");
         sampleOrderRepository.save(sampleOrder);
 
@@ -2551,8 +2551,8 @@ public class InquiryServiceImpl implements InquiryService {
         notification.setMessage("Buyer with ID : " + buyerUId + " has rejected the sample for query ID : " + sampleOrder.getQId());
         notification.setIsAdmin(true);
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notification.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
@@ -2566,8 +2566,8 @@ public class InquiryServiceImpl implements InquiryService {
         notify.setSellerId(sampleOrder.getSellerUId());
         notify.setIsRead(false);
         notify.setIsAdmin(false);
-        notify.setDate(LocalDate.now());
-        notify.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notify.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notify.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         notify.setSoId(soId);
 
 // Send the notification to the 'notification.queue' with the correct routing key

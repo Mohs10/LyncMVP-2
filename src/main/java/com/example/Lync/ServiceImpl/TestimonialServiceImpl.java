@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class TestimonialServiceImpl implements TestimonialService {
 
     @Override
     public Testimonial createTestimonial(Testimonial testimonial) {
-        testimonial.setDate(LocalDate.now());
+        testimonial.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         return testimonialRepository.save(testimonial);
     }
 
@@ -37,7 +39,7 @@ public class TestimonialServiceImpl implements TestimonialService {
         return testimonialRepository.findById(id).map(existingTestimonial -> {
             existingTestimonial.setName(testimonial.getName());
             existingTestimonial.setOrganizationName(testimonial.getOrganizationName());
-            existingTestimonial.setDate(LocalDate.now());
+            existingTestimonial.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
             existingTestimonial.setContent(testimonial.getContent());
             return testimonialRepository.save(existingTestimonial);
         }).orElseThrow(() -> new RuntimeException("Testimonial not found with id " + id));

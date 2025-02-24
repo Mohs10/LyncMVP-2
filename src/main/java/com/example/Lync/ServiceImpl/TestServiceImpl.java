@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -81,10 +79,10 @@ public class TestServiceImpl implements TestService {
         // Populate Test entity details
         test.setTestId("TEST-" + test.getQueryId() + "-" + System.currentTimeMillis());
         test.setBuyerId(inquiry.getBuyerId());
-        test.setSamplingFixationDate(LocalDate.now());
+        test.setSamplingFixationDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         test.setSellerId(inquiry.getSellerUId());
         test.setRequestedAt(LocalDateTime.now());
-        test.setTestingStartedAt(LocalDate.now());
+        test.setTestingStartedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
 
         // Set default agency approval if applicable
         if (test.getIsDefaultAgency()) {
@@ -442,7 +440,7 @@ public class TestServiceImpl implements TestService {
         // Update the test results
         test.setTestPassed(dto.getTestPassed());
         test.setFailureReason(dto.getFailureReason());
-        test.setTestingCompletedAt(LocalDate.now());
+        test.setTestingCompletedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         Test savedTest =  testRepository.save(test);
         // Construct a notification message for the admin
         String buyerMessage = String.format(
@@ -1025,8 +1023,8 @@ public class TestServiceImpl implements TestService {
 
 
         notification.setIsRead(false);
-        notification.setDate(LocalDate.now());
-        notification.setTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         // Determine the routing key and topic based on role or userId
         String routingKey;
