@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -454,6 +458,15 @@ public class AdminController {
     @GetMapping("/getOIdByQId/{qId}")
     public ResponseEntity<String> getOIdByQId(@PathVariable String qId){
         return new ResponseEntity<>(orderService.getOIdByQId(qId), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/time")
+    public ResponseEntity<?> getTime(){
+        System.out.println("UTC" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+        System.out.println("LocalDate" + LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        System.out.println("IST" + ZonedDateTime.now(ZoneId.of("IST")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+        return null;
     }
 
 
