@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class TestServiceImpl implements TestService {
         test.setBuyerId(inquiry.getBuyerId());
         test.setSamplingFixationDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         test.setSellerId(inquiry.getSellerUId());
-        test.setRequestedAt(LocalDateTime.now());
+        test.setRequestedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         test.setTestingStartedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
 
         // Set default agency approval if applicable
@@ -98,7 +99,7 @@ public class TestServiceImpl implements TestService {
         initialStatus.setTestId(savedTest.getTestId());
         initialStatus.setStatusPhase("Request");
         initialStatus.setStatusMessage("Test request initiated successfully.");
-        initialStatus.setStatusTimestamp(LocalDateTime.now());
+        initialStatus.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         initialStatus.setAdditionalDetails("Test created for Buyer ID: " + inquiry.getBuyerId());
 
         // Save the initial TestStatus entry
@@ -175,7 +176,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 1: Fixation of Sampling Date");
         status.setStatusMessage(isApproved ? "Sampling approved by Admin" : "Sampling rejected by Admin");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Admin has " + (isApproved ? "approved" : "rejected") + " the sampling request.");
 
         // Save the TestStatus entry
@@ -209,7 +210,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 1: Fixation of Sampling Date");
         status.setStatusMessage(isApproved ? "Sampling approved by Buyer" : "Sampling rejected by Buyer");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Buyer has " + (isApproved ? "approved" : "rejected") + " the sampling request.");
 
         // Save the TestStatus entry
@@ -248,7 +249,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 1: Fixation of Sampling Date");
         status.setStatusMessage(isApproved ? "Buyer agreed to terms" : "Buyer rejected terms");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Buyer has " + (isApproved ? "accepted" : "rejected") + " the terms.");
 
         // Save the TestStatus entry
@@ -289,7 +290,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 1: Fixation of Sampling Date");
         status.setStatusMessage(isApproved ? "Sampling approved by Seller" : "Sampling rejected by Seller");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Seller has " + (isApproved ? "approved" : "rejected") + " the sampling request.");
 
         // Save the TestStatus entry
@@ -330,7 +331,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 2: Date of Sampling");
         status.setStatusMessage("Sampling details updated");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Sampling date: " + dto.getSamplingDate() +
                 ", Location: " + dto.getSamplingLocation() +
                 ", Estimated result date: " + dto.getEstimatedResultDate());
@@ -362,7 +363,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 2: Date of Sampling");
         status.setStatusMessage("Sampling lot image uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Sampling lot image uploaded. Image URL: " + path);
 
         // Save the TestStatus entry
@@ -392,7 +393,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 2: Date of Sampling");
         status.setStatusMessage("Sealed lot image 1 uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Sealed lot image 1 uploaded.");
 
         // Save the TestStatus entry
@@ -422,7 +423,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 2: Date of Sampling");
         status.setStatusMessage("Sealed lot image 2 uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Sealed lot image 2 uploaded. Image URL: " + path);
 
         // Save the TestStatus entry
@@ -453,7 +454,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 3: Testing and Results");
         status.setStatusMessage(dto.getTestPassed() ? "Test passed successfully" : "Test failed");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Test result uploaded. Test passed: " + dto.getTestPassed() +
                 (dto.getTestPassed() ? "" : ", Failure Reason: " + dto.getFailureReason()));
 
@@ -471,7 +472,7 @@ public class TestServiceImpl implements TestService {
                 .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
 
         // Set the result upload date
-        test.setResultUploadDate(LocalDateTime.now());
+        test.setResultUploadDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
 
         // Upload the test report to S3
         String queryId = test.getQueryId();
@@ -506,7 +507,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 3: Testing and Results");
         status.setStatusMessage("Test results file uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Test results file uploaded. File URL: " + path);
 
         // Save the TestStatus entry
@@ -539,7 +540,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage(isApproved ? "Buyer accepted test result" : "Buyer rejected test result");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Buyer has " + (isApproved ? "accepted" : "rejected") + " the test result.");
 
         // Save the TestStatus entry
@@ -565,7 +566,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("Dispatch and arrival estimates updated");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Dispatch estimation date: " + dispatchEstimationDate + ", Arrival estimation date: " + arrivalEstimationDate);
 
         // Save the TestStatus entry
@@ -591,7 +592,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("Dispatch details logged successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Dispatch date: " + dto.getDispatchDate() + ", Vehicle weight: " + dto.getVehicleWeight());
 
         // Save the TestStatus entry
@@ -620,7 +621,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("Dispatch image 1 uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Dispatch image 1 uploaded. Image URL: " + path);
 
         // Save the TestStatus entry
@@ -649,7 +650,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("Dispatch image 2 uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Dispatch image 2 uploaded. Image URL: " + path);
 
         // Save the TestStatus entry
@@ -678,7 +679,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("Test invoice uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Test invoice uploaded. Invoice URL: " + path);
 
         // Save the TestStatus entry
@@ -706,7 +707,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 4: Dispatch");
         status.setStatusMessage("E-way bill uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("E-way bill uploaded. E-way Bill URL: " + path);
 
         // Save the TestStatus entry
@@ -744,7 +745,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 5: Payment");
         status.setStatusMessage("Buyer SOP uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Buyer SOP uploaded. SOP URL: " + path);
 
         // Save the TestStatus entry
@@ -783,7 +784,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 5: Payment");
         status.setStatusMessage("Seller SOP uploaded successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Seller SOP uploaded. SOP URL: " + path);
 
         // Save the TestStatus entry
@@ -820,7 +821,7 @@ public class TestServiceImpl implements TestService {
                 .orElseThrow(() -> new RuntimeException("Test not found with given test Id : " + testId));
 
         // Set payment completed timestamp
-        test.setPaymentCompletedAt(LocalDateTime.now());
+        test.setPaymentCompletedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
 
         // Save the updated test
         testRepository.save(test);
@@ -831,7 +832,7 @@ public class TestServiceImpl implements TestService {
         status.setTestId(testId);
         status.setStatusPhase("Phase 5: Payment");
         status.setStatusMessage("Payment processed successfully");
-        status.setStatusTimestamp(LocalDateTime.now());
+        status.setStatusTimestamp(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         status.setAdditionalDetails("Payment completed for test. Payment processed at: " + test.getPaymentCompletedAt());
 
         // Save the TestStatus entry

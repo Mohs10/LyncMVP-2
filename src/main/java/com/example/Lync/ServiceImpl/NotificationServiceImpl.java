@@ -13,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -78,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Scheduled(cron = "0 0 0 * * ?")
     public void deleteNotificationOlderThan30Days() {
-        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        LocalDateTime thirtyDaysAgo = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime().minusDays(30);
         List<Notification> notificationsToDelete = notificationRepository.findByCreatedAtBefore(thirtyDaysAgo);
 
         if(!notificationsToDelete.isEmpty()) {

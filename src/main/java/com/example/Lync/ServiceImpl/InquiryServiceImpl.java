@@ -431,6 +431,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setCity(inquiry.getCity());
         inquiryDTO.setPincode(inquiry.getPincode());
         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+        inquiryDTO.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
 
 // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -1381,45 +1382,47 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public String adminQuoteToBuyer(String qId, InquiryDTO inquiryDTO) {
-        Inquiry inquiry = inquiryRepository.findByQId(qId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        inquiry.setBuyerFinalPrice(inquiryDTO.getAdminInitialPrice());
-        System.out.println(inquiryDTO.getAdminInitialPrice());
-        inquiryRepository.save(inquiry);
-        System.out.println(inquiry.getBuyerFinalPrice());
 
-        BuyerNegotiate buyerNegotiate = new BuyerNegotiate();
-        buyerNegotiate.setQId(qId);
-        buyerNegotiate.setBuyerUId(inquiry.getBuyerId());
-        buyerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
-        buyerNegotiate.setComment(inquiryDTO.getComment());
-        buyerNegotiate.setPaymentTerm(inquiryDTO.getPaymentTerm());
-        buyerNegotiate.setAipDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
-        buyerNegotiate.setAipTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+        BuyerNegotiate negotiate = buyerNegotiateRepository.findByQId(qId);
+        if (negotiate == null) {
+            Inquiry inquiry = inquiryRepository.findByQId(qId)
+                    .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+            inquiry.setBuyerFinalPrice(inquiryDTO.getAdminInitialPrice());
+            inquiryRepository.save(inquiry);
+
+            BuyerNegotiate buyerNegotiate = new BuyerNegotiate();
+            buyerNegotiate.setQId(qId);
+            buyerNegotiate.setBuyerUId(inquiry.getBuyerId());
+            buyerNegotiate.setAdminInitialPrice(inquiryDTO.getAdminInitialPrice());
+            buyerNegotiate.setComment(inquiryDTO.getComment());
+            buyerNegotiate.setPaymentTerm(inquiryDTO.getPaymentTerm());
+            buyerNegotiate.setAipDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            buyerNegotiate.setAipTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 //        buyerNegotiate.setAfpTime(ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
-        buyerNegotiate.setStatus("Admin sent the quotation to buyer.");
-        buyerNegotiateRepository.save(buyerNegotiate);
+            buyerNegotiate.setStatus("Admin sent the quotation to buyer.");
+            buyerNegotiateRepository.save(buyerNegotiate);
 
-        Notification notification = new Notification();
-        notification.setNotificationId(UUID.randomUUID().toString());
-        notification.setMessage("You received the quotation of amount " + inquiryDTO.getAdminInitialPrice() + " for query ID : " + qId);
-        notification.setBuyerId(inquiry.getBuyerId());
-        notification.setIsRead(false);
-        notification.setIsAdmin(false);
-        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
-        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
-        notification.setInquiryId(qId);
+            Notification notification = new Notification();
+            notification.setNotificationId(UUID.randomUUID().toString());
+            notification.setMessage("You received the quotation of amount " + inquiryDTO.getAdminInitialPrice() + " for query ID : " + qId);
+            notification.setBuyerId(inquiry.getBuyerId());
+            notification.setIsRead(false);
+            notification.setIsAdmin(false);
+            notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+            notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+            notification.setInquiryId(qId);
 
 // Send the notification to the 'notification.queue' with the correct routing key
-        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
-        messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
-        notificationRepository.save(notification);
-        log.info("Sending WebSocket notification to destination: /topic/notifications/buyer/{}", inquiry.getBuyerId());
-        log.info("Notification Payload: {}", notification);
+            rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.BUYER_ROUTING_KEY, notification);
+            messagingTemplate.convertAndSend("/topic/notifications/buyer/" + inquiry.getBuyerId(), notification);
+            notificationRepository.save(notification);
 
+            return "Quotation has been sent to the Buyer of amount : " + inquiryDTO.getAdminInitialPrice();
+        } else {
+            return "Already you sent quotation for this query ID: " + qId;
+        }
 
-        return "Quotation has been sent to the Buyer of amount : " + inquiryDTO.getAdminInitialPrice();
     }
 
     @Override

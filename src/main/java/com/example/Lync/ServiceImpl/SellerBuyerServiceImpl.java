@@ -508,7 +508,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         FavouriteProduct favouriteProduct = new FavouriteProduct();
         favouriteProduct.setUserId(userId);
         favouriteProduct.setProductId(productId);
-        favouriteProduct.setAddedAt(LocalDateTime.now());
+        favouriteProduct.setAddedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         return favouriteProductRepository.save(favouriteProduct);
     }
 
@@ -535,7 +535,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         FavouriteCategory favouriteCategory = new FavouriteCategory();
         favouriteCategory.setUserId(userId);
         favouriteCategory.setCategoryId(categoryId);
-        favouriteCategory.setAddedAt(LocalDateTime.now());
+        favouriteCategory.setAddedAt(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime());
         return favouriteCategoryRepository.save(favouriteCategory);
     }
 
