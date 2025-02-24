@@ -465,7 +465,9 @@ public class AdminController {
     public ResponseEntity<?> getTime(){
         System.out.println("UTC" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         System.out.println("LocalDate" + LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
-        System.out.println("IST" + ZonedDateTime.now(ZoneId.of("IST")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+
+        System.out.println("ISTDate" + ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        System.out.println("IST" + ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         return null;
     }
 
