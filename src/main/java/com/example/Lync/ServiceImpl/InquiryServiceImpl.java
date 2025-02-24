@@ -697,6 +697,9 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setBuyerUId(inquiry.getBuyerId());
         inquiryDTO.setProductId(inquiry.getProductId());
 
+        inquiryDTO.setOptedSample(inquiry.getOptedSample());
+        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
         inquiryDTO.setProductName(product.getProductName());
@@ -737,6 +740,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
         inquiryDTO.setSellerUId(inquiry.getSellerUId());
         inquiryDTO.setSellerFinalPrice(inquiry.getSellerFinalPrice());
+        inquiryDTO.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
         inquiryDTO.setSentDate(inquiry.getSentDate());
         inquiryDTO.setSentTime(inquiry.getSentTime());
         inquiryDTO.setUnit(inquiry.getUnit());
@@ -1380,7 +1384,9 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
         inquiry.setBuyerFinalPrice(inquiryDTO.getAdminInitialPrice());
+        System.out.println(inquiryDTO.getAdminInitialPrice());
         inquiryRepository.save(inquiry);
+        System.out.println(inquiry.getBuyerFinalPrice());
 
         BuyerNegotiate buyerNegotiate = new BuyerNegotiate();
         buyerNegotiate.setQId(qId);
@@ -1422,16 +1428,14 @@ public class InquiryServiceImpl implements InquiryService {
         negotiate.setBuyerNegotiatePrice(amount);
         negotiate.setBnpDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
         negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
-//        System.out.println("1st" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime());
-//        System.out.println("2nd" + ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
-//        negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("UTC")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        inquiry.setBuyerFinalPrice(amount);
+        inquiry.setBuyerFinalPrice(null);
         inquiryRepository.save(inquiry);
+        System.out.println(amount);
+        System.out.println(inquiry.getBuyerFinalPrice());
 
-        negotiate.setBnpTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
         negotiate.setStatus("Buyer negotiated the price");
         buyerNegotiateRepository.save(negotiate);
 
@@ -1463,7 +1467,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         Inquiry inquiry = inquiryRepository.findByQId(qId)
                 .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
-        inquiry.setBuyerFinalPrice(null);
+        inquiry.setBuyerFinalPrice(amount);
         inquiryRepository.save(inquiry);
 
         Notification notification = new Notification();
@@ -1481,7 +1485,7 @@ public class InquiryServiceImpl implements InquiryService {
         messagingTemplate.convertAndSend("/topic/notifications/buyer/" + negotiate.getBuyerUId(), notification);
         notificationRepository.save(notification);
 
-        return "You sent the final price to buyer";
+        return "You sent the final price of " + amount + " to buyer for query ID : " + qId ;
     }
 
     @Override
