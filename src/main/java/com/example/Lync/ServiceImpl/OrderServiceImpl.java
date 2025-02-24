@@ -886,6 +886,7 @@ public class OrderServiceImpl implements OrderService {
                             .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
                     orderDTO.setOId(order.getOId());
                     orderDTO.setQId(order.getQId());
+                    orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
                     orderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
@@ -914,6 +915,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+        orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
@@ -982,6 +984,7 @@ public class OrderServiceImpl implements OrderService {
                             .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
                     orderDTO.setOId(order.getOId());
                     orderDTO.setQId(order.getQId());
+                    orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
                     orderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
@@ -1018,6 +1021,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+        orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
@@ -1175,6 +1179,7 @@ public class OrderServiceImpl implements OrderService {
                             .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
                     orderDTO.setOId(order.getOId());
                     orderDTO.setQId(order.getQId());
+                    orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
                     orderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
@@ -1209,6 +1214,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Query Id not found"));
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+        orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
