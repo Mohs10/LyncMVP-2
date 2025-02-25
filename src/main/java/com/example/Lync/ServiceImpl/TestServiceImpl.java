@@ -1005,6 +1005,7 @@ public class TestServiceImpl implements TestService {
         testDTO.setPrice(inquiry.getBuyerFinalPrice());
         testDTO.setVariety(productVariety);
         testDTO.setQuantity(inquiry.getQuantity());
+        testDTO.setPrice(inquiry.getSellerFinalPrice());
 
         String productImageUrl = null;
         if (product.getProductImageUrl() != null) {

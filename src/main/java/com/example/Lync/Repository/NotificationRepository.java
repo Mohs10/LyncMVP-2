@@ -16,10 +16,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
     @Query("SELECT n FROM Notification n WHERE n.isAdmin = true")
     List<Notification> findAllByIsAdminTrue();
 
-    @Query("SELECT n FROM Notification n WHERE n.sellerId IS NOT NULL")
+    @Query("SELECT n FROM Notification n WHERE n.sellerId IS NOT NULL ORDER BY n.date DESC, n.time DESC")
     List<Notification> findAllWhereSellerIdIsNotNull();
 
-    @Query("SELECT n FROM Notification n WHERE n.buyerId IS NOT NULL")
+    @Query("SELECT n FROM Notification n WHERE n.buyerId IS NOT NULL ORDER BY n.date DESC, n.time DESC")
     List<Notification> findAllWhereBuyerIdIsNotNull();
 
 }

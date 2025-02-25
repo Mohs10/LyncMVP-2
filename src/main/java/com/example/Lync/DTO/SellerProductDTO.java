@@ -37,6 +37,7 @@ public class SellerProductDTO {
 //    private MultipartFile productImage2;
     private String productImageUrl1;
     private String productImageUrl2;
+    private String adminProductImage;
 
     // Pricing details
     private Double maxPrice;

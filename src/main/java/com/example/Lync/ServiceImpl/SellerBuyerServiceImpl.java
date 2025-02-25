@@ -912,6 +912,10 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         dto.setProductFormName(formName);
         dto.setProductVarietyName(varietyName);
 
+        String productImage = productRepository.findById(sellerProduct.getProductId())
+                        .map(Product::getProductImageUrl)
+                                .orElse(null);
+        dto.setAdminProductImage(productImage != null ? s3Service.getProductImagePresignedUrl(productImage) : null);
 
 
         dto.setOriginOfProduce(sellerProduct.getOriginOfProduce());

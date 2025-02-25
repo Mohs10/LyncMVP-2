@@ -124,6 +124,9 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAdminInitialPrice(sellerNegotiate.getAdminInitialPrice());
         sellerReceiveInquiryDTO.setAdminAddressId(sellerNegotiate.getAdminAddressId());
 
+        sellerReceiveInquiryDTO.setAipDate(sellerNegotiate.getAipDate());
+        sellerReceiveInquiryDTO.setAipTime(sellerNegotiate.getAipTime());
+
         SellerBuyer sellerBuyer = sellerBuyerRepository.findById(sellerNegotiate.getSellerUId())
                 .orElseThrow(() -> new RuntimeException("Seller name not found with given Id : " + sellerNegotiate.getSellerUId()));
 
@@ -336,6 +339,9 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setBuyerUId(inquiry.getBuyerId());
                 inquiryDTO.setProductId(inquiry.getProductId());
 
+                inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
+                inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
+
                 // Fetch product from repository
                 Product product = productRepository.findById(inquiry.getProductId())
                         .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
@@ -387,6 +393,10 @@ public class InquiryServiceImpl implements InquiryService {
             }
         }
 
+//        inquiryDTOS.sort(Comparator
+//                        .comparing(InquiryDTO::getRaiseDate).reversed()
+//                        .thenComparing(InquiryDTO::getRaiseTime).reversed()
+//        );
         return inquiryDTOS;
     }
 
@@ -984,9 +994,7 @@ public class InquiryServiceImpl implements InquiryService {
 
     @Override
     public List<SellerReceiveInquiryDTO> sellerAllInquiries(String sellerUId) {
-        return sellerNegotiateRepository.findAll().stream()
-                .filter(sellerReceiveInquiryDTO ->
-                sellerReceiveInquiryDTO.getSellerUId().equals(sellerUId))
+        return sellerNegotiateRepository.findBySellerUId(sellerUId).stream()
                 .map(this::mapToSellerViewList)
                 .collect(Collectors.toList());
     }
