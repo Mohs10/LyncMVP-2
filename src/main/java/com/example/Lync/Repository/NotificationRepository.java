@@ -13,7 +13,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 
     List<Notification> findByCreatedAtBefore(LocalDateTime date);
 
-    @Query("SELECT n FROM Notification n WHERE n.isAdmin = true")
+    @Query("SELECT n FROM Notification n WHERE n.isAdmin = true ORDER BY n.date DESC, n.time DESC")
     List<Notification> findAllByIsAdminTrue();
 
     @Query("SELECT n FROM Notification n WHERE n.sellerId IS NOT NULL ORDER BY n.date DESC, n.time DESC")
