@@ -1,6 +1,7 @@
 package com.example.Lync.Service;
 
 import com.example.Lync.DTO.OrderDTO;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -78,7 +79,8 @@ public interface OrderService {
 
     OrderDTO sellerGetOrderDetails(String oId, String sellerId);
 
-    String paymentIdReceived (String orderId, String paymentId , String buyerId);
+    String paymentIdReceived (String orderId, String paymentId , String buyerId, Double buyerPaid);
+//    public String paymentAmountReceived(String orderId, Double buyerPaid, String buyerId) ;
 
     Long getOrderCountByBuyer(String buyerUId, int year, int month);
 

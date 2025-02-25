@@ -12,6 +12,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -1293,7 +1294,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String paymentIdReceived(String orderId, String paymentId , String buyerId) {
+    public String paymentIdReceived(String orderId, String paymentId , String buyerId,  Double buyerPaid) {
 
         // Fetch the order from the repository
         Order order = orderRepository.findById(orderId)
@@ -1301,7 +1302,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Update the payment ID for the order
         order.setPaymentId(paymentId);
-
+        order.setBuyerPaid(buyerPaid);
         // Save the updated order back to the repository
         orderRepository.save(order);
 
@@ -1326,6 +1327,43 @@ public class OrderServiceImpl implements OrderService {
         // Return a success message
         return "Payment ID successfully updated, and notification sent for Order ID: " + orderId;
     }
+//    @Override
+//
+//    public String paymentAmountReceived(String orderId, Double buyerPaid, String buyerId) {
+//
+//        // Fetch the order from the repository
+//        Order order = orderRepository.findById(orderId)
+//                .orElseThrow(() -> new RuntimeException("Order not found with given Order ID: " + orderId));
+//
+//        // Update the paid amount for the order
+//        order.setBuyerPaid(buyerPaid);
+//
+//        // Save the updated order back to the repository
+//        orderRepository.save(order);
+//
+//        // Create and configure a notification
+//        Notification notification = new Notification();
+//        notification.setNotificationId(UUID.randomUUID().toString());
+//        notification.setMessage("Payment amount of ₹" + buyerPaid + " has been successfully received for Order ID: " + orderId +
+//                ". Buyer ID: " + buyerId + " has acknowledged the receipt of the product.");
+//        notification.setIsAdmin(true);
+//        notification.setIsRead(false);
+//        notification.setDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+//        notification.setTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
+//        notification.setSoId(orderId);
+//
+//        // Send the notification to the message queue and WebSocket topic
+//        rabbitTemplate.convertAndSend(MessageConfig.EXCHANGE, MessageConfig.ADMIN_ROUTING_KEY, notification);
+//        messagingTemplate.convertAndSend("/topic/notifications", notification);
+//
+//        // Save the notification to the repository
+//        notificationRepository.save(notification);
+//
+//        // Return a success message
+//        return "Payment amount successfully updated, and notification sent for Order ID: " + orderId;
+//    }
+//
+
 
     @Override
     public Long getOrderCountByBuyer(String buyerUId, int year, int month) {

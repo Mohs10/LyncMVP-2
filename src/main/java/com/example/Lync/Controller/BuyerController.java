@@ -450,7 +450,10 @@ public class BuyerController {
     @PostMapping("/{orderId}/payment")
     public ResponseEntity<String> updatePaymentId(
             @PathVariable String orderId,
-            @RequestParam String paymentId) {
+            @RequestParam String paymentId,
+            @RequestParam Double buyerPaid
+    ) {
+
         try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -459,7 +462,7 @@ public class BuyerController {
                     new RuntimeException("SellerBuyer details not found for email: " + username)
             );
             // Call the service to update payment ID and send notification
-            String response = orderService.paymentIdReceived(orderId, paymentId ,buyerDetails.getUserId());
+            String response = orderService.paymentIdReceived(orderId, paymentId ,buyerDetails.getUserId(),buyerPaid);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // Return an error response
@@ -467,6 +470,30 @@ public class BuyerController {
                     .body("An error occurred: " + e.getMessage());
         }
     }
+
+
+//    @PostMapping("/{orderId}/payment-amount")
+//    public ResponseEntity<String> updatePaymentAmount(
+//            @PathVariable String orderId,
+//            @RequestParam Double buyerPaid) {
+//        try {
+//            // Get authenticated user details
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            String username = authentication.getName();
+//            SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+//                    new RuntimeException("SellerBuyer details not found for email: " + username)
+//            );
+//
+//            // Call the service to update the payment amount and send notification
+//            String response = orderService.paymentAmountReceived(orderId, buyerPaid, buyerDetails.getUserId());
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            // Return an error response
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("An error occurred: " + e.getMessage());
+//        }
+//    }
+
 
     @GetMapping("/countByBuyerOrder")
     public ResponseEntity<Long> getOrderCountByBuyer(@RequestParam int year, @RequestParam int month) {
