@@ -3,6 +3,7 @@ package com.example.Lync.DTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import com.example.Lync.Entity.TestStatus;
@@ -35,9 +36,19 @@ public class TestDTO {
     private LocalDate samplingAcceptanceDeadline; // Deadline for buyer's acceptance
     private LocalDate samplingDate; // Actual sampling date
     private String samplingLocation; // Location of the lot
+
     private String samplingImagesUrl; // URL for sampling images
+    private LocalDate samplingImagesUrlDate; // Update time samplingImagesUrlDate
+    private LocalTime samplingImagesUrlTime;
+
     private String sealedLotImage1Url; // URL for sealed lot images with 3rd party label
+    private LocalDate sealedLotImage1UrlDate; // Update time sealedLotImage1UrlDate
+    private LocalTime sealedLotImage1UrlTime;
+
     private String sealedLotImage2Url; // URL for sealed lot images with 3rd party label
+    private LocalDate sealedLotImage2UrlDate; // Update time sealedLotImage2UrlDate
+    private LocalTime sealedLotImage2UrlTime;
+
     private LocalDate estimatedResultDate; // Estimated result date
     private String testReportUrl; // URL of the test report
     private Boolean testPassed = false; // Indicates whether the test passed

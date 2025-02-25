@@ -352,6 +352,8 @@ public class TestServiceImpl implements TestService {
 
         // Upload the sampling image to S3
         String path = s3Service.uploadTestSamplingImage(queryId, testId, multipartFile);
+        test.setSamplingImagesUrlDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        test.setSamplingImagesUrlTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         // Update the test with the new sampling image URL
         test.setSamplingImagesUrl(path);
@@ -382,6 +384,8 @@ public class TestServiceImpl implements TestService {
 
         // Upload the sealed lot image 1 to S3
         String path = s3Service.uploadTestSealedLotImage1(queryId, testId, multipartFile);
+        test.setSealedLotImage1UrlDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        test.setSealedLotImage1UrlTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         // Update the test with the new sealed lot image 1 URL
         test.setSealedLotImage1Url(path);
@@ -412,6 +416,8 @@ public class TestServiceImpl implements TestService {
 
         // Upload the sealed lot image 2 to S3
         String path = s3Service.uploadTestSealedLotImage2(queryId, testId, multipartFile);
+        test.setSealedLotImage2UrlDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
+        test.setSealedLotImage2UrlTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
 
         // Update the test with the new sealed lot image 2 URL
         test.setSealedLotImage2Url(path);
@@ -875,18 +881,24 @@ public class TestServiceImpl implements TestService {
             samplingImagesUrl = s3Service.getFiles(test.getSamplingImagesUrl());
         }
         testDTO.setSamplingImagesUrl(samplingImagesUrl);
+        testDTO.setSamplingImagesUrlDate(test.getSamplingImagesUrlDate());
+        testDTO.setSamplingImagesUrlTime(test.getSamplingImagesUrlTime());
 
         String sealedLotImage1Url = null;
         if (test.getSealedLotImage1Url() != null) {
             sealedLotImage1Url = s3Service.getFiles(test.getSealedLotImage1Url());
         }
         testDTO.setSealedLotImage1Url(sealedLotImage1Url);
+        testDTO.setSealedLotImage1UrlDate(test.getSealedLotImage1UrlDate());
+        testDTO.setSealedLotImage1UrlTime(test.getSealedLotImage1UrlTime());
 
         String sealedLotImage2Url = null;
         if (test.getSealedLotImage2Url() != null) {
             sealedLotImage2Url = s3Service.getFiles(test.getSealedLotImage2Url());
         }
         testDTO.setSealedLotImage2Url(sealedLotImage2Url);
+        testDTO.setSealedLotImage2UrlDate(test.getSealedLotImage2UrlDate());
+        testDTO.setSealedLotImage2UrlTime(test.getSealedLotImage2UrlTime());
 
         String testReportUrl = null;
         if (test.getTestReportUrl() != null) {

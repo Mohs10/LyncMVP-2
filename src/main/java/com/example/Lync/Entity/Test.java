@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Entity class representing a Test request, its lifecycle, and related details.
@@ -68,8 +69,14 @@ public class Test {
     @Column(columnDefinition = "TEXT")
     private String samplingLocation; // Location of the lot
     private String samplingImagesUrl; // URL for sampling images
+    private LocalDate samplingImagesUrlDate; // Update time samplingImagesUrlDate
+    private LocalTime samplingImagesUrlTime;
     private String sealedLotImage1Url; // URL for sealed lot images with 3rd party label
+    private LocalDate sealedLotImage1UrlDate; // Update time sealedLotImage1UrlDate
+    private LocalTime sealedLotImage1UrlTime;
     private String sealedLotImage2Url; // URL for sealed lot images with 3rd party label
+    private LocalDate sealedLotImage2UrlDate; // Update time sealedLotImage2UrlDate
+    private LocalTime sealedLotImage2UrlTime;
 
     private LocalDate estimatedResultDate; // Estimated result date (after 10 days)
 
