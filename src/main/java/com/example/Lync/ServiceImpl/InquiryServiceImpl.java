@@ -423,6 +423,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setQuantity(inquiry.getQuantity());
         inquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
         inquiryDTO.setPriceTerms(inquiry.getPriceTerms());
+        inquiryDTO.setPriceTermOther(inquiry.getPriceTermOther());
         inquiryDTO.setAskMinPrice(inquiry.getAskMinPrice());
         inquiryDTO.setAskMaxPrice(inquiry.getAskMaxPrice());
         inquiryDTO.setPriceUnit(inquiry.getPriceUnit());
