@@ -37,6 +37,7 @@ public class Inquiry {
     private Double quantity;
     private String quantityUnit;
     private String priceTerms;
+    private String priceTermOther;
     //private Boolean certificate;
     private Double askMinPrice; //buyer price
     private Double askMaxPrice; //buyer price

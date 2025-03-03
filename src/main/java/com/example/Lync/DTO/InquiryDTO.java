@@ -37,6 +37,7 @@ public class InquiryDTO {
     private Double quantity;
     private String quantityUnit;
     private String priceTerms;
+    private String priceTermOther;
 //    private Boolean certificate;
     private Double askMinPrice;
     private Double askMaxPrice;
