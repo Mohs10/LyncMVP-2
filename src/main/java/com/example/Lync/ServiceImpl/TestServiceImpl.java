@@ -975,6 +975,12 @@ public class TestServiceImpl implements TestService {
         List<TestStatus> statusList = testStatusRepository.findByTestId(test.getTestId());
         testDTO.setStatusList(statusList);
 
+        Inquiry inquiry = inquiryRepository.findByQId(test.getQueryId())
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id: " + test.getQueryId()));
+        Product product = productRepository.findById(inquiry.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        testDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
+
         return testDTO;
     }
 

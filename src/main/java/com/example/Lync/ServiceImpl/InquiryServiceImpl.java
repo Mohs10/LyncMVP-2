@@ -641,6 +641,8 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setCity(inquiry.getCity());
                 inquiryDTO.setPincode(inquiry.getPincode());
                 inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+                inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
+
 
                 // Fetch specifications for the inquiry
                 List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -758,6 +760,8 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setSentDate(inquiry.getSentDate());
         inquiryDTO.setSentTime(inquiry.getSentTime());
         inquiryDTO.setUnit(inquiry.getUnit());
+        inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
+
 
         // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -1079,6 +1083,8 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAfpDate(sellerNegotiate.getAfpDate());
         sellerReceiveInquiryDTO.setAfpTime(sellerNegotiate.getAfpTime());
         sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
+        sellerReceiveInquiryDTO.setProductImageURL(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
+
 
         // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -1676,7 +1682,7 @@ public class InquiryServiceImpl implements InquiryService {
                     sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
                     sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
                     sampleOrderDTO.setBuyerAmount(sampleOrder.getBuyerAmount());
-
+                    sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
                     sampleOrderDTO.setBuyerRequestDate(sampleOrder.getBuyerRequestDate());
                     sampleOrderDTO.setBuyerRequestTime(sampleOrder.getBuyerRequestTime());
 
@@ -1717,6 +1723,7 @@ public class InquiryServiceImpl implements InquiryService {
         sampleOrderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(sampleOrder.getProductVarietyId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
+        sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
         sampleOrderDTO.setBuyerUnit(sampleOrder.getBuyerUnit());
@@ -1800,6 +1807,7 @@ public class InquiryServiceImpl implements InquiryService {
                     sampleOrderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(sampleOrder.getProductVarietyId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product variety not found with ID : " + sampleOrder.getProductVarietyId())).getVarietyName());
+                    sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                     sampleOrderDTO.setBuyerQuantity(sampleOrder.getBuyerQuantity());
                     sampleOrderDTO.setBuyerAddressId(sampleOrder.getBuyerAddressId());
@@ -1844,6 +1852,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         Product product = productRepository.findById(sampleOrder.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + sampleOrder.getProductId()));
+        sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         sampleOrderDTO.setProductId(sampleOrder.getProductId());
         sampleOrderDTO.setProductName(product.getProductName());
@@ -1942,6 +1951,7 @@ public class InquiryServiceImpl implements InquiryService {
 
         Product product = productRepository.findById(sampleOrder.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + sampleOrder.getProductId()));
+        sampleOrderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         sampleOrderDTO.setProductId(sampleOrder.getProductId());
         sampleOrderDTO.setProductName(product.getProductName());

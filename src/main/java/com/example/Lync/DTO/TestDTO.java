@@ -75,6 +75,7 @@ public class TestDTO {
     private String sopForBuyerUrl;
 
     private List<TestStatus> statusList;
+    private String productImageUrl;
 
 }
 

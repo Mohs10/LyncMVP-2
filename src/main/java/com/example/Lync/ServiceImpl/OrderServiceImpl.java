@@ -889,6 +889,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setQId(order.getQId());
                     orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
+                    orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
                     orderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
@@ -918,6 +919,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
         orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
+        orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
@@ -987,6 +989,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setQId(order.getQId());
                     orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
+                    orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
                     orderDTO.setVarietyName(product.getVarieties().stream()
                             .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
@@ -1024,6 +1027,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
         orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
+        orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
@@ -1182,6 +1186,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDTO.setQId(order.getQId());
                     orderDTO.setProductId(product.getProductId());
                     orderDTO.setProductName(product.getProductName());
+                    orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
                     orderDTO.setProductQuantity(order.getProductQuantity());
                     orderDTO.setSellerFinalPrice(order.getSellerFinalPrice());
                     orderDTO.setAdminAddressId(order.getAdminAddressId());
@@ -1220,6 +1225,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
         orderDTO.setProductId(product.getProductId());
         orderDTO.setProductName(product.getProductName());
+        orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
         orderDTO.setVarietyName(product.getVarieties().stream()
                 .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());

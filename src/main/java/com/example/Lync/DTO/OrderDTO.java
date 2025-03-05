@@ -24,6 +24,7 @@ public class OrderDTO {
     // Product details
     private Long productId;
     private String productName; // Reference to Product
+    private String productImageUrl;
     private String formName; // ID for the form of the product
     private String varietyName;
 
