@@ -25,9 +25,9 @@ public class Inquiry {
     private Long osId;
     private String spId;
 
-    private boolean optedSample;
-    private boolean optedTesting;
-    private boolean optedOrder;
+    private Boolean optedSample;
+    private Boolean optedTesting;
+    private Boolean optedOrder;
 
     // Product details
     private Long productId; // Reference to Product

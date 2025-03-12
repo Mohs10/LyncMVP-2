@@ -33,8 +33,8 @@ public class Order {
     private String paymentId;
     private String status;
 
-    private boolean optedSample;
-    private boolean optedTesting;
+    private Boolean optedSample;
+    private Boolean optedTesting;
 
     private String sellerSopURL;
     private String buyerSopURL;

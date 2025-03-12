@@ -143,9 +143,9 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
-        sellerReceiveInquiryDTO.setOptedSample(inquiry.isOptedSample());
-        sellerReceiveInquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-        sellerReceiveInquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+        sellerReceiveInquiryDTO.setOptedSample(inquiry.getOptedSample());
+        sellerReceiveInquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        sellerReceiveInquiryDTO.setOptedOrder(inquiry.getOptedOrder());
         sellerReceiveInquiryDTO.setProductImageURL(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         // Fetch specifications for the inquiry
@@ -371,9 +371,9 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setProductFormId(inquiry.getProductFormId());
                 inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
                 inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
-                inquiryDTO.setOptedSample(inquiry.isOptedSample());
-                inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-                inquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+                inquiryDTO.setOptedSample(inquiry.getOptedSample());
+                inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+                inquiryDTO.setOptedOrder(inquiry.getOptedOrder());
                 inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                 // Fetch specifications for the inquiry
@@ -453,9 +453,9 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
 
         inquiryDTO.setBuyerWantsTC(inquiry.isBuyerWantsTC());
-        inquiryDTO.setOptedSample(inquiry.isOptedSample());
-        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-        inquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+        inquiryDTO.setOptedSample(inquiry.getOptedSample());
+        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        inquiryDTO.setOptedOrder(inquiry.getOptedOrder());
 
 // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -549,9 +549,9 @@ public class InquiryServiceImpl implements InquiryService {
                         inquiryDTO.setCity(inquiry.getCity());
                         inquiryDTO.setPincode(inquiry.getPincode());
                         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
-                        inquiryDTO.setOptedSample(inquiry.isOptedSample());
-                        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-                        inquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+                        inquiryDTO.setOptedSample(inquiry.getOptedSample());
+                        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+                        inquiryDTO.setOptedOrder(inquiry.getOptedOrder());
                         inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                         // Fetch and set inquiry specifications
@@ -727,9 +727,9 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setBuyerUId(inquiry.getBuyerId());
         inquiryDTO.setProductId(inquiry.getProductId());
 
-        inquiryDTO.setOptedSample(inquiry.isOptedSample());
-        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-        inquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+        inquiryDTO.setOptedSample(inquiry.getOptedSample());
+        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        inquiryDTO.setOptedOrder(inquiry.getOptedOrder());
 
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
@@ -1077,9 +1077,9 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
 
-        sellerReceiveInquiryDTO.setOptedSample(inquiry.isOptedSample());
-        sellerReceiveInquiryDTO.setOptedTesting(inquiry.isOptedTesting());
-        sellerReceiveInquiryDTO.setOptedOrder(inquiry.isOptedOrder());
+        sellerReceiveInquiryDTO.setOptedSample(inquiry.getOptedSample());
+        sellerReceiveInquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        sellerReceiveInquiryDTO.setOptedOrder(inquiry.getOptedOrder());
 
         sellerReceiveInquiryDTO.setQuantity(inquiry.getQuantity());
         sellerReceiveInquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
