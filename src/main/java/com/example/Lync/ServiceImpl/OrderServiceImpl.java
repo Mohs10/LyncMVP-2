@@ -86,7 +86,6 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
 
-
             order.setOId(orderId);
             order.setQId(qId);
             order.setBuyerUId(inquiry.getBuyerId());
@@ -103,6 +102,9 @@ public class OrderServiceImpl implements OrderService {
             order.setOptedTesting(inquiry.isOptedTesting());
             order.setStatus("Buyer uploaded the purchase order");
             orderRepository.save(order);
+
+            inquiry.setOptedOrder(true);
+            inquiryRepository.save(inquiry);
 
             SellerProduct sellerProduct = sellerProductRepository.findById(inquiry.getSpId())
                     .orElseThrow(() -> new RuntimeException("Seller product is not found with the given Id : " + inquiry.getSpId()));

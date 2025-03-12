@@ -26,6 +26,7 @@ public class SellerReceiveInquiryDTO {
 
     private boolean optedSample;
     private boolean optedTesting;
+    private boolean optedOrder;
 
     //Order Specification
     private Double quantity;

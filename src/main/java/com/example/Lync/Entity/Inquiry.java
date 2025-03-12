@@ -27,6 +27,7 @@ public class Inquiry {
 
     private boolean optedSample;
     private boolean optedTesting;
+    private boolean optedOrder;
 
     // Product details
     private Long productId; // Reference to Product

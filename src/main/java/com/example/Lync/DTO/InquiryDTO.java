@@ -25,6 +25,7 @@ public class InquiryDTO {
 
     private boolean optedSample;
     private boolean optedTesting;
+    private boolean optedOrder;
 
     private String productName;
     private String FormName;
