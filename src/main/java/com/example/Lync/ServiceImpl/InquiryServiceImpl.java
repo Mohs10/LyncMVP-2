@@ -60,19 +60,19 @@ public class InquiryServiceImpl implements InquiryService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private final Map<String, Inquiry> inquiryQIdCache = new HashMap<>();
-
-    @PostConstruct
-    public void init(){
-        loadByQIdCache();
-    }
-
-    public void loadByQIdCache(){
-        List<Inquiry> inquiries = inquiryRepository.findAll();
-        for(Inquiry inquiry : inquiries){
-            inquiryQIdCache.put(inquiry.getQId(), inquiry);
-        }
-    }
+//    private final Map<String, Inquiry> inquiryQIdCache = new HashMap<>();
+//
+//    @PostConstruct
+//    public void init(){
+//        loadByQIdCache();
+//    }
+//
+//    public void loadByQIdCache(){
+//        List<Inquiry> inquiries = inquiryRepository.findAll();
+//        for(Inquiry inquiry : inquiries){
+//            inquiryQIdCache.put(inquiry.getQId(), inquiry);
+//        }
+//    }
 
 
 
@@ -143,6 +143,8 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setFormName(product.getForms().stream().map(Form::getFormName).toList().toString());
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+        sellerReceiveInquiryDTO.setOptedSample(inquiry.isOptedSample());
+        sellerReceiveInquiryDTO.setOptedTesting(inquiry.isOptedTesting());
         sellerReceiveInquiryDTO.setProductImageURL(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
         // Fetch specifications for the inquiry
@@ -243,6 +245,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setCity(inquiryDTO.getCity());
         inquiry.setPincode(inquiryDTO.getPincode());
         inquiry.setSpecifyDeliveryDate(inquiryDTO.getSpecifyDeliveryDate());
+        inquiry.setBuyerWantsTC(inquiryDTO.isBuyerWantsTC());
 
 //        Product product = productRepository.findById(inquiryDTO.getProductId())
 //                .orElseThrow(() -> new RuntimeException("Product not found at ID: " + inquiryDTO.getProductId()));
@@ -367,6 +370,8 @@ public class InquiryServiceImpl implements InquiryService {
                 inquiryDTO.setProductFormId(inquiry.getProductFormId());
                 inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
                 inquiryDTO.setOrderStatus(inquiry.getOrderStatus());
+                inquiryDTO.setOptedSample(inquiry.isOptedSample());
+                inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
                 inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                 // Fetch specifications for the inquiry
@@ -445,8 +450,9 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
         inquiryDTO.setBuyerFinalPrice(inquiry.getBuyerFinalPrice());
 
-        inquiryDTO.setOptedSample(inquiry.getOptedSample());
-        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        inquiryDTO.setBuyerWantsTC(inquiry.isBuyerWantsTC());
+        inquiryDTO.setOptedSample(inquiry.isOptedSample());
+        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
 
 // Fetch specifications for the inquiry
         List<InquirySpecification> specifications = inquirySpecificationRepository.findByQId(inquiry.getQId());
@@ -540,6 +546,8 @@ public class InquiryServiceImpl implements InquiryService {
                         inquiryDTO.setCity(inquiry.getCity());
                         inquiryDTO.setPincode(inquiry.getPincode());
                         inquiryDTO.setSpecifyDeliveryDate(inquiry.getSpecifyDeliveryDate());
+                        inquiryDTO.setOptedSample(inquiry.isOptedSample());
+                        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
                         inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
                         // Fetch and set inquiry specifications
@@ -715,8 +723,8 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setBuyerUId(inquiry.getBuyerId());
         inquiryDTO.setProductId(inquiry.getProductId());
 
-        inquiryDTO.setOptedSample(inquiry.getOptedSample());
-        inquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        inquiryDTO.setOptedSample(inquiry.isOptedSample());
+        inquiryDTO.setOptedTesting(inquiry.isOptedTesting());
 
         Product product = productRepository.findById(inquiry.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
@@ -763,6 +771,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setSentDate(inquiry.getSentDate());
         inquiryDTO.setSentTime(inquiry.getSentTime());
         inquiryDTO.setUnit(inquiry.getUnit());
+        inquiryDTO.setBuyerWantsTC(inquiry.isBuyerWantsTC());
         inquiryDTO.setProductImageUrl(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
 
@@ -1063,8 +1072,8 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setProductFormId(inquiry.getProductFormId());
         sellerReceiveInquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
 
-        sellerReceiveInquiryDTO.setOptedSample(inquiry.getOptedSample());
-        sellerReceiveInquiryDTO.setOptedTesting(inquiry.getOptedTesting());
+        sellerReceiveInquiryDTO.setOptedSample(inquiry.isOptedSample());
+        sellerReceiveInquiryDTO.setOptedTesting(inquiry.isOptedTesting());
 
         sellerReceiveInquiryDTO.setQuantity(inquiry.getQuantity());
         sellerReceiveInquiryDTO.setQuantityUnit(inquiry.getQuantityUnit());
@@ -1088,6 +1097,7 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setAfpDate(sellerNegotiate.getAfpDate());
         sellerReceiveInquiryDTO.setAfpTime(sellerNegotiate.getAfpTime());
         sellerReceiveInquiryDTO.setStatus(sellerNegotiate.getStatus());
+        sellerReceiveInquiryDTO.setBuyerWantsTC(inquiry.isBuyerWantsTC());
         sellerReceiveInquiryDTO.setProductImageURL(product.getProductImageUrl() !=null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
 

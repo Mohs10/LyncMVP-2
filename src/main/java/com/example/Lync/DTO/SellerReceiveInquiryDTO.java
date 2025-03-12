@@ -24,8 +24,8 @@ public class SellerReceiveInquiryDTO {
     private Long productVarietyId;
     private String productImageURL;
 
-    private Boolean optedSample;
-    private Boolean optedTesting;
+    private boolean optedSample;
+    private boolean optedTesting;
 
     //Order Specification
     private Double quantity;
@@ -66,6 +66,9 @@ public class SellerReceiveInquiryDTO {
     private LocalDate afpDate;
     private LocalTime afpTime;
     private String status;
+
+    //Transaction Certificate
+    private boolean buyerWantsTC;
 
     //List of dynamic Specifications
     private List<SpecificationDTO> specifications;

@@ -33,6 +33,9 @@ public class Order {
     private String paymentId;
     private String status;
 
+    private boolean optedSample;
+    private boolean optedTesting;
+
     private String sellerSopURL;
     private String buyerSopURL;
 
@@ -153,6 +156,8 @@ public class Order {
     private LocalDate buyerReceivedOrderDate;
     private LocalTime buyerReceivedOrderTime;
 
+    //Transaction Certificate
+    private boolean buyerWantsTC;
 
     // Getters and Setters
 }

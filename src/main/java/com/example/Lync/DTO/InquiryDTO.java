@@ -23,8 +23,8 @@ public class InquiryDTO {
     private Long productFormId; // ID for the form of the product
     private Long productVarietyId;
 
-    private Boolean optedSample;
-    private Boolean optedTesting;
+    private boolean optedSample;
+    private boolean optedTesting;
 
     private String productName;
     private String FormName;
@@ -109,6 +109,9 @@ public class InquiryDTO {
 
     //Invoice Url
     private String invoiceUrl;
+
+    //Transaction Certificate
+    private boolean buyerWantsTC;
 
     //List of dynamic Specifications
     private List<SpecificationDTO> specifications;

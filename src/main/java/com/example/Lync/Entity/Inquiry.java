@@ -25,8 +25,8 @@ public class Inquiry {
     private Long osId;
     private String spId;
 
-    private Boolean optedSample;
-    private Boolean optedTesting;
+    private boolean optedSample;
+    private boolean optedTesting;
 
     // Product details
     private Long productId; // Reference to Product
@@ -84,6 +84,9 @@ public class Inquiry {
 
     //Invoice Url
     private String invoiceUrl;
+
+    //Transaction Certificate
+    private boolean buyerWantsTC;
 
     @ManyToMany
     @JoinTable(

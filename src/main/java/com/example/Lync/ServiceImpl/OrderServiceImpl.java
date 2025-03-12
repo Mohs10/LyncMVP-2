@@ -98,7 +98,9 @@ public class OrderServiceImpl implements OrderService {
             order.setBuyerPurchaseOrderURL(key);
             order.setBuyerPurchaseOrderURLDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
             order.setBuyerPurchaseOrderURLTime(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalTime().truncatedTo(ChronoUnit.SECONDS));
-
+            order.setBuyerWantsTC(inquiry.isBuyerWantsTC());
+            order.setOptedSample(inquiry.isOptedSample());
+            order.setOptedTesting(inquiry.isOptedTesting());
             order.setStatus("Buyer uploaded the purchase order");
             orderRepository.save(order);
 
@@ -796,6 +798,9 @@ public class OrderServiceImpl implements OrderService {
         if (!sellerId.equals(order.getSellerUId())) {
             throw new UnauthorizedException("Unauthorized: Seller ID does not match with the inquiry.");
         }
+        if (!order.isBuyerWantsTC()) {
+            throw new RuntimeException("The buyer doesn't want the Transaction Certificate !");
+        }
         String s3Key = s3Service.sellerUploadTransactionCertificate(oId, file);
         order.setSellerTransactionCertificate(s3Key);
         order.setSellerTransactionCertificateDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
@@ -823,6 +828,9 @@ public class OrderServiceImpl implements OrderService {
     public String adminUploadTransactionCertificate(String oId, MultipartFile file) throws IOException {
         Order order = orderRepository.findById(oId)
                 .orElseThrow(() -> new RuntimeException("Order not found with given Order Id: " + oId));
+        if (!order.isBuyerWantsTC()) {
+            throw new RuntimeException("The buyer doesn't want the Transaction Certificate !");
+        }
         String key = s3Service.adminUploadTransactionCertificate(oId, file);
         order.setAdminTransactionCertificate(key);
         order.setAdminTransactionCertificateDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDate());
@@ -897,6 +905,8 @@ public class OrderServiceImpl implements OrderService {
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
                     orderDTO.setStatus(order.getStatus());
+                    orderDTO.setOptedSample(order.isOptedSample());
+                    orderDTO.setOptedTesting(order.isOptedTesting());
                 return orderDTO;
                 }).toList();
     }
@@ -972,6 +982,8 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminTransactionCertificateTime(order.getAdminTransactionCertificateTime());
         orderDTO.setBuyerReceivedOrderDate(order.getBuyerReceivedOrderDate());
         orderDTO.setBuyerReceivedOrderTime(order.getBuyerReceivedOrderTime());
+        orderDTO.setOptedSample(order.isOptedSample());
+        orderDTO.setOptedTesting(order.isOptedTesting());
 
         return orderDTO;
     }
@@ -998,6 +1010,8 @@ public class OrderServiceImpl implements OrderService {
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
                     orderDTO.setProductQuantity(order.getProductQuantity());
                     orderDTO.setStatus(order.getStatus());
+                    orderDTO.setOptedSample(order.isOptedSample());
+                    orderDTO.setOptedTesting(order.isOptedTesting());
                     return orderDTO;
                 }).toList();
     }
@@ -1035,6 +1049,8 @@ public class OrderServiceImpl implements OrderService {
                 .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                 .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
 
+        orderDTO.setOptedSample(order.isOptedSample());
+        orderDTO.setOptedTesting(order.isOptedTesting());
         // Assuming s3Service is your service for handling file uploads to S3
 
         orderDTO.setBuyerPurchaseOrderURL(order.getBuyerPurchaseOrderURL() != null ? s3Service.getFiles(order.getBuyerPurchaseOrderURL()) : null);
@@ -1197,6 +1213,8 @@ public class OrderServiceImpl implements OrderService {
                             .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
                             .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
                     orderDTO.setStatus(order.getStatus());
+                    orderDTO.setOptedSample(order.isOptedSample());
+                    orderDTO.setOptedTesting(order.isOptedTesting());
                     return orderDTO;
                 }).toList();
     }
@@ -1243,6 +1261,8 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setAdminPurchaseOrderURLDate(order.getAdminPurchaseOrderURLDate());
         orderDTO.setAdminPurchaseOrderURLTime(order.getAdminPurchaseOrderURLTime());
 
+        orderDTO.setOptedSample(order.isOptedSample());
+        orderDTO.setOptedTesting(order.isOptedTesting());
 // Handle other file uploads similarly
         orderDTO.setSellerPurchaseInvoiceURL(order.getSellerPurchaseInvoiceURL() != null ? s3Service.getFiles(order.getSellerPurchaseInvoiceURL()) : null);
         orderDTO.setSellerOrderLoadingVehicleImg(order.getSellerOrderLoadingVehicleImg() != null ? s3Service.getFiles(order.getSellerOrderLoadingVehicleImg()) : null);
