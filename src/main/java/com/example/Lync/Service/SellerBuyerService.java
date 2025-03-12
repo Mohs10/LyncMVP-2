@@ -1,9 +1,6 @@
 package com.example.Lync.Service;
 
-import com.example.Lync.DTO.PriceRangeProjection;
-import com.example.Lync.DTO.SellerBuyerAddressDTO;
-import com.example.Lync.DTO.SellerBuyerDTO;
-import com.example.Lync.DTO.SellerProductDTO;
+import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
@@ -84,4 +81,6 @@ public interface SellerBuyerService {
     public String changeStatusForSellerBuyer(String userId, Boolean isActive);
 
     public Boolean checkIfProductExists(Long productId, Long productVarietyId, Long productFormId, String sellerId) ;
+
+    BuyerProfileStatDTO buyerStatisticsByBuyerId(String userId);
     }

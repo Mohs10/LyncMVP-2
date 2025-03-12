@@ -24,9 +24,9 @@ public class SellerReceiveInquiryDTO {
     private Long productVarietyId;
     private String productImageURL;
 
-    private boolean optedSample;
-    private boolean optedTesting;
-    private boolean optedOrder;
+    private Boolean optedSample;
+    private Boolean optedTesting;
+    private Boolean optedOrder;
 
     //Order Specification
     private Double quantity;

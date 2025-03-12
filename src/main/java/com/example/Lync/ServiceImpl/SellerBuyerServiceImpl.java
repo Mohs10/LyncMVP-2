@@ -43,6 +43,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final ProductRepository productRepository;
     private final FavouriteProductRepository favouriteProductRepository;
     private final SellerProductRepository sellerProductRepository;
+    private final InquiryRepository inquiryRepository;
 
     private final FormRepository formRepository;
     private final VarietyRepository varietyRepository;
@@ -64,7 +65,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository, NotificationRepository notificationRepository) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository, NotificationRepository notificationRepository, InquiryRepository inquiryRepository) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -78,6 +79,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.s3Service = s3Service;
         this.sellerBuyerAddressRepository = sellerBuyerAddressRepository;
         this.notificationRepository = notificationRepository;
+        this.inquiryRepository = inquiryRepository;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
     private final Map<String, SellerBuyer> sellerBuyerEmailCache = new HashMap<>();
@@ -1130,6 +1132,44 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         System.out.println("OLO Working");
 
         return sellerProductRepository.checkSellerProduct(productId,productVarietyId,productFormId,sellerId);
+    }
+
+    @Override
+    public BuyerProfileStatDTO buyerStatisticsByBuyerId(String userId) {
+        SellerBuyer sellerBuyer = sellerBuyerRepository.findById(userId)
+                .orElseThrow(()-> new RuntimeException("Buyer not find with given Id :" + userId));
+
+        List<Inquiry> inquiries = inquiryRepository.findByBuyerId(sellerBuyer.getUserId());
+
+        BuyerProfileStatDTO DTO = new BuyerProfileStatDTO();
+        DTO.setUserId(sellerBuyer.getUserId());
+        DTO.setNoOfQueries(inquiries.size());
+        for (Inquiry inquiry : inquiries) {
+            InquiryDTO inquiryDTO = new InquiryDTO();
+
+            inquiryDTO.setQId(inquiry.getQId());
+            inquiryDTO.setBuyerUId(inquiry.getBuyerId());
+            inquiryDTO.setProductId(inquiry.getProductId());
+
+            // Fetch product details
+            Product product = productRepository.findById(inquiry.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+
+            // Set product-related fields
+            inquiryDTO.setProductName(product.getProductName());
+            inquiryDTO.setVarietyName(product.getVarieties().stream()
+                    .map(Variety::getVarietyName)
+                    .collect(Collectors.joining(", ")));
+            inquiryDTO.setFormName(product.getForms().stream()
+                    .map(Form::getFormName)
+                    .collect(Collectors.joining(", ")));
+
+            // Set order specifications
+            inquiryDTO.setProductFormId(inquiry.getProductFormId());
+            inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+        }
+
+        return null;
     }
 
 
