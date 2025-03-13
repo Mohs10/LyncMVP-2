@@ -83,4 +83,7 @@ public interface SellerBuyerService {
     public Boolean checkIfProductExists(Long productId, Long productVarietyId, Long productFormId, String sellerId) ;
 
     BuyerProfileStatDTO buyerStatisticsByBuyerId(String userId);
-    }
+
+    SellerProfileStatDTO sellerStatisticsBySellerId(String userId);
+
+}

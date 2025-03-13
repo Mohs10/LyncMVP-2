@@ -484,6 +484,23 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    //http://lyncorganikness.ap-south-1.elasticbeanstalk.com/auth/admin/buyerStatistics
+    @GetMapping("/buyerStatistics/{buyerId}")
+    public ResponseEntity<BuyerProfileStatDTO> buyerStatistics(@PathVariable String buyerId) {
+
+        BuyerProfileStatDTO buyerProfileStatDTO = sellerBuyerService.buyerStatisticsByBuyerId(buyerId);
+        return new ResponseEntity<>(buyerProfileStatDTO, HttpStatus.OK);
+    }
+
+    //http://lyncorganikness.ap-south-1.elasticbeanstalk.com/auth/admin/buyerStatistics
+    @GetMapping("/sellerStatistics/{sellerId}")
+    public ResponseEntity<SellerProfileStatDTO> sellerStatistics(@PathVariable String sellerId) {
+
+        SellerProfileStatDTO sellerProfileStatDTO = sellerBuyerService.sellerStatisticsBySellerId(sellerId);
+        return new ResponseEntity<>(sellerProfileStatDTO, HttpStatus.OK);
+    }
+
+
 
 
 
