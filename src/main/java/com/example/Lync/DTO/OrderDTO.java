@@ -17,6 +17,7 @@ public class OrderDTO {
     private String buyerUId; // Reference to buyer (User)
     private String sellerUId; // Reference to seller (User)
     private String status;
+    private String name;
 
     private Boolean optedSample;
     private Boolean optedTesting;

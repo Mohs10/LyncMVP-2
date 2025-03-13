@@ -51,6 +51,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private final S3Service s3Service;
     private final SellerBuyerAddressRepository sellerBuyerAddressRepository;
     private NotificationRepository notificationRepository;
+    private final OrderRepository orderRepository;
 
     private static final AtomicInteger serialNumber = new AtomicInteger(1); // Initialize starting value
 
@@ -65,7 +66,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
     private PasswordEncoder encoder;
 
 
-    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository, NotificationRepository notificationRepository, InquiryRepository inquiryRepository) {
+    public SellerBuyerServiceImpl(SellerBuyerRepository sellerBuyerRepository, UserInfoRepository userInfoRepository, FavouriteCategoryRepository favouriteCategoryRepository, TypeRepository typeRepository, ProductRepository productRepository, FavouriteProductRepository favouriteProductRepository, SellerProductRepository sellerProductRepository, FormRepository formRepository, VarietyRepository varietyRepository, SellerProductSpecificationRepository sellerProductSpecificationRepository, S3Service s3Service, SellerBuyerAddressRepository sellerBuyerAddressRepository, NotificationRepository notificationRepository, InquiryRepository inquiryRepository, OrderRepository orderRepository) {
         this.sellerBuyerRepository = sellerBuyerRepository;
         this.userInfoRepository = userInfoRepository;
         this.favouriteCategoryRepository = favouriteCategoryRepository;
@@ -80,6 +81,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
         this.sellerBuyerAddressRepository = sellerBuyerAddressRepository;
         this.notificationRepository = notificationRepository;
         this.inquiryRepository = inquiryRepository;
+        this.orderRepository = orderRepository;
     }
     private final Map<String, SellerBuyer> sellerBuyerPhoneNumberCache = new HashMap<>();
     private final Map<String, SellerBuyer> sellerBuyerEmailCache = new HashMap<>();
@@ -1140,7 +1142,7 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
                 .orElseThrow(()-> new RuntimeException("Buyer not find with given Id :" + userId));
 
         List<Inquiry> inquiries = inquiryRepository.findByBuyerId(sellerBuyer.getUserId());
-
+        List<InquiryDTO> inquiryDTOS = new ArrayList<>();
         BuyerProfileStatDTO DTO = new BuyerProfileStatDTO();
         DTO.setUserId(sellerBuyer.getUserId());
         DTO.setNoOfQueries(inquiries.size());
@@ -1148,12 +1150,13 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
             InquiryDTO inquiryDTO = new InquiryDTO();
 
             inquiryDTO.setQId(inquiry.getQId());
-            inquiryDTO.setBuyerUId(inquiry.getBuyerId());
             inquiryDTO.setProductId(inquiry.getProductId());
 
             // Fetch product details
             Product product = productRepository.findById(inquiry.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+
+            inquiryDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
 
             // Set product-related fields
             inquiryDTO.setProductName(product.getProductName());
@@ -1167,9 +1170,45 @@ public class SellerBuyerServiceImpl implements SellerBuyerService {
             // Set order specifications
             inquiryDTO.setProductFormId(inquiry.getProductFormId());
             inquiryDTO.setProductVarietyId(inquiry.getProductVarietyId());
+            inquiryDTO.setRaiseDate(inquiry.getRaiseDate());
+            inquiryDTO.setRaiseTime(inquiry.getRaiseTime());
+            inquiryDTOS.add(inquiryDTO);
         }
+        DTO.setInquiryDTOS(inquiryDTOS);
+        List<Order> orders = orderRepository.findByBuyerUId(userId);
+        DTO.setNoOfOrders(orders.size());
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        for (Order order : orders) {
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.setOId(order.getOId());
+            orderDTO.setQId(order.getQId());
+            Inquiry inquiry = inquiryRepository.findByQId(order.getQId())
+                    .orElseThrow(() -> new RuntimeException("Query Id not found"));
+            Product product = productRepository.findById(inquiry.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found for ID: " + inquiry.getProductId()));
+            orderDTO.setProductId(product.getProductId());
+            orderDTO.setProductName(product.getProductName());
+            orderDTO.setProductImageUrl(product.getProductImageUrl() != null ? s3Service.getProductImagePresignedUrl(product.getProductImageUrl()) : null);
+            orderDTO.setVarietyName(product.getVarieties().stream()
+                    .filter(variety -> variety.getVarietyId().equals(inquiry.getProductVarietyId())).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Product variety not found with ID: " + inquiry.getProductVarietyId())).getVarietyName());
+            orderDTO.setFormName(product.getForms().stream()
+                    .filter(form -> form.getFormId().equals(inquiry.getProductFormId())).findFirst()
+                    .orElseThrow(() -> new RuntimeException("Product form not found with ID: " + inquiry.getProductFormId())).getFormName());
+            orderDTO.setStatus(order.getStatus());
+            orderDTO.setOptedSample(order.getOptedSample());
+            orderDTO.setOptedTesting(order.getOptedTesting());
+            orderDTO.setBuyerPurchaseOrderURLDate(order.getBuyerPurchaseOrderURLDate());
+            orderDTO.setBuyerPurchaseOrderURLTime(order.getBuyerPurchaseOrderURLTime());
+            orderDTO.setSellerUId(order.getSellerUId());
+            if (order.getSellerUId() != null) {
+                orderDTO.setName(sellerBuyerRepository.findById(order.getSellerUId()).orElseThrow(() -> new RuntimeException("The seller is not fetching...")).getFullName());
+            }
+            orderDTOS.add(orderDTO);
+        }
+        DTO.setOrderDTOs(orderDTOS);
 
-        return null;
+        return DTO;
     }
 
 

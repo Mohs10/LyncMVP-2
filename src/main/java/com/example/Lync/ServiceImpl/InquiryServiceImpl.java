@@ -8,7 +8,6 @@ import com.example.Lync.Exception.ResourceNotFoundException;
 import com.example.Lync.Repository.*;
 import com.example.Lync.Service.InquiryService;
 import com.example.Lync.Service.SellerBuyerService;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -2681,6 +2679,14 @@ public class InquiryServiceImpl implements InquiryService {
         return s3Service.getFiles(inquiry.getPurchaseOrderUrl());
     }
 
+    @Override
+    public void testingNotRequired(String qId, String buyerUId) {
+        Inquiry inquiry = inquiryRepository.findByQId(qId)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found with given Inquiry Id : " + qId));
+        inquiry.setOptedTesting(false);
+        inquiryRepository.save(inquiry);
+    }
+
     public List<InquiryDTO> getALl(){
         List<Inquiry> inquiries =inquiryRepository.findAll();
 //        return inquiries.stream().sorted((o1, o2) -> o1.getPincode()- o2.getPincode())
@@ -2692,6 +2698,10 @@ public class InquiryServiceImpl implements InquiryService {
                     return inquiryDTO;
                 }).toList();
     }
+
+
+
+
 
 }
 

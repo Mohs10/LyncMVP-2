@@ -3,10 +3,7 @@ package com.example.Lync.Controller;
 import com.example.Lync.Config.JwtService;
 import com.example.Lync.Config.S3Service;
 import com.example.Lync.DTO.*;
-import com.example.Lync.Entity.AdminAddress;
-import com.example.Lync.Entity.SellerBuyer;
-import com.example.Lync.Entity.SellerBuyerAddress;
-import com.example.Lync.Entity.SellerProduct;
+import com.example.Lync.Entity.*;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.SellerProductRepository;
 import com.example.Lync.Repository.UserInfoRepository;
@@ -693,6 +690,5 @@ public class SellerController {
         Long count = orderService.getOrderCountBySeller(sellerDetails.getUserId(), year, month);
         return ResponseEntity.ok(count);
     }
-
 
 }

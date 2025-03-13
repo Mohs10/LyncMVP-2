@@ -1,6 +1,7 @@
 package com.example.Lync.Service;
 
 import com.example.Lync.DTO.OrderDTO;
+import com.example.Lync.Entity.Order;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,5 +86,6 @@ public interface OrderService {
     Long getOrderCountByBuyer(String buyerUId, int year, int month);
 
     Long getOrderCountBySeller(String sellerUId, int year, int month);
+
 
 }

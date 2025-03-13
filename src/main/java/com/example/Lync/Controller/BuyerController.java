@@ -6,7 +6,6 @@ import com.example.Lync.DTO.*;
 import com.example.Lync.Entity.FavouriteCategory;
 import com.example.Lync.Entity.FavouriteProduct;
 import com.example.Lync.Entity.SellerBuyer;
-import com.example.Lync.Exception.UnauthorizedException;
 import com.example.Lync.Repository.SellerBuyerRepository;
 import com.example.Lync.Repository.UserInfoRepository;
 import com.example.Lync.Service.*;
@@ -506,6 +505,32 @@ public class BuyerController {
         Long count = orderService.getOrderCountByBuyer(buyerDetails.getUserId(), year, month);
         return ResponseEntity.ok(count);
     }
+
+    @GetMapping("/buyerStatistics")
+    public ResponseEntity<BuyerProfileStatDTO> buyerStatistics() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        BuyerProfileStatDTO buyerProfileStatDTO = sellerBuyerService.buyerStatisticsByBuyerId(buyerDetails.getUserId());
+        return new ResponseEntity<>(buyerProfileStatDTO, HttpStatus.OK);
+    }
+
+    @PatchMapping("/buyerTestingNotOpted/{qId}")
+    public ResponseEntity<Void> testingNotOpted(@PathVariable String qId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SellerBuyer buyerDetails = sellerBuyerRepository.findByEmail(username).orElseThrow(() ->
+                new RuntimeException("SellerBuyer details not found for email: " + username)
+        );
+
+        inquiryService.testingNotRequired(qId, buyerDetails.getUserId());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 
 
 

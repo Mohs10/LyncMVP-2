@@ -113,4 +113,6 @@ public interface InquiryService {
     String uploadPurchaseOrder(String qId, MultipartFile file) throws IOException;
 
     String getPurchaseOrder(String qId);
+
+    void testingNotRequired(String qId, String buyerUId);
 }
