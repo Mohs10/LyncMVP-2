@@ -245,13 +245,14 @@ public class AdminController {
         return ResponseEntity.ok(responseMessage);
     }
 
-    @GetMapping("/sellerSellingProduct/{productId}/{productFormId}/{productVarietyId}")
+    @GetMapping("/sellerSellingProduct/{productId}/{productFormId}/{productVarietyId}/{certificationName}")
     public ResponseEntity<List<SellerProductDTO>> sellersSellingProducts(@PathVariable Long productId,
                                                                          @PathVariable Long productFormId,
                                                                          @PathVariable Long productVarietyId,
+                                                                         @PathVariable String certificationName,
                                             @RequestParam(required = false) List<String> specificationNames){
         List<SellerProductDTO> sellerProductDTOList = inquiryService
-                .sellersSellingProduct(productId, productFormId, productVarietyId, specificationNames != null ? specificationNames : List.of());
+                .sellersSellingProduct(productId, productFormId, productVarietyId, certificationName, specificationNames != null ? specificationNames : List.of());
         return new ResponseEntity<>(sellerProductDTOList, HttpStatus.OK);
     }
 

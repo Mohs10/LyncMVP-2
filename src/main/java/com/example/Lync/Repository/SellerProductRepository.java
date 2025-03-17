@@ -16,12 +16,15 @@ public interface SellerProductRepository extends JpaRepository<SellerProduct, St
     List<SellerProduct> findByPId(@Param("productId") Long productId);
 
     @Query("SELECT sp FROM SellerProduct sp JOIN sp.specifications sps " +
-            "WHERE sp.productId = :productId AND sp.productFormId = :productFormId AND sp.productVarietyId = :productVarietyId " +
+            "WHERE sp.productId = :productId AND sp.productFormId = :productFormId AND sp.productVarietyId = :productVarietyId AND sp.certificationName = :certificationName " +
             "AND sps.specificationName IN :specificationNames")
-    List<SellerProduct> findBySpecificationAndProductAttributes(List<String> specificationNames, Long productId, Long productFormId, Long productVarietyId);
+    List<SellerProduct> findBySpecificationAndProductAttributes(List<String> specificationNames, Long productId, Long productFormId, Long productVarietyId, String certificationName);
 
-    @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId AND sp.productFormId = :productFormId AND sp.productVarietyId = :productVarietyId")
-    List<SellerProduct> findByProductIdAndProductFormIdAndProductVarietyId(@Param("productId") Long productId, @Param("productFormId") Long productFormId, @Param("productVarietyId") Long productVarietyId);
+    @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId AND sp.productFormId = :productFormId AND sp.productVarietyId = :productVarietyId AND sp.certificationName = :certificationName")
+    List<SellerProduct> findByProductIdAndProductFormIdAndProductVarietyIdAndCertificationName(@Param("productId") Long productId, @Param("productFormId") Long productFormId, @Param("productVarietyId") Long productVarietyId, @Param("certificationName") String certificationName);
+
+    @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId AND sp.productVarietyId = :productVarietyId AND sp.certificationName = :certificationName")
+    List<SellerProduct> findByProductIdAndProductVarietyIdAndCertificationName(@Param("productId") Long productId, @Param("productVarietyId") Long productVarietyId, @Param("certificationName") String certificationName);
 
     @Query("SELECT sp FROM SellerProduct sp WHERE sp.productId = :productId AND sp.productVarietyId = :productVarietyId")
     List<SellerProduct> findByProductIdAndProductVarietyId(@Param("productId") Long productId, @Param("productVarietyId") Long productVarietyId);

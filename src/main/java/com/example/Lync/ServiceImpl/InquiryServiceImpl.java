@@ -961,25 +961,33 @@ public class InquiryServiceImpl implements InquiryService {
 
     //Admin checks all sellers selling a particular product
     @Override
-    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, List<String> specificationNames) {
+    public List<SellerProductDTO> sellersSellingProduct(Long productId, Long productFormId, Long productVarietyId, String certificationName, List<String> specificationNames) {
 
         List<SellerProductDTO> sellerProductDTOS = new ArrayList<>();
         Set<String> uniqueSpIds = new HashSet<>();
         Map<String, String> spIdToMessageMap = new HashMap<>();
         Map<String, Integer> spIdToPriorityMap = new HashMap<>();
 
-        int priority = 4;
-        for(SellerProduct sellerProduct : sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId)) {
+        int priority = 5;
+        for(SellerProduct sellerProduct : sellerProductRepository.findBySpecificationAndProductAttributes(specificationNames, productId, productFormId, productVarietyId, certificationName)) {
             if(uniqueSpIds.add(sellerProduct.getSpId())) {
-                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form, Variety and Specifications");
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form, Variety, Certification and Specifications");
+                spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
+            }
+        }
+
+        priority = 4;
+        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductFormIdAndProductVarietyIdAndCertificationName(productId, productFormId, productVarietyId, certificationName)) {
+            if(uniqueSpIds.add(sellerProduct.getSpId())) {
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form, Variety and Certification");
                 spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
             }
         }
 
         priority = 3;
-        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductFormIdAndProductVarietyId(productId, productFormId, productVarietyId)) {
+        for(SellerProduct sellerProduct : sellerProductRepository.findByProductIdAndProductVarietyIdAndCertificationName(productId, productVarietyId, certificationName)) {
             if(uniqueSpIds.add(sellerProduct.getSpId())) {
-                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Form and Variety");
+                spIdToMessageMap.put(sellerProduct.getSpId(), "Matching based on Product, Variety and Certification");
                 spIdToPriorityMap.put(sellerProduct.getSpId(), priority);
             }
         }
