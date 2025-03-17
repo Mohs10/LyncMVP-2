@@ -236,6 +236,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setOther(inquiryDTO.getOther());
         inquiry.setOtherCertification(inquiryDTO.getOtherCertification());
         inquiry.setPackagingMaterial(inquiryDTO.getPackagingMaterial());
+        inquiry.setPackagingMaterialOther(inquiryDTO.getPackagingMaterialOther());
         inquiry.setPaymentTerms(inquiryDTO.getPaymentTerms());
         inquiry.setTargetLeadTime(inquiryDTO.getTargetLeadTime());
         inquiry.setDeliveryAddress(inquiryDTO.getDeliveryAddress());
@@ -440,6 +441,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setOther(inquiry.getOther());
         inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
         inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+        inquiryDTO.setPackagingMaterialOther(inquiry.getPackagingMaterialOther());
         inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
         inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
         inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
@@ -539,6 +541,7 @@ public class InquiryServiceImpl implements InquiryService {
                         inquiryDTO.setOther(inquiry.getOther());
                         inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
                         inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+                        inquiryDTO.setPackagingMaterialOther(inquiry.getPackagingMaterialOther());
                         inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
                         inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
                         inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
@@ -757,6 +760,7 @@ public class InquiryServiceImpl implements InquiryService {
         inquiryDTO.setOther(inquiry.getOther());
         inquiryDTO.setOtherCertification(inquiry.getOtherCertification());
         inquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+        inquiryDTO.setPackagingMaterialOther(inquiry.getPackagingMaterialOther());
         inquiryDTO.setPaymentTerms(inquiry.getPaymentTerms());
         inquiryDTO.setTargetLeadTime(inquiry.getTargetLeadTime());
         inquiryDTO.setDeliveryAddress(inquiry.getDeliveryAddress());
@@ -1089,6 +1093,7 @@ public class InquiryServiceImpl implements InquiryService {
         sellerReceiveInquiryDTO.setOther(inquiry.getOther());
         sellerReceiveInquiryDTO.setOtherCertification(inquiry.getOtherCertification());
         sellerReceiveInquiryDTO.setPackagingMaterial(inquiry.getPackagingMaterial());
+        sellerReceiveInquiryDTO.setPackagingMaterialOther(inquiry.getPackagingMaterialOther());
         sellerReceiveInquiryDTO.setAdminInitialPrice(sellerNegotiate.getAdminInitialPrice());
         sellerReceiveInquiryDTO.setAipDate(sellerNegotiate.getAipDate());
         sellerReceiveInquiryDTO.setAipTime(sellerNegotiate.getAipTime());

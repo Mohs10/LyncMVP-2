@@ -492,7 +492,7 @@ public class AdminController {
         return new ResponseEntity<>(buyerProfileStatDTO, HttpStatus.OK);
     }
 
-    //http://lyncorganikness.ap-south-1.elasticbeanstalk.com/auth/admin/buyerStatistics
+    //http://lyncorganikness.ap-south-1.elasticbeanstalk.com/auth/admin/sellerStatistics
     @GetMapping("/sellerStatistics/{sellerId}")
     public ResponseEntity<SellerProfileStatDTO> sellerStatistics(@PathVariable String sellerId) {
 

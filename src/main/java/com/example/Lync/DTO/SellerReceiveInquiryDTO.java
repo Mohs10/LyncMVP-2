@@ -43,6 +43,7 @@ public class SellerReceiveInquiryDTO {
     private String otherCertification;
 
     private String packagingMaterial;
+    private String packagingMaterialOther;
 
     //Product Specification
     private Double chalkyGrains;

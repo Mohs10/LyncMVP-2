@@ -51,6 +51,7 @@ public class Inquiry {
     private Boolean other;
     private String otherCertification;
     private String packagingMaterial;
+    private String packagingMaterialOther;
     private String paymentTerms;
     private String targetLeadTime;
     private String deliveryAddress;
